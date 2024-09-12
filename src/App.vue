@@ -1,12 +1,12 @@
 <script setup>
-import SearchVideo from './components/SearchVideo.vue'
+import SearchBox from './components/SearchBox.vue'
 import VideoList from './components/VideoList.vue';
 </script>
 
 <template>
   <main class="main">
-    <div class="searchVideo">
-      <SearchVideo />
+    <div class="searchBox">
+      <SearchBox />
     </div>
     <div class="videoList">
       <VideoList />

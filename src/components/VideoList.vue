@@ -52,6 +52,7 @@ const officialChannels = ref([
 ]);
 
 const freeChannels = ref([
+  { id: 37, title: '来看点播', url: ' https://lkvod.me/ ' },
   { id: 1, title: '美益达影视', url: 'https://www.myd02.com' },
   { id: 2, title: '555电影', url: 'https://www.555dy1.com' },
   { id: 3, title: 'FreeOK', url: 'https://www.freeok.pro' },
@@ -84,6 +85,8 @@ const freeChannels = ref([
   { id: 33, title: '大师兄影视', url: 'https://dsxys.pro' },
   { id: 35, title: '快看影视', url: 'https://www.kuaikanys.net' },
   { id: 36, title: '片库', url: 'https://www.piankumi.cc/' },
+
+
   // 可以继续添加更多的免费频道链接
 ]);
 const friendLinks = ref([
