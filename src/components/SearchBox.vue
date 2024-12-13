@@ -3,7 +3,7 @@
     <input type="text" v-model="searchQuery" placeholder="搜索视频..." />
     <button @click="search">搜索</button>
   </div>
-  <div v-for="video in recommendedFilms" :key="video.name" class="aVideo">
+  <!-- <div v-for="video in recommendedFilms" :key="video.name" class="aVideo">
     <img class="videoPoster" :src="video.poster" alt="海报" />
     <div>
       <p class="videoName">{{ video.name }}</p>
@@ -11,20 +11,20 @@
       <p class="videoActor">主演: {{ video.actor }}</p>
       <p class="videoTime">时间: {{ video.time }}</p>
       <p class="videoDouban">豆瓣评分: {{ video.douban }}</p>
-      <p class="videoEvaluation">评价: {{ video.evaluation }}</p>
+      <p class="videoEvaluation">评价: {{ video.keywords }}</p>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: 'sk-03126c7e1f2747d5845e6671d71f2255',
-  dangerouslyAllowBrowser: true // 添加此选项以允许在浏览器中使用
-});
+// const openai = new OpenAI({
+//   baseURL: 'https://api.deepseek.com',
+//   apiKey: 'sk-03126c7e1f2747d5845e6671d71f2255',
+//   dangerouslyAllowBrowser: true // 添加此选项以允许在浏览器中使用
+// });
 
 // const openai = new OpenAI({
 //   baseURL: 'https://api.siliconflow.cn/v1/',
@@ -32,46 +32,47 @@ const openai = new OpenAI({
 //   dangerouslyAllowBrowser: true // 添加此选项以允许在浏览器中使用
 // });
 
-async function toAi(message) {
-  const completion = await openai.chat.completions.create({
-    messages: message,
-    // model: "Qwen/Qwen2-7B-Instruct",
-    model: "deepseek-chat",
-  });
-  console.log(completion.choices[0].message.content);
-  recommendedFilms.value = JSON.parse(completion.choices[0].message.content);
-}
+// async function toAi(message) {
+//   const completion = await openai.chat.completions.create({
+//     messages: message,
+//     // model: "Qwen/Qwen2-7B-Instruct",
+//     model: "deepseek-chat",
+//   });
+//   console.log(completion.choices[0].message.content);
+//   recommendedFilms.value = JSON.parse(completion.choices[0].message.content);
+// }
 
-const prompt = ref('');
+// const prompt = ref('');
 
-onMounted(async () => {
-  try {
-    const response = await fetch('../prompt/search.txt');
-    if (!response.ok) {
-      throw new Error('无法读取文件');
-    }
-    prompt.value = await response.text();
-    allMessage.push({ role: "system", content: prompt.value });
-  } catch (error) {
-    console.error('读取文件时出错:', error);
-  }
-});
+// onMounted(async () => {
+//   try {
+//     const response = await fetch('../prompt/search.txt');
+//     if (!response.ok) {
+//       throw new Error('无法读取文件');
+//     }
+//     prompt.value = await response.text();
+//     allMessage.push({ role: "system", content: prompt.value });
+//   } catch (error) {
+//     console.error('读取文件时出错:', error);
+//   }
+// });
 
-const allMessage = [];
-const aiMessage = [];
-const recommendedFilms = ref([]);
+// const allMessage = [];
+// const aiMessage = [];
+// const recommendedFilms = ref([]);
 
 
 const searchQuery = ref('');
-const searchUrl = 'https://lkvod.me/nk/-------------.html?wd=';
+const searchUrl = 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=';
 
 
 const search = async () => {
   if (searchQuery.value === "") {
     alert('请输入内容！');
   } else {
-    allMessage.push({ role: "user", content: searchQuery.value });
-    await toAi(allMessage);
+    window.open(searchUrl + searchQuery.value, '_blank');
+    // allMessage.push({ role: "user", content: searchQuery.value });
+    // await toAi(allMessage);
   }
 };
 
