@@ -1,206 +1,178 @@
 <template>
-  <div class="searchBox">
-    <input type="text" v-model="searchQuery" placeholder="搜索视频..." />
-    <button @click="search">搜索</button>
-  </div>
-  <!-- <div v-for="video in recommendedFilms" :key="video.name" class="aVideo">
-    <img class="videoPoster" :src="video.poster" alt="海报" />
-    <div>
-      <p class="videoName">{{ video.name }}</p>
-      <p class="videoDirector">导演: {{ video.director }}</p>
-      <p class="videoActor">主演: {{ video.actor }}</p>
-      <p class="videoTime">时间: {{ video.time }}</p>
-      <p class="videoDouban">豆瓣评分: {{ video.douban }}</p>
-      <p class="videoEvaluation">评价: {{ video.keywords }}</p>
+  <div class="search-box-container">
+    <div class="search-box">
+      <div class="input-wrapper">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="搜索视频..."
+          @keyup.enter="handleSearch"
+        />
+      </div>
+      <button @click="handleSearch">
+        <span>搜索</span>
+      </button>
     </div>
-  </div> -->
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import OpenAI from "openai";
+import { ref } from 'vue'
 
-// const openai = new OpenAI({
-//   baseURL: 'https://api.deepseek.com',
-//   apiKey: 'sk-03126c7e1f2747d5845e6671d71f2255',
-//   dangerouslyAllowBrowser: true // 添加此选项以允许在浏览器中使用
-// });
+const searchQuery = ref('')
 
-// const openai = new OpenAI({
-//   baseURL: 'https://api.siliconflow.cn/v1/',
-//   apiKey: 'sk-znrtcqyzubppaupfgqrvxdvqfpudactmikrymjcftvkrdwwr',
-//   dangerouslyAllowBrowser: true // 添加此选项以允许在浏览器中使用
-// });
-
-// async function toAi(message) {
-//   const completion = await openai.chat.completions.create({
-//     messages: message,
-//     // model: "Qwen/Qwen2-7B-Instruct",
-//     model: "deepseek-chat",
-//   });
-//   console.log(completion.choices[0].message.content);
-//   recommendedFilms.value = JSON.parse(completion.choices[0].message.content);
-// }
-
-// const prompt = ref('');
-
-// onMounted(async () => {
-//   try {
-//     const response = await fetch('../prompt/search.txt');
-//     if (!response.ok) {
-//       throw new Error('无法读取文件');
-//     }
-//     prompt.value = await response.text();
-//     allMessage.push({ role: "system", content: prompt.value });
-//   } catch (error) {
-//     console.error('读取文件时出错:', error);
-//   }
-// });
-
-// const allMessage = [];
-// const aiMessage = [];
-// const recommendedFilms = ref([]);
-
-
-const searchQuery = ref('');
-const searchUrl = 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=';
-
-
-const search = async () => {
-  if (searchQuery.value === "") {
-    alert('请输入内容！');
-  } else {
-    window.open(searchUrl + searchQuery.value, '_blank');
-    // allMessage.push({ role: "user", content: searchQuery.value });
-    // await toAi(allMessage);
+const handleSearch = () => {
+  const query = searchQuery.value.trim()
+  if (query) {
+    const searchUrl = `https://zhuiyingmao5.com/vodsearch/-------------.html?wd=${encodeURIComponent(query)}`
+    window.open(searchUrl, '_blank')
   }
-};
-
-const handleKeydown = (event) => {
-  if (event.key === "Enter") {
-    search();
-  }
-};
-
-window.addEventListener('keydown', handleKeydown);
+}
 </script>
 
 <style scoped>
-.searchBox {
+.search-box-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(255, 107, 26, 0.1);
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
   display: flex;
   align-items: center;
-  padding: 10px;
-  border: 1px solid orange;
-  background-color: white;
-  border-radius: 50px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeIn 1s ease-in-out;
-  margin-top: 100px;
-}
-
-.searchBox:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transform: scale(1.05);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 input {
-  width: 600px;
-  height: 40px;
-  margin-left: 10px;
-  font-size: 20px;
   flex: 1;
-  border: none;
+  padding: 0.875rem 1rem 0.875rem 1rem;
+  width: 100%;
+  border: 2px solid #ffe5d4;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fff8f3;
+  color: #333;
+}
+
+input:focus {
   outline: none;
+  border-color: #ff6b1a;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(255, 107, 26, 0.1);
+}
+
+input::placeholder {
+  color: #ffb38a;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: orange;
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
   color: white;
   border: none;
-  border-radius: 50px;
-  margin-left: 10px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(255, 107, 26, 0.2);
 }
 
 button:hover {
-  background-color: #ff8c00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
+  background: linear-gradient(135deg, #ffa666 0%, #ff8c3d 100%);
 }
 
-.aVideo {
-  display: flex;
-  flex-direction: row;
-  margin-top: 30px;
-  background-color: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 107, 26, 0.2);
+  background: linear-gradient(135deg, #ff6b1a 0%, #ff5500 100%);
 }
 
-.videoPoster {
-  width: 160px;
-  /* height: 240px; */
-  border-radius: 12px;
-  border: 1px solid white;
-  margin-right: 15px;
-}
+@media (max-width: 680px) {
+  .search-box-container {
+    padding: 0.75rem;
+  }
 
-.videoName {
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
+  .search-box {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 16px;
+  }
 
-.videoDirector {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.videoActor {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.videoTime {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.videoDouban {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.videoEvaluation {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-@media screen and (max-width: 768px) {
   input {
-    width: 260px;
-    height: 40px;
+    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    font-size: 0.875rem;
+  }
+
+  .search-icon {
+    font-size: 0.875rem;
+    left: 0.875rem;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    min-width: auto;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-box {
+    background: #222;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  input {
+    background: #2a2a2a;
+    border-color: rgba(255, 140, 61, 0.3);
+    color: #fff;
+  }
+
+  input:focus {
+    background: #333;
+    border-color: #ff8c3d;
+    box-shadow: 0 0 0 4px rgba(255, 140, 61, 0.15);
+  }
+
+  input::placeholder {
+    color: #ff8c3d;
+    opacity: 0.6;
+  }
+
+  button {
+    background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
+  }
+
+  button:hover {
+    background: linear-gradient(135deg, #ffa666 0%, #ff8c3d 100%);
+  }
+
+  button:active {
+    background: linear-gradient(135deg, #ff6b1a 0%, #ff5500 100%);
   }
 }
 </style>

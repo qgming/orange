@@ -1,17 +1,8 @@
 <script setup>
-import SearchBox from './components/SearchBox.vue'
-import VideoList from './components/VideoList.vue';
 </script>
 
 <template>
-  <main class="main">
-    <div class="searchBox">
-      <SearchBox />
-    </div>
-    <div class="videoList">
-      <VideoList />
-    </div>
-  </main>
+  <router-view></router-view>
 </template>
 
 <style scoped>
@@ -19,12 +10,13 @@ import VideoList from './components/VideoList.vue';
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 100px;
+  margin: 5px;
+  border-radius: 12px;
 }
 
 @media screen and (max-width: 768px) {
   .main {
-    margin: 20px;
+    margin: 0;
   }
 }
 </style>

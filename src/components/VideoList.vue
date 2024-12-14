@@ -1,447 +1,53 @@
 <template>
   <div class="videoList">
-    <div class="section">
-      <div class="section-header">
-        <h3>官方影视</h3>
-        <button class="expand-btn" @click="toggleExpand('official')" v-if="officialChannels.length > getDefaultVisibleCount()">
-          {{ expandedSections.official ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.official }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.official }">
-        <div v-for="video in getVisibleCards(officialChannels, 'official')" :key="video.id" class="card" @click="goToUrl(video.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(video.url)" 
-              :src="getFavicon(video.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(video.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(video.title) }}</div>
-          </div>
-          <a>{{ video.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>免费影视</h3>
-        <button class="expand-btn" @click="toggleExpand('free')" v-if="freeChannels.length > getDefaultVisibleCount()">
-          {{ expandedSections.free ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.free }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.free }">
-        <div v-for="video in getVisibleCards(freeChannels, 'free')" :key="video.id" class="card" @click="goToUrl(video.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(video.url)" 
-              :src="getFavicon(video.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(video.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(video.title) }}</div>
-          </div>
-          <a>{{ video.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>极客社区</h3>
-        <button class="expand-btn" @click="toggleExpand('friend')" v-if="friendLinks.length > getDefaultVisibleCount()">
-          {{ expandedSections.friend ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.friend }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.friend }">
-        <div v-for="link in getVisibleCards(friendLinks, 'friend')" :key="link.id" class="card" @click="goToUrl(link.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(link.url)" 
-              :src="getFavicon(link.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(link.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(link.title) }}</div>
-          </div>
-          <a>{{ link.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>图书资源</h3>
-        <button class="expand-btn" @click="toggleExpand('book')" v-if="bookResources.length > getDefaultVisibleCount()">
-          {{ expandedSections.book ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.book }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.book }">
-        <div v-for="book in getVisibleCards(bookResources, 'book')" :key="book.id" class="card" @click="goToUrl(book.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(book.url)" 
-              :src="getFavicon(book.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(book.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(book.title) }}</div>
-          </div>
-          <a>{{ book.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>网盘搜索</h3>
-        <button class="expand-btn" @click="toggleExpand('disk')" v-if="diskSearch.length > getDefaultVisibleCount()">
-          {{ expandedSections.disk ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.disk }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.disk }">
-        <div v-for="disk in getVisibleCards(diskSearch, 'disk')" :key="disk.id" class="card" @click="goToUrl(disk.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(disk.url)" 
-              :src="getFavicon(disk.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(disk.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(disk.title) }}</div>
-          </div>
-          <a>{{ disk.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>游戏资源</h3>
-        <button class="expand-btn" @click="toggleExpand('game')" v-if="gameResources.length > getDefaultVisibleCount()">
-          {{ expandedSections.game ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.game }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.game }">
-        <div v-for="game in getVisibleCards(gameResources, 'game')" :key="game.id" class="card" @click="goToUrl(game.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(game.url)" 
-              :src="getFavicon(game.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(game.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(game.title) }}</div>
-          </div>
-          <a>{{ game.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>学习资源</h3>
-        <button class="expand-btn" @click="toggleExpand('learn')" v-if="learningResources.length > getDefaultVisibleCount()">
-          {{ expandedSections.learn ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.learn }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.learn }">
-        <div v-for="learn in getVisibleCards(learningResources, 'learn')" :key="learn.id" class="card" @click="goToUrl(learn.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(learn.url)" 
-              :src="getFavicon(learn.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(learn.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(learn.title) }}</div>
-          </div>
-          <a>{{ learn.title }}</a>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-header">
-        <h3>软件资源</h3>
-        <button class="expand-btn" @click="toggleExpand('software')" v-if="softwareResources.length > getDefaultVisibleCount()">
-          {{ expandedSections.software ? '收起' : '展开' }}
-          <span class="arrow" :class="{ 'arrow-up': expandedSections.software }">▼</span>
-        </button>
-      </div>
-      <div class="cardContainer" :class="{ 'expanded': expandedSections.software }">
-        <div v-for="software in getVisibleCards(softwareResources, 'software')" :key="software.id" class="card" @click="goToUrl(software.url)">
-          <div class="logo-container">
-            <img 
-              v-if="hasFavicon(software.url)" 
-              :src="getFavicon(software.url)" 
-              alt="logo" 
-              class="logo" 
-              @error="faviconCache[new URL(software.url).hostname] = false"
-            />
-            <div v-else class="text-logo">{{ getFirstChar(software.title) }}</div>
-          </div>
-          <a>{{ software.title }}</a>
-        </div>
-      </div>
-    </div>
+    <SectionBlock
+      title="官方影视"
+      :items="officialChannels"
+    />
+    <SectionBlock
+      title="免费影视"
+      :items="freeChannels"
+    />
+    <SectionBlock
+      title="在线游戏"
+      :items="gameResources"
+    />
+    <SectionBlock
+      title="图书资源"
+      :items="bookResources"
+    />
+    <SectionBlock
+      title="AI工具"
+      :items="aiResources"
+    />
+    <SectionBlock
+      title="极客社区"
+      :items="communityChannels"
+    />
+    <SectionBlock
+      title="网盘磁力"
+      :items="diskSearch"
+    />
+    <SectionBlock
+      title="学习资源"
+      :items="learningResources"
+    />
+    <SectionBlock
+      title="音乐资源"
+      :items="musicResources"
+    />
+    <SectionBlock
+      title="软件游戏"
+      :items="softwareGameResources"
+    />
   </div>
+  <div class="footer">
+    <p>Copyright (c) 2024 - {{ new Date().getFullYear() }} <a href="https://github.com/qgming">极点维度</a></p>
+    <p>Version 1.0.0</p>
+    <p><router-link to="/privacy">隐私政策</router-link></p>
+  </div>
+
 </template>
-
-<script setup>
-import { ref, reactive } from 'vue';
-
-// 展开状态控制
-const expandedSections = reactive({
-  official: false,
-  free: false,
-  book: false,
-  disk: false,
-  game: false,
-  learn: false,
-  software: false,
-  friend: false
-});
-
-// 每行显示的卡片数量（根据屏幕宽度动态计算）
-const getCardsPerRow = () => {
-  const width = window.innerWidth;
-  if (width >= 1024) return 6;
-  if (width >= 768) return 4;
-  if (width >= 360) return 3;
-  return 2;
-};
-
-// 计算默认显示的卡片数量（两行）
-const getDefaultVisibleCount = () => getCardsPerRow() * 2;
-
-// 获取应该显示的卡片
-const getVisibleCards = (cards, sectionKey) => {
-  const visibleCount = expandedSections[sectionKey] ? cards.length : getDefaultVisibleCount();
-  return cards.slice(0, visibleCount);
-};
-
-// 切换展开状态
-const toggleExpand = (sectionKey) => {
-  expandedSections[sectionKey] = !expandedSections[sectionKey];
-};
-
-const officialChannels = ref([
-  { id: 1, title: '哔哩哔哩', url: 'https://www.bilibili.com' },
-  { id: 2, title: '爱奇艺', url: 'https://www.iqiyi.com' },
-  { id: 3, title: '腾讯视频', url: 'https://v.qq.com' },
-  { id: 4, title: '优酷', url: 'https://www.youku.com' },
-  { id: 5, title: '芒果TV', url: 'https://www.mgtv.com' },
-  { id: 6, title: '央视网', url: 'https://www.cctv.com' },
-  { id: 7, title: 'YouTube', url: 'https://www.youtube.com' },
-  { id: 8, title: 'Netflix', url: 'https://www.netflix.com' },
-  { id: 9, title: '抖音网页版', url: 'https://www.douyin.com' },
-  { id: 10, title: '西瓜视频', url: 'https://www.ixigua.com' }
-]);
-
-const freeChannels = ref([
-  { id: 1, title: '低端影视', url: 'https://ddys.art' },
-  { id: 2, title: '茶杯狐', url: 'https://cupfox.app' },
-  { id: 3, title: '剧迷', url: 'https://gimytv.app' },
-  { id: 4, title: '在线之家', url: 'https://www.zxzj.site' },
-  { id: 5, title: 'AGE动漫', url: 'https://www.agemys.org' },
-  { id: 6, title: '樱花动漫', url: 'https://www.yhdmp.net' },
-  { id: 7, title: '555影视', url: 'https://www.555dy.com' },
-  { id: 8, title: '大师兄影视', url: 'https://dsxys.com' },
-  { id: 9, title: '片库', url: 'https://www.pianku.la' },
-  { id: 10, title: 'LIBVIO', url: 'https://www.libvio.me' },
-  { id: 11, title: '动漫岛', url: 'https://www.dmd85.com' },
-  { id: 12, title: '哔嘀影视', url: 'https://www.bdys10.com' },
-  { id: 13, title: '泥巴影院', url: 'https://www.nbys.tv' },
-  { id: 14, title: '91影院', url: 'https://91free.vip' },
-  { id: 15, title: 'HDmoli', url: 'https://www.hdmoli.com' },
-  { id: 16, title: '素白白', url: 'https://www.subaibai.com' },
-  { id: 17, title: 'Cokemv', url: 'https://cokemv.me' },
-  { id: 18, title: '电影先生', url: 'https://www.dianying.im' },
-  { id: 19, title: '追剧达人', url: 'https://vipmv.co' },
-  { id: 20, title: '影视工厂', url: 'https://www.ysgc.fun' },
-  { id: 21, title: '看看剧', url: 'https://www.kankanju.cc' },
-  { id: 22, title: '剧荒', url: 'https://juhuang.tv' },
-  { id: 23, title: 'Zzzfun', url: 'http://www.zzzfun.com' },
-  { id: 24, title: '独播库', url: 'https://duboku.tv' },
-  { id: 25, title: '8K影视', url: 'https://www.8kvod.com' }
-]);
-
-const friendLinks = ref([
-  { id: 1, title: '知乎', url: 'https://www.zhihu.com' },
-  { id: 2, title: '微博', url: 'https://weibo.com' },
-  { id: 3, title: '豆瓣', url: 'https://www.douban.com' },
-  { id: 4, title: 'CSDN', url: 'https://www.csdn.net' },
-  { id: 5, title: '简书', url: 'https://www.jianshu.com' },
-  { id: 6, title: '掘金', url: 'https://juejin.cn' },
-  { id: 7, title: 'V2EX', url: 'https://www.v2ex.com' },
-  { id: 8, title: '少数派', url: 'https://sspai.com' },
-  { id: 9, title: '什么值得买', url: 'https://www.smzdm.com' },
-  { id: 10, title: '小众软件', url: 'https://www.appinn.com' },
-  { id: 11, title: '博客园', url: 'https://www.cnblogs.com' },
-  { id: 12, title: '开源中国', url: 'https://www.oschina.net' },
-  { id: 13, title: 'InfoQ', url: 'https://www.infoq.cn' },
-  { id: 14, title: '思否', url: 'https://segmentfault.com' },
-  { id: 15, title: 'Gitee', url: 'https://gitee.com' },
-  { id: 16, title: 'HelloGitHub', url: 'https://hellogithub.com' },
-  { id: 17, title: '掘金酱', url: 'https://e.juejin.cn' },
-  { id: 18, title: 'GitChat', url: 'https://gitbook.cn' }
-]);
-
-const bookResources = ref([
-  { id: 1, title: 'Z-Library', url: 'https://singlelogin.re' },
-  { id: 2, title: '24h搜书', url: 'https://24hbook.com' },
-  { id: 3, title: '鸠摩搜书', url: 'https://www.jiumodiary.com' },
-  { id: 4, title: '熊猫搜书', url: 'https://xmsoushu.com' },
-  { id: 5, title: 'Library Genesis', url: 'https://libgen.rs' },
-  { id: 6, title: '书享家', url: 'https://shuxiangjia.cn' },
-  { id: 7, title: '无名图书', url: 'https://www.book123.info' },
-  { id: 8, title: 'Gutenberg', url: 'https://www.gutenberg.org' },
-  { id: 9, title: 'Internet Archive', url: 'https://archive.org' },
-  { id: 10, title: '书栈网', url: 'https://www.bookstack.cn' },
-  { id: 11, title: 'PDF Drive', url: 'https://www.pdfdrive.com' },
-  { id: 12, title: '全国图书馆', url: 'http://www.ucdrs.superlib.net' },
-  { id: 13, title: 'CSDN博客', url: 'https://blog.csdn.net' },
-  { id: 14, title: '脚本之家', url: 'https://www.jb51.net' },
-  { id: 15, title: '码农之家', url: 'https://www.xz577.com' },
-  { id: 16, title: '码农网', url: 'https://www.codercto.com' },
-  { id: 17, title: 'IT天空', url: 'https://www.itsk.com' },
-  { id: 18, title: 'FreeMbook', url: 'https://freembook.com' },
-  { id: 19, title: '中国哲学书', url: 'https://ctext.org/zhs' },
-  { id: 20, title: '中国知网', url: 'https://www.cnki.net' }
-]);
-
-const diskSearch = ref([
-  { id: 1, title: '阿里云盘', url: 'https://www.aliyundrive.com' },
-  { id: 2, title: '阿里云盘资源', url: 'https://alipanso.com' },
-  { id: 3, title: '小纸条', url: 'https://u.gitcafe.net' },
-  { id: 4, title: '大力盘搜索', url: 'https://www.dalipan.com' },
-  { id: 5, title: '云盘资源', url: 'https://www.yunpanziyuan.com' },
-  { id: 6, title: '奈斯搜索', url: 'https://www.niceso.fun' },
-  { id: 7, title: '易搜', url: 'https://yiso.fun' },
-  { id: 8, title: '猫狸盘搜', url: 'https://www.alipansou.com' },
-  { id: 9, title: '云盘分享', url: 'https://www.yunpan123.com' },
-  { id: 10, title: '超能搜', url: 'https://www.chaonengso.com' },
-  { id: 11, title: '阿里小站', url: 'https://alixiaozhan.net' },
-  { id: 12, title: '盘友社区', url: 'https://www.panyoubbs.com' },
-  { id: 13, title: '霸王龙影库', url: 'https://t-rex.tzfile.com' },
-  { id: 14, title: '阿里云盘资源导航', url: 'https://aliyun.panpanr.com' },
-  { id: 15, title: '网盘资源分享', url: 'https://aliwp.cn' }
-]);
-
-const gameResources = ref([
-  { id: 1, title: 'Steam', url: 'https://store.steampowered.com' },
-  { id: 2, title: 'Epic免费', url: 'https://store.epicgames.com/free-games' },
-  { id: 3, title: '3DM游戏', url: 'https://www.3dmgame.com' },
-  { id: 4, title: '游侠网', url: 'https://www.ali213.net' },
-  { id: 5, title: '游民星空', url: 'https://www.gamersky.com' },
-  { id: 6, title: '小霸王', url: 'https://www.yikm.net' },
-  { id: 7, title: 'GOG', url: 'https://www.gog.com' },
-  { id: 8, title: 'Humble', url: 'https://www.humblebundle.com' },
-  { id: 9, title: 'Switch520', url: 'https://www.switch520.com' },
-  { id: 10, title: 'CrazyGames', url: 'https://www.crazygames.com' },
-  { id: 11, title: 'Itch.io', url: 'https://itch.io' },
-  { id: 12, title: '游戏年轮', url: 'https://www.bibgame.com' },
-  { id: 13, title: '叽哩叽哩', url: 'https://www.jiligamefun.com' },
-  { id: 14, title: '游戏下载', url: 'https://www.xidfr.com' },
-  { id: 15, title: '游戏仓库', url: 'https://www.gamekeep.net' },
-  { id: 16, title: '老男人游戏网', url: 'https://www.oldmanemu.net' },
-  { id: 17, title: 'Watt Toolkit', url: 'https://steampp.net' },
-  { id: 18, title: '蘑菇游戏', url: 'https://www.mogud.com' }
-]);
-
-const learningResources = ref([
-  { id: 1, title: '菜鸟教程', url: 'https://www.runoob.com' },
-  { id: 2, title: 'W3School', url: 'https://www.w3school.com.cn' },
-  { id: 3, title: '中国大学MOOC', url: 'https://www.icourse163.org' },
-  { id: 4, title: '学堂在线', url: 'https://www.xuetangx.com' },
-  { id: 5, title: 'Coursera', url: 'https://www.coursera.org' },
-  { id: 6, title: 'edX', url: 'https://www.edx.org' },
-  { id: 7, title: 'Udemy', url: 'https://www.udemy.com' },
-  { id: 8, title: '极客时间', url: 'https://time.geekbang.org' },
-  { id: 9, title: 'LeetCode', url: 'https://leetcode.cn' },
-  { id: 10, title: 'GitHub', url: 'https://github.com' },
-  { id: 11, title: '掘金', url: 'https://juejin.cn' },
-  { id: 12, title: '牛客网', url: 'https://www.nowcoder.com' },
-  { id: 13, title: '慕课网', url: 'https://www.imooc.com' },
-  { id: 14, title: '网易公开课', url: 'https://open.163.com' },
-  { id: 15, title: '腾讯课堂', url: 'https://ke.qq.com' },
-  { id: 16, title: '51CTO学院', url: 'https://edu.51cto.com' },
-  { id: 17, title: '力扣', url: 'https://leetcode.cn' },
-  { id: 18, title: 'SegmentFault', url: 'https://segmentfault.com' },
-  { id: 19, title: 'InfoQ', url: 'https://www.infoq.cn' },
-  { id: 20, title: 'GitChat', url: 'https://gitbook.cn' }
-]);
-
-const softwareResources = ref([
-  { id: 1, title: '果核剥壳', url: 'https://www.ghxi.com' },
-  { id: 2, title: '423Down', url: 'https://www.423down.com' },
-  { id: 3, title: '异次元', url: 'https://www.iplaysoft.com' },
-  { id: 4, title: '小众软件', url: 'https://www.appinn.com' },
-  { id: 5, title: '吾爱破解', url: 'https://www.52pojie.cn' },
-  { id: 6, title: '胡萝卜周', url: 'https://www.carrotchou.blog' },
-  { id: 7, title: '软件管家', url: 'https://www.mpyit.com' },
-  { id: 8, title: '腾讯软件', url: 'https://pc.qq.com' },
-  { id: 9, title: '微当下载', url: 'https://www.weidown.com' },
-  { id: 10, title: '软件先锋', url: 'https://soft.macxf.com' },
-  { id: 11, title: '大眼仔旭', url: 'http://www.dayanzai.me' },
-  { id: 12, title: '落尘之木', url: 'https://www.luochenzhimu.com' },
-  { id: 13, title: '殁漂遥', url: 'https://www.mpyit.com' },
-  { id: 14, title: '软件SOS', url: 'https://www.rjsos.com' },
-  { id: 15, title: '易破解', url: 'https://www.ypojie.com' },
-  { id: 16, title: '软件缘', url: 'https://www.appcgn.com' },
-  { id: 17, title: '软件目录', url: 'https://www.rjml.cn' },
-  { id: 18, title: '阿虚同学', url: 'https://axutongxue.com' },
-  { id: 19, title: 'N软网', url: 'https://www.nruan.com' },
-  { id: 20, title: '佛系软件', url: 'https://foxirj.com' }
-]);
-
-const faviconCache = reactive({});
-
-function getFirstChar(title) {
-  return title.charAt(0);
-}
-
-function getFavicon(url) {
-  try {
-    const hostname = new URL(url).hostname;
-    // 如果缓存中已经明确标记为失败，直接返回null
-    if (faviconCache[hostname] === false) {
-      return null;
-    }
-    // 如果缓存中有有效的URL，返回该URL
-    if (faviconCache[hostname]) {
-      return faviconCache[hostname];
-    }
-    // 否则尝试获取Google的favicon
-    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
-  } catch (e) {
-    console.error('Error getting favicon:', e);
-    return null;
-  }
-}
-
-function hasFavicon(url) {
-  try {
-    const hostname = new URL(url).hostname;
-    // 只有明确标记为false时才返回false
-    return faviconCache[hostname] !== false;
-  } catch (e) {
-    return false;
-  }
-}
-
-function goToUrl(url) {
-  window.open(url, '_blank');
-}
-</script>
 
 <style scoped>
 .videoList {
@@ -451,265 +57,970 @@ function goToUrl(url) {
   padding: 20px;
   box-sizing: border-box;
 }
-
-.section {
-  margin-bottom: 30px;
-}
-
-.section h3 {
-  margin-bottom: 20px;
-  font-size: 20px;
-  color: #333;
-  padding: 0 10px;
-}
-
-.cardContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 10px;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-/* 默认高度设置为两行卡片的高度 */
-.cardContainer:not(.expanded) {
-  max-height: 360px; /* 根据实际卡片高度调整 */
-}
-
-.cardContainer.expanded {
-  max-height: 2000px; /* 设置一个足够大的值 */
-}
-
-/* 在较小屏幕上调整默认高度 */
-@media screen and (max-width: 767px) {
-  .cardContainer:not(.expanded) {
-    max-height: 280px;
-  }
-}
-
-.card {
-  flex: 0 0 auto;
+.footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 15px;
-  background: white;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  width: calc(20% - 16px); /* 5 cards per row by default */
-  min-width: 140px;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-.logo-container {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  background: #f8f9fa;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.card:hover .logo-container {
-  transform: scale(1.05);
-}
-
-.logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.text-logo {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-  border-radius: 50%;
-  font-size: 16px;
-  font-weight: bold;
-  color: #666;
-  text-transform: uppercase;
-}
-
-a {
-  margin-top: 8px;
-  color: #333;
+  padding: 20px;
   font-size: 14px;
+  color: #999;
+}
+
+.footer a {
+  color: #666;
   text-decoration: none;
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.4;
-  max-width: 100%;
+  transition: color 0.2s ease;
 }
 
-/* Desktop styles */
-@media screen and (min-width: 1024px) {
-  .videoList {
-    padding: 30px;
-  }
-
-  .cardContainer {
-    gap: 25px;
-  }
-
-  .card {
-    width: calc(16.666% - 21px); /* 6 cards per row */
-    padding: 20px;
-  }
-
-  .logo-container {
-    width: 56px;
-    height: 56px;
-  }
-
-  .logo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .text-logo {
-    font-size: 24px;
-  }
-
-  a {
-    font-size: 16px;
-  }
-}
-
-/* Tablet styles */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .cardContainer {
-    gap: 20px;
-  }
-
-  .card {
-    width: calc(25% - 15px); /* 4 cards per row */
-  }
-}
-
-/* Mobile styles */
-@media screen and (max-width: 767px) {
-  .videoList {
-    padding: 15px;
-  }
-
-  .section h3 {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
-
-  .cardContainer {
-    gap: 15px;
-    padding: 5px;
-  }
-
-  .card {
-    width: calc(33.333% - 10px); /* 3 cards per row */
-    padding: 12px;
-    min-width: 100px;
-  }
-
-  .logo-container {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 8px;
-  }
-
-  .logo {
-    width: 24px;
-    height: 24px;
-  }
-
-  .text-logo {
-    font-size: 16px;
-  }
-
-  a {
-    font-size: 12px;
-    margin-top: 6px;
-  }
-}
-
-/* Small mobile styles */
-@media screen and (max-width: 359px) {
-  .cardContainer {
-    gap: 10px;
-  }
-
-  .card {
-    width: calc(50% - 5px); /* 2 cards per row */
-    padding: 10px;
-  }
-
-  .logo-container {
-    width: 36px;
-    height: 36px;
-  }
-
-  .logo {
-    width: 20px;
-    height: 20px;
-  }
-
-  .text-logo {
-    font-size: 14px;
-  }
-
-  a {
-    font-size: 11px;
-  }
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0 10px;
-}
-
-.expand-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border: none;
-  background-color: #f0f0f0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #666;
-  transition: all 0.3s ease;
-}
-
-.expand-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.arrow {
-  display: inline-block;
-  transition: transform 0.3s ease;
-  font-size: 12px;
-}
-
-.arrow-up {
-  transform: rotate(180deg);
+.footer a:hover {
+  color: #333;
 }
 </style>
+
+<script setup>
+import { ref } from 'vue'
+import SectionBlock from './SectionBlock.vue'
+// 官方影视
+const officialChannels = ref([
+  { 
+    id: 1, 
+    title: '哔哩哔哩', 
+    url: 'https://www.bilibili.com',
+    description: '国内知名的视频弹幕网站，提供高质量的动漫、游戏、音乐、舞蹈、科技等内容'
+  },
+  { 
+    id: 2, 
+    title: '爱奇艺', 
+    url: 'https://www.iqiyi.com',
+    description: '中国领先的在线视频平台，提供正版高清电影、电视剧、综艺、动漫等内容'
+  },
+  { 
+    id: 3, 
+    title: '腾讯视频', 
+    url: 'https://v.qq.com',
+    description: '腾讯旗下视频平台，提供海量正版影视内容和独播剧集'
+  },
+  { 
+    id: 4, 
+    title: '优酷', 
+    url: 'https://www.youku.com',
+    description: '阿里巴巴旗下视频网站，提供丰富的影视剧、综艺节目和独家内容'
+  },
+  { 
+    id: 5, 
+    title: '芒果TV', 
+    url: 'https://www.mgtv.com',
+    description: '湖南广播电视台旗下视频平台，提供湖南卫视节目和独家综艺内容'
+  },
+  { 
+    id: 6, 
+    title: '央视网', 
+    url: 'https://www.cctv.com',
+    description: '中央广播电视总台官方网站，提供新闻、纪录片等权威视听节目'
+  },
+  { 
+    id: 7, 
+    title: 'YouTube', 
+    url: 'https://www.youtube.com',
+    description: '全球最大的视频分享平台，提供海量用户原创内容和娱乐视频'
+  },
+  { 
+    id: 8, 
+    title: 'Netflix', 
+    url: 'https://www.netflix.com',
+    description: '全球知名流媒体平台，提供高质量的原创电影、剧集和纪录片'
+  },
+  { 
+    id: 9, 
+    title: '抖音网页版', 
+    url: 'https://www.douyin.com',
+    description: '字节跳动旗下短视频平台，提供趣味短视频内容和直播服务'
+  },
+  { 
+    id: 10, 
+    title: '西瓜视频', 
+    url: 'https://www.ixigua.com',
+    description: '字节跳动旗下中长视频平台，提供丰富的知识、娱乐和资讯内容'
+  }
+]);
+//免费影视
+const freeChannels = ref([
+  { 
+    id: 1, 
+    title: '美益达影视', 
+    url: 'https://meiyd14.tv',
+    description: '免费在线影视网站，提供最新电影、电视剧、动漫在线观看'
+  },
+  { 
+    id: 2, 
+    title: '耐看点播', 
+    url: 'https://www.nkdvd.com',
+    description: '高清影视在线观看平台，更新速度快，画质清晰'
+  },
+  { 
+    id: 3, 
+    title: '555影视', 
+    url: 'https://www.555dy.com',
+    description: '免费在线影视网站，资源丰富，更新及时'
+  },
+  { 
+    id: 4, 
+    title: '低端影视', 
+    url: 'https://ddys.art',
+    description: '提供高清影视在线观看，注重用户体验和播放质量'
+  },
+  { 
+    id: 5, 
+    title: '茶杯狐', 
+    url: 'https://cupfox.app',
+    description: '影视资源聚合搜索引擎，帮助用户找到想看的视频内容'
+  },
+  { 
+    id: 6, 
+    title: '剧迷', 
+    url: 'https://gimy.tv',
+    description: '专注于海外剧集的在线观看平台，提供多语言字幕'
+  },
+  { 
+    id: 7, 
+    title: '在线之家', 
+    url: 'https://www.zxzj.site',
+    description: '提供高清电影、电视剧在线观看，播放速度快'
+  },
+  { 
+    id: 8, 
+    title: 'AGE动漫', 
+    url: 'https://www.agemys.org',
+    description: '专注于动漫内容的在线观看平台，更新速度快'
+  },
+  { 
+    id: 9, 
+    title: '樱花动漫', 
+    url: 'https://www.yhdmp.net',
+    description: '提供日本动漫在线观看，资源更新及时'
+  },
+  { 
+    id: 10, 
+    title: '大师兄影视', 
+    url: 'https://dsxys.com',
+    description: '影视剧在线观看网站，内容丰富，广告少'
+  },
+  { 
+    id: 11, 
+    title: '皮皮蛋影视', 
+    url: 'https://ppdys.vip',
+    description: '免费在线观看电影、电视剧的影视网站'
+  },
+  { 
+    id: 12, 
+    title: 'LIBVIO', 
+    url: 'https://www.libvio.me',
+    description: '高清影视在线观看，支持多种播放线路'
+  },
+  { 
+    id: 13, 
+    title: '动漫岛', 
+    url: 'https://www.dmd85.com',
+    description: '专注动漫内容的在线观看网站，资源丰富'
+  },
+  { 
+    id: 14, 
+    title: '哔嘀影视', 
+    url: 'https://www.bdys10.com',
+    description: '提供高清电影在线观看，注重画质'
+  },
+  { 
+    id: 15, 
+    title: '泥巴影院', 
+    url: 'https://www.nbys.tv',
+    description: '提供电影、电视剧、动漫在线观看服务'
+  },
+  { 
+    id: 16, 
+    title: '91影院', 
+    url: 'https://91free.vip',
+    description: '免费在线影视网站，更新及时'
+  },
+  { 
+    id: 17, 
+    title: 'HDmoli', 
+    url: 'https://www.hdmoli.com',
+    description: '提供高清电影在线观看，画质优良'
+  },
+  { 
+    id: 18, 
+    title: '素白白', 
+    url: 'https://www.subaibai.com',
+    description: '提供影视剧在线观看，界面简洁'
+  },
+  { 
+    id: 19, 
+    title: 'Cokemv', 
+    url: 'https://cokemv.me',
+    description: '在线影视网站，资源更新快'
+  },
+  { 
+    id: 20, 
+    title: '电影先生', 
+    url: 'https://www.dianying.im',
+    description: '提供高清电影在线观看服务'
+  },
+  { 
+    id: 21, 
+    title: '追剧达人', 
+    url: 'https://vipmv.co',
+    description: '提供最新电视剧在线观看'
+  },
+  { 
+    id: 22, 
+    title: '影视工厂', 
+    url: 'https://www.ysgc.fun',
+    description: '影视剧在线观看平台，内容丰富'
+  },
+  { 
+    id: 23, 
+    title: '看看剧', 
+    url: 'https://www.kankanju.cc',
+    description: '提供电视剧、电影在线观看'
+  },
+  { 
+    id: 24, 
+    title: '剧荒', 
+    url: 'https://juhuang.tv',
+    description: '影视剧资源网站，帮助用户找到好看的影视作品'
+  },
+  { 
+    id: 25, 
+    title: 'Zzzfun', 
+    url: 'http://www.zzzfun.com',
+    description: '动漫视频网站，提供动漫在线观看服务'
+  },
+  { 
+    id: 26, 
+    title: '独播库', 
+    url: 'https://duboku.tv',
+    description: '影视剧在线观看平台，更新及时'
+  },
+  { 
+    id: 27, 
+    title: '爱迪影视', 
+    url: 'https://aidi.tv',
+    description: '提供电影、电视剧在线观看服务'
+  },
+  { 
+    id: 28, 
+    title: '达达龟', 
+    url: 'https://www.dadagui.me',
+    description: '动漫、影视剧在线观看网站'
+  },
+  { 
+    id: 29, 
+    title: '乐猪TV', 
+    url: 'http://www.lezhutv.com',
+    description: '提供影视剧在线观看，播放流畅'
+  },
+  { 
+    id: 30, 
+    title: '快看影视', 
+    url: 'https://www.kuaikanys.net',
+    description: '在线影视网站，内容更新快'
+  }
+]);
+// 社区
+const communityChannels = ref([
+  { 
+    id: 1, 
+    title: 'GitHub', 
+    url: 'https://github.com',
+    description: '全球最大的代码托管平台，开源项目聚集地'
+  },
+  { 
+    id: 2, 
+    title: 'Stack Overflow', 
+    url: 'https://stackoverflow.com',
+    description: '全球最大的程序员问答社区，解决技术难题'
+  },
+  { 
+    id: 3, 
+    title: '掘金', 
+    url: 'https://juejin.cn',
+    description: '高质量技术社区，前沿技术分享和讨论'
+  },
+  { 
+    id: 4, 
+    title: 'V2EX', 
+    url: 'https://www.v2ex.com',
+    description: '程序员交流社区，分享技术和生活话题'
+  },
+  { 
+    id: 5, 
+    title: 'CSDN', 
+    url: 'https://www.csdn.net',
+    description: '国内最大的IT技术社区，教程资源丰富'
+  },
+  { 
+    id: 6, 
+    title: '开源中国', 
+    url: 'https://www.oschina.net',
+    description: '国内活跃的开源技术社区，软件更新及时'
+  },
+  { 
+    id: 7, 
+    title: '博客园', 
+    url: 'https://www.cnblogs.com',
+    description: '老牌技术博客平台，深度技术文章多'
+  },
+  { 
+    id: 8, 
+    title: 'InfoQ', 
+    url: 'https://www.infoq.cn',
+    description: '高质量软件开发资讯，前沿技术解读'
+  },
+  { 
+    id: 9, 
+    title: 'Gitee', 
+    url: 'https://gitee.com',
+    description: '国内代码托管平台，企业级研发协作'
+  },
+  { 
+    id: 10, 
+    title: 'LeetCode', 
+    url: 'https://leetcode.cn',
+    description: '程序员刷题平台，面试算法题库'
+  },
+  { 
+    id: 11, 
+    title: 'DEV Community', 
+    url: 'https://dev.to',
+    description: '国际开发者社区，技术博客分享平台'
+  },
+  { 
+    id: 12, 
+    title: 'Reddit编程区', 
+    url: 'https://www.reddit.com/r/programming',
+    description: '国际程序员讨论区，技术话题交流'
+  },
+  { 
+    id: 13, 
+    title: 'HelloGitHub', 
+    url: 'https://hellogithub.com',
+    description: '分享GitHub上优质的开源项目，适合新手'
+  },
+  { 
+    id: 14, 
+    title: 'Trending', 
+    url: 'https://github.com/trending',
+    description: 'GitHub趋势榜，热门开源项目推荐'
+  },
+  { 
+    id: 15, 
+    title: 'HackerNews', 
+    url: 'https://news.ycombinator.com',
+    description: '硅谷技术新闻，创业和技术讨论'
+  }
+]);
+// 书籍
+const bookResources = ref([
+  { 
+    id: 1, 
+    title: 'Z-Library', 
+    url: 'https://zh.z-lib.fm/',
+    description: '最大数字图书馆，每日可下载10本，支持中英文'
+  },
+  { 
+    id: 2, 
+    title: '安娜的档案', 
+    url: 'https://zh.annas-archive.org/',
+    description: 'Z-Library镜像站，资源更全面'
+  },
+  { 
+    id: 3, 
+    title: '鸠摩搜书', 
+    url: 'https://www.jiumodiary.com',
+    description: '国内最好用的电子书搜索引擎，无需注册'
+  },
+  { 
+    id: 4, 
+    title: '24h搜书', 
+    url: 'https://24hbook.com',
+    description: '界面简洁的聚合搜索，支持推送到Kindle'
+  },
+  { 
+    id: 5, 
+    title: '熊猫搜书', 
+    url: 'https://xmsoushu.com',
+    description: '专注网盘电子书资源，支持在线预览'
+  },
+  { 
+    id: 6, 
+    title: '无名图书', 
+    url: 'https://www.book123.info',
+    description: '专注计算机编程书籍，PDF格式为主'
+  },
+  { 
+    id: 7, 
+    title: '书栈网', 
+    url: 'https://www.bookstack.cn',
+    description: '开源技术文档分享，支持在线阅读和导出'
+  },
+  { 
+    id: 8, 
+    title: 'PDF Drive', 
+    url: 'https://www.pdfdrive.com',
+    description: '超过8千万PDF资源，支持多语言检索'
+  },
+  { 
+    id: 9, 
+    title: 'Internet Archive', 
+    url: 'https://archive.org',
+    description: '互联网档案馆，包含绝版珍贵书籍'
+  },
+  { 
+    id: 10, 
+    title: 'Gutenberg', 
+    url: 'https://www.gutenberg.org',
+    description: '6万多本免费公版电子书，经典名著多'
+  },
+  { 
+    id: 11, 
+    title: 'FreeMbook', 
+    url: 'https://freembook.com',
+    description: '每日更新免费电子书，提供多种格式下载'
+  },
+  { 
+    id: 12, 
+    title: '全国图书馆', 
+    url: 'http://www.ucdrs.superlib.net',
+    description: '正版学术资源，可在线阅读和文献传递'
+  },
+  { 
+    id: 13, 
+    title: '中国哲学书', 
+    url: 'https://ctext.org/zhs',
+    description: '中国古籍数字化，支持全文检索和对照阅读'
+  }
+]);
+// 网盘磁力
+const diskSearch = ref([
+  { 
+    id: 1, 
+    title: '阿里云盘', 
+    url: 'https://www.aliyundrive.com',
+    description: '官方网盘，稳定可靠，空间大且速度快'
+  },
+  { 
+    id: 2, 
+    title: '云盘资源分享', 
+    url: 'https://www.yunpanziyuan.com',
+    description: '资源分享社区，更新快且活跃'
+  },
+  { 
+    id: 3, 
+    title: '易搜', 
+    url: 'https://yiso.fun',
+    description: '界面简洁的搜索引擎，响应快'
+  },
+  { 
+    id: 4, 
+    title: 'TorrentKitty', 
+    url: 'https://www.torrentkitty.tv',
+    description: '磁力搜索引擎，资源丰富'
+  },
+  { 
+    id: 5, 
+    title: 'BTDigg', 
+    url: 'https://btdig.com',
+    description: 'DHT磁力搜索引擎，资源全'
+  },
+  { 
+    id: 6, 
+    title: 'The Pirate Bay', 
+    url: 'https://thepiratebay.org',
+    description: '世界最大的种子站点'
+  },
+  { 
+    id: 7, 
+    title: '1337x', 
+    url: 'https://1337x.to',
+    description: '知名BT资源网站，界面友好'
+  },
+  { 
+    id: 8, 
+    title: 'NYAA', 
+    url: 'https://nyaa.si',
+    description: '专注动漫资源的BT站点'
+  },
+  { 
+    id: 9, 
+    title: 'EZTV', 
+    url: 'https://eztv.re',
+    description: '专注电视剧资源的BT站'
+  },
+  { 
+    id: 10, 
+    title: 'YTS', 
+    url: 'https://yts.mx',
+    description: '高清电影磁力下载站'
+  }
+]);
+// 在线游戏
+const gameResources = ref([
+  { 
+    id: 1, 
+    title: '4399小游戏', 
+    url: 'https://www.4399.com',
+    description: '中国最大的在线游戏平台，每日更新，游戏数量庞大'
+  },
+  { 
+    id: 2, 
+    title: '7k7k小游戏', 
+    url: 'https://www.7k7k.com',
+    description: '经典小游戏网站，20年老站，游戏分类清晰'
+  },
+  { 
+    id: 3, 
+    title: '17yy', 
+    url: 'https://www.17yy.com',
+    description: '专注HTML5游戏，手机电脑都能玩'
+  },
+  { 
+    id: 4, 
+    title: '小霸王', 
+    url: 'https://www.yikm.net',
+    description: '在线FC游戏，完美复刻童年回忆'
+  },
+  { 
+    id: 5, 
+    title: 'CrazyGames', 
+    url: 'https://www.crazygames.com',
+    description: '国际知名H5游戏平台，游戏质量高'
+  },
+  { 
+    id: 6, 
+    title: 'Y8 Games', 
+    url: 'https://zh.y8.com',
+    description: '经典Flash游戏网站，支持中文，游戏量大'
+  },
+  { 
+    id: 7, 
+    title: 'Poki', 
+    url: 'https://poki.com',
+    description: '高质量HTML5游戏，界面简洁无广告'
+  },
+  { 
+    id: 8, 
+    title: '2144', 
+    url: 'https://www.2144.cn',
+    description: '老牌小游戏网站，运营超15年'
+  },
+  { 
+    id: 9, 
+    title: '游戏狗', 
+    url: 'https://www.gamedog.cn',
+    description: '在线小游戏平台，更新速度快'
+  },
+  { 
+    id: 10, 
+    title: 'Kongregate', 
+    url: 'https://www.kongregate.com',
+    description: '国外知名游戏平台，独立游戏多'
+  }
+]);
+// 学习
+const learningResources = ref([
+  { 
+    id: 1, 
+    title: '中国大学MOOC', 
+    url: 'https://www.icourse163.org',
+    description: '国内知名MOOC平台，提供优质大学课程'
+  },
+  { 
+    id: 2, 
+    title: '网易公开课', 
+    url: 'https://open.163.com',
+    description: '网易旗下免费课程平台，内容丰富'
+  },
+  { 
+    id: 3, 
+    title: '学堂在线', 
+    url: 'https://www.xuetangx.com',
+    description: '清华大学创办的MOOC平台，课程质量高'
+  },
+  { 
+    id: 4, 
+    title: 'Coursera', 
+    url: 'https://www.coursera.org',
+    description: '全球顶级MOOC平台，提供名校课程'
+  },
+  { 
+    id: 5, 
+    title: 'edX', 
+    url: 'https://www.edx.org',
+    description: '麻省理工和哈佛大学创建的在线学习平台'
+  },
+  { 
+    id: 6, 
+    title: 'freeCodeCamp', 
+    url: 'https://www.freecodecamp.org',
+    description: '免费学习编程的开源社区，提供证书'
+  },
+  { 
+    id: 7, 
+    title: 'MDN Web Docs', 
+    url: 'https://developer.mozilla.org',
+    description: 'Mozilla的Web技术权威文档'
+  },
+  { 
+    id: 8, 
+    title: 'GitHub Learning Lab', 
+    url: 'https://lab.github.com',
+    description: 'GitHub官方互动式学习平台'
+  },
+  { 
+    id: 9, 
+    title: 'Codecademy', 
+    url: 'https://www.codecademy.com',
+    description: '互动式编程学习平台，基础课程免费'
+  },
+  { 
+    id: 10, 
+    title: 'LeetCode', 
+    url: 'https://leetcode.com',
+    description: '程序员刷题平台，提供免费题库'
+  },
+  { 
+    id: 11, 
+    title: 'W3School', 
+    url: 'https://www.w3school.com.cn',
+    description: '领先的Web技术教程网站'
+  },
+  { 
+    id: 12, 
+    title: '菜鸟教程', 
+    url: 'https://www.runoob.com',
+    description: '提供编程技术基础教程，适合入门学习'
+  },
+  { 
+    id: 13, 
+    title: 'CS50', 
+    url: 'https://cs50.harvard.edu',
+    description: '哈佛大学著名的计算机科学入门课程'
+  },
+  { 
+    id: 14, 
+    title: 'MIT OpenCourseWare', 
+    url: 'https://ocw.mit.edu',
+    description: 'MIT开放课程，完全免费'
+  },
+  { 
+    id: 15, 
+    title: 'Khan Academy', 
+    url: 'https://www.khanacademy.org',
+    description: '免费教育资源网站，课程体系完整'
+  }
+]);
+// 软件游戏
+const softwareGameResources = ref([
+  { 
+    id: 1, 
+    title: '果核剥壳', 
+    url: 'https://www.ghxi.com',
+    description: '优质软件分享网站，提供绿色破解版软件'
+  },
+  { 
+    id: 2, 
+    title: '423Down', 
+    url: 'https://www.423down.com',
+    description: '专注于Windows软件的下载站，资源丰富'
+  },
+  { 
+    id: 3, 
+    title: '吾爱破解', 
+    url: 'https://www.52pojie.cn',
+    description: '国内知名软件安全与破解论坛'
+  },
+  { 
+    id: 4, 
+    title: '异次元', 
+    url: 'https://www.iplaysoft.com',
+    description: '优质软件推荐网站，注重软件质量'
+  },
+  { 
+    id: 5, 
+    title: '小众软件', 
+    url: 'https://www.appinn.com',
+    description: '分享免费实用的小众软件'
+  },
+  { 
+    id: 6, 
+    title: 'IGG Games', 
+    url: 'https://igg-games.com',
+    description: '老牌游戏资源站，更新及时'
+  },
+  { 
+    id: 7, 
+    title: 'FitGirl Repacks', 
+    url: 'https://fitgirl-repacks.site',
+    description: '知名游戏压缩包分享站'
+  },
+  { 
+    id: 8, 
+    title: 'Steam', 
+    url: 'https://store.steampowered.com',
+    description: '全球最大的游戏发行平台'
+  },
+  { 
+    id: 9, 
+    title: 'Epic Games', 
+    url: 'https://store.epicgames.com',
+    description: '每周提供免费游戏的平台'
+  },
+  { 
+    id: 10, 
+    title: 'GOG', 
+    url: 'https://www.gog.com',
+    description: '无DRM的经典游戏下载平台'
+  },
+  { 
+    id: 11, 
+    title: 'DODI Repacks', 
+    url: 'https://dodi-repacks.site',
+    description: '高质量游戏压缩包分享'
+  },
+  { 
+    id: 12, 
+    title: '3DM游戏网', 
+    url: 'https://www.3dmgame.com',
+    description: '游戏下载与汉化补丁资源'
+  },
+  { 
+    id: 13, 
+    title: '游侠网', 
+    url: 'https://www.ali213.net',
+    description: '老牌游戏下载网站，资讯全面'
+  },
+  { 
+    id: 14, 
+    title: 'ElAmigos Games', 
+    url: 'https://elamigos-games.com',
+    description: '优质游戏资源分享站'
+  },
+]);
+//音乐资源
+const musicResources = ref([
+  { 
+    id: 1, 
+    title: '网易云音乐', 
+    url: 'https://music.163.com',
+    description: '网易旗下音乐平台，提供海量音乐在线试听和正版音乐下载服务'
+  },
+  { 
+    id: 2, 
+    title: 'QQ音乐', 
+    url: 'https://y.qq.com',
+    description: '腾讯音乐旗下音乐平台，提供正版音乐在线收听和下载'
+  },
+  { 
+    id: 3, 
+    title: '咪咕音乐', 
+    url: 'https://music.migu.cn',
+    description: '中国移动旗下音乐平台，提供正版音乐和无损音质服务'
+  },
+  { 
+    id: 4, 
+    title: '酷我音乐', 
+    url: 'https://www.kuwo.cn',
+    description: '在线音乐平台，提供音乐播放、下载和音乐资讯服务'
+  },
+  { 
+    id: 5, 
+    title: '酷狗音乐', 
+    url: 'https://www.kugou.com',
+    description: '在线音乐平台，提供音乐在线试听和下载服务'
+  },
+  { 
+    id: 6, 
+    title: '5SING', 
+    url: 'http://5sing.kugou.com',
+    description: '中国原创音乐平台，提供原创音乐分享和交流'
+  },
+  { 
+    id: 7, 
+    title: '音乐磁场', 
+    url: 'https://www.hifini.com',
+    description: '无损音乐下载平台，提供高品质音乐资源'
+  },
+  { 
+    id: 8, 
+    title: '51Ape', 
+    url: 'http://www.51ape.com',
+    description: '无损音乐下载网站，提供APE、FLAC等格式音乐下载'
+  },
+  { 
+    id: 9, 
+    title: 'DTShot', 
+    url: 'https://www.dtshot.com',
+    description: '无损音乐下载网站，提供高品质音乐资源'
+  },
+  { 
+    id: 10, 
+    title: '音乐搜索器', 
+    url: 'https://music.liuzhijin.cn',
+    description: '音乐聚合搜索引擎，支持多平台音乐搜索'
+  },
+  { 
+    id: 11, 
+    title: 'Listen 1', 
+    url: 'https://listen1.github.io/listen1',
+    description: '音乐聚合播放器，支持多平台音乐播放'
+  },
+  { 
+    id: 12, 
+    title: 'SoundCloud', 
+    url: 'https://soundcloud.com',
+    description: '国际音乐平台，提供独立音乐人作品分享和发现'
+  },
+  { 
+    id: 13, 
+    title: 'Spotify', 
+    url: 'https://open.spotify.com',
+    description: '全球流行的音乐流媒体服务平台'
+  },
+  { 
+    id: 14, 
+    title: '果核音乐搜索', 
+    url: 'https://music.ghxi.com',
+    description: '音乐聚合搜索，支持多平台音乐搜索和下载'
+  }
+]);
+//AI工具
+const aiResources = ref([
+  {
+    id: 1,
+    title: 'ChatGPT',
+    url: 'https://chat.openai.com',
+    description: '全球最热门的AI助手，支持免费使用GPT-3.5'
+  },
+  {
+    id: 2,
+    title: '文心一言',
+    url: 'https://yiyan.baidu.com',
+    description: '百度AI助手，免费使用次数充足'
+  },
+  {
+    id: 3,
+    title: 'Claude',
+    url: 'https://claude.ai',
+    description: '免费使用GPT-4级别模型，支持上传文件'
+  },
+  {
+    id: 4,
+    title: '通义千问',
+    url: 'https://qianwen.aliyun.com',
+    description: '阿里AI助手，每日免费额度generous'
+  },
+  {
+    id: 5,
+    title: 'Deepseek',
+    url: 'https://chat.deepseek.com',
+    description: '免费使用强大的代码助手，支持中文'
+  },
+  {
+    id: 6,
+    title: 'Kimi Chat',
+    url: 'https://kimi.moonshot.cn',
+    description: '月之暗面AI助手，免费使用无限制'
+  },
+  {
+    id: 7,
+    title: '智谱清言',
+    url: 'https://chatglm.cn',
+    description: '清华ChatGLM模型，响应速度快'
+  },
+  {
+    id: 8,
+    title: '讯飞星火',
+    url: 'https://xinghuo.xfyun.cn',
+    description: '科大讯飞AI助手，语音交互强大'
+  },
+  {
+    id: 9,
+    title: 'Codeium',
+    url: 'https://codeium.com',
+    description: '免费AI代码补全和生成工具'
+  },
+  {
+    id: 10,
+    title: 'Cursor',
+    url: 'https://cursor.sh',
+    description: 'AI编程IDE，代码解释和生成'
+  },
+  {
+    id: 11,
+    title: 'Bito AI',
+    url: 'https://bito.ai',
+    description: 'AI编程助手，支持多种IDE插件'
+  },
+  {
+    id: 12,
+    title: 'GitHub Copilot',
+    url: 'https://github.com/features/copilot',
+    description: '微软AI编程助手，学生免费'
+  },
+  {
+    id: 13,
+    title: 'Phind',
+    url: 'https://phind.com',
+    description: '专注于开发者的AI搜索引擎'
+  },
+  {
+    id: 14,
+    title: 'Perplexity AI',
+    url: 'https://perplexity.ai',
+    description: 'AI搜索引擎，实时联网查询'
+  },
+  {
+    id: 15,
+    title: 'You.com',
+    url: 'https://you.com',
+    description: 'AI搜索引擎，支持代码搜索'
+  },
+  {
+    id: 16,
+    title: 'Stable Diffusion',
+    url: 'https://stablediffusionweb.com',
+    description: '免费AI绘画工具，支持在线使用'
+  },
+  {
+    id: 17,
+    title: 'Midjourney',
+    url: 'https://www.midjourney.com',
+    description: '顶级AI绘画工具，画质精美'
+  },
+  {
+    id: 18,
+    title: 'Bing Image Creator',
+    url: 'https://www.bing.com/create',
+    description: '微软免费AI绘画工具，每日限额'
+  },
+  {
+    id: 19,
+    title: 'Poe',
+    url: 'https://poe.com',
+    description: '聚合多个AI模型，包括Claude'
+  },
+  {
+    id: 20,
+    title: 'Character AI',
+    url: 'https://character.ai',
+    description: 'AI角色扮演对话平台'
+  },
+  {
+    id: 21,
+    title: 'Hugging Face',
+    url: 'https://huggingface.co',
+    description: 'AI模型开源社区，可在线体验'
+  }
+]);
+</script>
