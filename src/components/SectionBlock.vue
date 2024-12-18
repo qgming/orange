@@ -78,7 +78,16 @@ const getFirstChar = (title) => {
   return title.charAt(0)
 }
 
-const getFavicon = (url) => {
+/**
+ * 获取网站的favicon图标。
+ * @param {string} url - 网站的URL。
+ * @returns {Promise<string|null>} - 返回favicon的URL，如果获取失败则返回null。
+ * 逻辑：
+ * 1. 从URL中提取主机名。
+ * 2. 检查缓存，如果缓存中存在favicon则返回缓存的值。
+ * 3. 如果缓存中没有favicon，则构造Google的favicon服务URL并异步获取。
+ */
+const getFavicon = async (url) => {
   try {
     const hostname = new URL(url).hostname
     
@@ -91,13 +100,26 @@ const getFavicon = (url) => {
     }
 
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`
-    return faviconUrl
+    const response = await fetch(faviconUrl);
+    if (!response.ok) {
+      handleFaviconError(url);
+      return null;
+    }
+    faviconCache.value[hostname] = faviconUrl;
+    return faviconUrl;
   } catch (e) {
     console.error('获取favicon出错:', e)
     return null
   }
 }
 
+/**
+ * 处理获取favicon时的错误。
+ * @param {string} url - 网站的URL。
+ * 逻辑：
+ * 1. 从URL中提取主机名。
+ * 2. 将缓存中的该主机名的favicon标记为false，表示获取失败。
+ */
 const handleFaviconError = (url) => {
   try {
     const hostname = new URL(url).hostname
@@ -107,6 +129,14 @@ const handleFaviconError = (url) => {
   }
 }
 
+/**
+ * 检查网站是否有favicon。
+ * @param {string} url - 网站的URL。
+ * @returns {boolean} - 如果有favicon则返回true，否则返回false。
+ * 逻辑：
+ * 1. 从URL中提取主机名。
+ * 2. 检查缓存中该主机名的值，如果值不是false，则返回true。
+ */
 const hasFavicon = (url) => {
   try {
     const hostname = new URL(url).hostname

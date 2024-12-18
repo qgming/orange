@@ -56,9 +56,8 @@ onMounted(() => {
   font-size: 2.5rem;
   font-weight: bold;
   background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(255, 107, 26, 0.1);
+  background-clip: text;
+  color: transparent;
 }
 
 .logo {
