@@ -19,14 +19,7 @@
         @click="goToUrl(item.url)"
       >
         <div class="logo-container">
-          <img 
-            v-if="hasFavicon(item.url)" 
-            :src="getFavicon(item.url)" 
-            alt="logo" 
-            class="logo" 
-            @error="handleFaviconError(item.url)"
-          />
-          <div v-else class="text-logo">{{ getFirstChar(item.title) }}</div>
+          <div class="text-logo">{{ item.title.charAt(0) }}</div>
         </div>
         <a>{{ item.title }}</a>
         <div class="tooltip">{{ item.description }}</div>
@@ -36,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
   title: {
@@ -50,7 +43,6 @@ const props = defineProps({
 })
 
 const isExpanded = ref(false)
-const faviconCache = ref({})
 
 // 每行显示的卡片数量（根据屏幕宽度动态计算）
 const getCardsPerRow = () => {
@@ -60,7 +52,6 @@ const getCardsPerRow = () => {
   return 3
 }
 
-// 计算默认显示的卡片数量（两行）
 const getDefaultVisibleCount = () => getCardsPerRow() * 2
 
 // 获取应该显示的卡片
@@ -72,78 +63,6 @@ const visibleItems = computed(() => {
 // 切换展开状态
 const toggleExpand = () => {
   isExpanded.value = !isExpanded.value
-}
-
-const getFirstChar = (title) => {
-  return title.charAt(0)
-}
-
-/**
- * 获取网站的favicon图标。
- * @param {string} url - 网站的URL。
- * @returns {Promise<string|null>} - 返回favicon的URL，如果获取失败则返回null。
- * 逻辑：
- * 1. 从URL中提取主机名。
- * 2. 检查缓存，如果缓存中存在favicon则返回缓存的值。
- * 3. 如果缓存中没有favicon，则构造Google的favicon服务URL并异步获取。
- */
-const getFavicon = async (url) => {
-  try {
-    const hostname = new URL(url).hostname
-    
-    // 检查缓存
-    if (faviconCache.value[hostname] === false) {
-      return null
-    }
-    if (faviconCache.value[hostname]) {
-      return faviconCache.value[hostname]
-    }
-
-    const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`
-    const response = await fetch(faviconUrl);
-    if (!response.ok) {
-      handleFaviconError(url);
-      return null;
-    }
-    faviconCache.value[hostname] = faviconUrl;
-    return faviconUrl;
-  } catch (e) {
-    console.error('获取favicon出错:', e)
-    return null
-  }
-}
-
-/**
- * 处理获取favicon时的错误。
- * @param {string} url - 网站的URL。
- * 逻辑：
- * 1. 从URL中提取主机名。
- * 2. 将缓存中的该主机名的favicon标记为false，表示获取失败。
- */
-const handleFaviconError = (url) => {
-  try {
-    const hostname = new URL(url).hostname
-    faviconCache.value[hostname] = false
-  } catch (e) {
-    console.error('处理favicon错误时出错:', e)
-  }
-}
-
-/**
- * 检查网站是否有favicon。
- * @param {string} url - 网站的URL。
- * @returns {boolean} - 如果有favicon则返回true，否则返回false。
- * 逻辑：
- * 1. 从URL中提取主机名。
- * 2. 检查缓存中该主机名的值，如果值不是false，则返回true。
- */
-const hasFavicon = (url) => {
-  try {
-    const hostname = new URL(url).hostname
-    return faviconCache.value[hostname] !== false
-  } catch (e) {
-    return false
-  }
 }
 
 const goToUrl = (url) => {
@@ -227,24 +146,10 @@ const goToUrl = (url) => {
   background: #fff1e6;
 }
 
-.logo {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-
 .text-logo {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ff8c3d;
-  border-radius: 10px;
-  font-size: 1.1rem;
+  font-size: 24px;
   font-weight: bold;
-  color: white;
-  text-transform: uppercase;
+  color: #ff6b1a;
 }
 
 a {
@@ -334,6 +239,13 @@ a {
   transform: rotate(180deg);
 }
 
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff6b1a;
+  margin-right: 0.5rem;
+}
+
 @media (max-width: 1024px) {
   .section-header {
     padding: 1.25rem 0.5rem;
@@ -361,11 +273,6 @@ a {
   .logo-container {
     width: 48px;
     height: 48px;
-  }
-
-  .logo, .text-logo {
-    width: 32px;
-    height: 32px;
   }
 
   .tooltip {
@@ -403,11 +310,6 @@ a {
     background: #333;
   }
 
-  .text-logo {
-    background-color: #ff8c3d;
-    color: #fff;
-  }
-
   a {
     color: #bbb;
   }
@@ -437,6 +339,10 @@ a {
   }
 
   .arrow {
+    color: #ff8c3d;
+  }
+
+  .logo {
     color: #ff8c3d;
   }
 }

@@ -145,30 +145,30 @@ const officialChannels = ref([
   }
 ]);
 //免费影视
-const freeChannels = ref([
+const freeChannels = ref([ 
   { 
     id: 1, 
-    title: '美益达影视', 
-    url: 'https://meiyd14.tv',
-    description: '免费在线影视网站，提供最新电影、电视剧、动漫在线观看'
-  },
-  { 
-    id: 2, 
     title: '耐看点播', 
     url: 'https://www.nkdvd.com',
     description: '高清影视在线观看平台，更新速度快，画质清晰'
   },
   { 
-    id: 3, 
+    id: 2, 
     title: '555影视', 
     url: 'https://www.555dy.com',
     description: '免费在线影视网站，资源丰富，更新及时'
   },
   { 
-    id: 4, 
+    id: 3, 
     title: '低端影视', 
     url: 'https://ddys.art',
     description: '提供高清影视在线观看，注重用户体验和播放质量'
+  },
+  { 
+    id: 4, 
+    title: '美益达影视', 
+    url: 'https://meiyd14.tv',
+    description: '免费在线影视网站，提供最新电影、电视剧、动漫在线观看'
   },
   { 
     id: 5, 
