@@ -1,4 +1,4 @@
-# 极点 AI 搜索
+# 橘子导航
 
 ![orange](https://socialify.git.ci/qgming/orange/image?issues=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fqgming%2Forange%2Fd1c8c26a19827b78ea5e5a641a453b5d902276cd%2Fpublic%2Ffavicon.svg&name=1&owner=1&pattern=Plus&stargazers=1&theme=Light)
 
