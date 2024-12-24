@@ -38,7 +38,7 @@ onMounted(() => {
 
         <section>
           <h2>6. 联系我们</h2>
-          <p>如果您对本隐私政策有任何问题，请通过 <a href="https://github.com/qgming" target="_blank" rel="noopener noreferrer">GitHub</a> 联系我们。</p>
+          <p>如果您对本隐私政策有任何问题，请通过 邮箱qgming@qq.com 联系我们。</p>
         </section>
 
         <div class="back-link">

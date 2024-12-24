@@ -40,6 +40,10 @@
       title="软件游戏"
       :items="softwareGameResources"
     />
+    <SectionBlock
+      title="友情链接"
+      :items="friendLinks"
+    />
   </div>
   <div class="footer">
     <p>Copyright (c) 2024 - {{ new Date().getFullYear() }} <a href="https://github.com/qgming">极点维度</a></p>
@@ -425,27 +429,28 @@ const bookResources = ref([
   { 
     id: 1, 
     title: 'Z-Library', 
-    url: 'https://zh.z-lib.fm/',
-    description: '最大数字图书馆，每日可下载10本，支持中英文'
+    url: 'https://z-lib.rest/',
+    description: '全球最大数字图书馆，图书论文资源丰富，支持各种语言'
   },
   { 
     id: 2, 
-    title: '安娜的档案', 
-    url: 'https://zh.annas-archive.org/',
-    description: 'Z-Library镜像站，资源更全面'
+    title: '24h搜书', 
+    url: 'https://book.daohangxie.com',
+    description: '资源丰富，国内可以直接访问，界面简洁的聚合搜索'
   },
   { 
     id: 3, 
+    title: '安娜的档案', 
+    url: 'https://zh.annas-archive.org',
+    description: 'Z-Library镜像站，资源更全面'
+  },
+  { 
+    id: 4, 
     title: '鸠摩搜书', 
     url: 'https://www.jiumodiary.com',
     description: '国内最好用的电子书搜索引擎，无需注册'
   },
-  { 
-    id: 4, 
-    title: '24h搜书', 
-    url: 'https://24hbook.com',
-    description: '界面简洁的聚合搜索，支持推送到Kindle'
-  },
+
   { 
     id: 5, 
     title: '熊猫搜书', 
@@ -1022,5 +1027,20 @@ const aiResources = ref([
     url: 'https://huggingface.co',
     description: 'AI模型开源社区，可在线体验'
   }
+]);
+//友情链接
+const friendLinks = ref([
+  { 
+    id: 1, 
+    title: '极点AI搜索', 
+    url: 'https://s.jdwdai.com',
+    description: '由极点维度开发的开源AI搜索网站'
+  },
+  { 
+    id: 2, 
+    title: '极点智能体', 
+    url: 'https://jdwdai.com',
+    description: '由极点维度开发的智能体平台，有自媒体文章生成，论文写作等'
+  },
 ]);
 </script>
