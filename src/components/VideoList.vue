@@ -745,6 +745,24 @@ const softwareGameResources = ref([
     url: 'https://www.52pojie.cn',
     description: '国内知名软件安全与破解论坛'
   },
+  {
+    id: 6,
+    title: 'Byrut Game',
+    url: 'https://byrutgame.org/',
+    description: '俄罗斯游戏资源站，更新及时'
+  },
+  {
+    id: 12,
+    title: '3DM游戏网',
+    url: 'https://www.3dmgame.com',
+    description: '游戏下载与汉化补丁资源'
+  },
+  {
+    id: 13,
+    title: '游侠网',
+    url: 'https://www.ali213.net',
+    description: '老牌游戏下载网站，资讯全面'
+  },
   { 
     id: 4, 
     title: '异次元', 
@@ -757,56 +775,40 @@ const softwareGameResources = ref([
     url: 'https://www.appinn.com',
     description: '分享免费实用的小众软件'
   },
+
   { 
-    id: 6, 
+    id: 7,
     title: 'IGG Games', 
     url: 'https://igg-games.com',
-    description: '老牌游戏资源站，更新及时'
+    description: '注意：部分游戏会有广告\n老牌游戏资源站，更新及时'
   },
   { 
-    id: 7, 
+    id: 8,
     title: 'FitGirl Repacks', 
     url: 'https://fitgirl-repacks.site',
     description: '知名游戏压缩包分享站'
   },
   { 
-    id: 8, 
+    id: 9,
     title: 'Steam', 
     url: 'https://store.steampowered.com',
     description: '全球最大的游戏发行平台'
   },
   { 
-    id: 9, 
+    id: 10,
     title: 'Epic Games', 
     url: 'https://store.epicgames.com',
     description: '每周提供免费游戏的平台'
   },
   { 
-    id: 10, 
+    id: 11,
     title: 'GOG', 
     url: 'https://www.gog.com',
     description: '无DRM的经典游戏下载平台'
   },
+
   { 
-    id: 11, 
-    title: 'DODI Repacks', 
-    url: 'https://dodi-repacks.site',
-    description: '高质量游戏压缩包分享'
-  },
-  { 
-    id: 12, 
-    title: '3DM游戏网', 
-    url: 'https://www.3dmgame.com',
-    description: '游戏下载与汉化补丁资源'
-  },
-  { 
-    id: 13, 
-    title: '游侠网', 
-    url: 'https://www.ali213.net',
-    description: '老牌游戏下载网站，资讯全面'
-  },
-  { 
-    id: 14, 
+    id: 14,
     title: 'ElAmigos Games', 
     url: 'https://elamigos-games.com',
     description: '优质游戏资源分享站'
