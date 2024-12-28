@@ -144,9 +144,9 @@ const freeChannels = ref([
   },
   {
     id: 5,
-    title: '茶杯狐',
-    url: 'https://cupfox.app',
-    description: '影视资源聚合搜索引擎，帮助用户找到想看的视频内容'
+    title: '易看影视',
+    url: 'https://jiaqjdj.one/',
+    description: '影视资源聚合，帮助用户找到想看的视频内容'
   },
   {
     id: 6,
@@ -297,7 +297,14 @@ const freeChannels = ref([
     title: '快看影视',
     url: 'https://www.kuaikanys.net',
     description: '在线影视网站，内容更新快'
-  }
+  },
+  {
+    id: 31,
+    title: '茶杯狐',
+    url: 'https://cupfox.love/',
+    description: '影视片单分享网站'
+  },
+
 ]);
 // 社区
 const communityChannels = ref([
