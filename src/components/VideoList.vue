@@ -133,7 +133,7 @@ const freeChannels = ref([
   {
     id: 3,
     title: '低端影视',
-    url: 'https://ddys.one',
+    url: 'https://ddys.pro',
     description: '提供高清影视在线观看，注重用户体验和播放质量'
   },
   {
