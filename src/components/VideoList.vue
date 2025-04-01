@@ -120,9 +120,9 @@ const officialChannels = ref([
 const freeChannels = ref([
   {
     id: 1,
-    title: '耐看点播',
-    url: 'https://www.nkdvd.com',
-    description: '高清影视在线观看平台，更新速度快，画质清晰'
+    title: '来看点播',
+    url: 'https://lkvod.me/',
+    description: '免费在线影视网站，提供最新电影、电视剧、动漫在线观看'
   },
   {
     id: 2,
@@ -138,13 +138,13 @@ const freeChannels = ref([
   },
   {
     id: 4,
-    title: '美益达影视',
-    url: 'https://meiyd14.tv',
-    description: '免费在线影视网站，提供最新电影、电视剧、动漫在线观看'
+    title: '耐看点播',
+    url: 'https://www.nkdvd.com',
+    description: '高清影视在线观看平台，更新速度快，画质清晰'
   },
   {
     id: 5,
-    title: '易看影视',
+    title: '午夜影视',
     url: 'https://jiaqjdj.one/',
     description: '影视资源聚合，帮助用户找到想看的视频内容'
   },

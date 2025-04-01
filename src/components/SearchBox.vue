@@ -1,13 +1,11 @@
 <template>
   <div class="search-box-container">
     <div class="search-box">
+      <button class="toggle-button" @click="toggleSearchSite">
+        <span>{{ currentSiteName }}</span>
+      </button>
       <div class="input-wrapper">
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="搜索视频..."
-          @keyup.enter="handleSearch"
-        />
+        <input type="text" v-model="searchQuery" placeholder="搜索视频..." @keyup.enter="handleSearch" />
       </div>
       <button @click="handleSearch">
         <span>搜索</span>
@@ -17,14 +15,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const searchQuery = ref('')
+const currentSiteIndex = ref(0)
+const searchSites = [
+  { name: '追影猫', url: 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=' },
+  { name: '皮皮蛋', url: 'https://ppdys.vip/vodsearch/-------------.html?wd=' },
+  { name: '来看点播', url: 'https://lkvod.me/nk/-------------.html?wd=' },
+
+]
+
+const currentSiteName = computed(() => searchSites[currentSiteIndex.value].name)
+
+const toggleSearchSite = () => {
+  currentSiteIndex.value = (currentSiteIndex.value + 1) % searchSites.length
+}
 
 const handleSearch = () => {
   const query = searchQuery.value.trim()
   if (query) {
-    const searchUrl = `https://zhuiyingmao5.com/vodsearch/-------------.html?wd=${encodeURIComponent(query)}`
+    const searchUrl = searchSites[currentSiteIndex.value].url + encodeURIComponent(query)
     window.open(searchUrl, '_blank')
   }
 }
@@ -38,16 +49,42 @@ const handleSearch = () => {
   padding: 1.25rem;
 }
 
+.toggle-button {
+  width: 90px;
+  /* 固定宽度 */
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #ffb38a 0%, #ff9e6b 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 180, 130, 0.25);
+  background: linear-gradient(135deg, #ffc5a1 0%, #ffb38a 100%);
+}
+
+.toggle-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 180, 130, 0.2);
+  background: linear-gradient(135deg, #ffb38a 0%, #ff9e6b 100%);
+}
+
 .search-box {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 0.75rem;
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 4px 16px rgba(255, 107, 26, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 180, 130, 0.15);
+  transition: all 0.3s ease;
 }
 
 .input-wrapper {
@@ -59,55 +96,48 @@ const handleSearch = () => {
 
 input {
   flex: 1;
-  padding: 0.875rem 1rem 0.875rem 1rem;
-  width: 100%;
-  border: 2px solid #ffe5d4;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ffd8c0;
   border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #fff8f3;
-  color: #333;
+  font-size: 0.95rem;
+  background: #fff9f5;
+  color: #5a4a42;
+  transition: all 0.2s ease;
 }
 
 input:focus {
   outline: none;
-  border-color: #ff6b1a;
+  border-color: #ffb38a;
   background: white;
-  box-shadow: 0 0 0 4px rgba(255, 107, 26, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 180, 130, 0.1);
 }
 
 input::placeholder {
   color: #ffb38a;
+  opacity: 0.7;
 }
 
 button {
-  padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
+  padding: 0 1.5rem;
+  background: linear-gradient(135deg, #ffb38a 0%, #ff9e6b 100%);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  min-width: 100px;
-  box-shadow: 0 2px 8px rgba(255, 107, 26, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
-  background: linear-gradient(135deg, #ffa666 0%, #ff8c3d 100%);
+  box-shadow: 0 4px 12px rgba(255, 180, 130, 0.25);
+  background: linear-gradient(135deg, #ffc5a1 0%, #ffb38a 100%);
 }
 
 button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(255, 107, 26, 0.2);
-  background: linear-gradient(135deg, #ff6b1a 0%, #ff5500 100%);
+  box-shadow: 0 2px 4px rgba(255, 180, 130, 0.2);
+  background: linear-gradient(135deg, #ffb38a 0%, #ff9e6b 100%);
 }
 
 @media (max-width: 680px) {
@@ -115,64 +145,63 @@ button:active {
     padding: 0.75rem;
   }
 
+  .toggle-button {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
   .search-box {
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem;
-    border-radius: 16px;
   }
 
   input {
-    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    padding: 0.75rem 1rem;
     font-size: 0.875rem;
-  }
-
-  .search-icon {
-    font-size: 0.875rem;
-    left: 0.875rem;
   }
 
   button {
     width: 100%;
     padding: 0.75rem;
     font-size: 0.875rem;
-    min-width: auto;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   .search-box {
-    background: #222;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: #1e1e1e;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
   }
 
   input {
-    background: #2a2a2a;
-    border-color: rgba(255, 140, 61, 0.3);
-    color: #fff;
+    background: #252525;
+    border-color: rgba(255, 180, 130, 0.3);
+    color: #e0d7d2;
   }
 
   input:focus {
-    background: #333;
-    border-color: #ff8c3d;
-    box-shadow: 0 0 0 4px rgba(255, 140, 61, 0.15);
+    background: #2d2d2d;
+    border-color: #ffb38a;
+    box-shadow: 0 0 0 4px rgba(255, 180, 130, 0.15);
   }
 
   input::placeholder {
-    color: #ff8c3d;
-    opacity: 0.6;
+    color: #ffb38a;
+    opacity: 0.5;
   }
 
   button {
-    background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
+    background: linear-gradient(135deg, #ff9e6b 0%, #ff8c52 100%);
   }
 
   button:hover {
-    background: linear-gradient(135deg, #ffa666 0%, #ff8c3d 100%);
+    background: linear-gradient(135deg, #ffb38a 0%, #ff9e6b 100%);
   }
 
   button:active {
-    background: linear-gradient(135deg, #ff6b1a 0%, #ff5500 100%);
+    background: linear-gradient(135deg, #ff8c52 0%, #ff7b3d 100%);
   }
 }
 </style>

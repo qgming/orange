@@ -35,29 +35,31 @@ onMounted(() => {
 <style scoped>
 .main {
   min-height: 100vh;
-  padding: 2rem 1rem;
-  background-color: #fff8f3;
+  padding: 1.5rem 1rem;
+  background: linear-gradient(135deg, #fff8f3 0%, #fff1e6 100%);
 }
 
 .content {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .title-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff6b1a 0%, #ff5500 100%);
   background-clip: text;
   color: transparent;
+  letter-spacing: -0.5px;
 }
 
 .logo {
@@ -104,7 +106,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes slideUp {
@@ -115,9 +119,12 @@ onMounted(() => {
 }
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-6px);
   }
@@ -146,7 +153,7 @@ onMounted(() => {
   .main {
     background-color: #1a1a1a;
   }
-  
+
   .title {
     background: linear-gradient(135deg, #ff8c3d 0%, #ff6b1a 100%);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
