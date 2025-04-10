@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 橘子主体 -->
+    <circle cx="256" cy="256" r="220" fill="url(#orangeGradient)"/>
+    
+    <!-- 橘子纹理 -->
+    <path d="M256 76C123.2 76 76 203.2 76 256C76 358.4 153.6 436 256 436C358.4 436 436 358.4 436 256C436 153.6 388.8 76 256 76Z" 
+          fill="url(#textureGradient)" 
+          opacity="0.1"/>
+    
+    <!-- 叶子 -->
+    <path d="M290 96C290 96 310 66 340 56C370 46 400 56 400 56C400 56 390 86 360 96C330 106 290 96 290 96Z" 
+          fill="#4CAF50"/>
+    
+    <!-- 高光效果 -->
+    <circle cx="200" cy="200" r="80" fill="url(#highlightGradient)" opacity="0.2"/>
+    
+    <!-- 渐变定义 -->
+    <defs>
+        <!-- 橘子主体渐变 -->
+        <linearGradient id="orangeGradient" x1="76" y1="76" x2="436" y2="436">
+            <stop offset="0%" stop-color="#FF8C3D"/>
+            <stop offset="100%" stop-color="#FF6B1A"/>
+        </linearGradient>
+        
+        <!-- 纹理渐变 -->
+        <linearGradient id="textureGradient" x1="76" y1="76" x2="436" y2="436">
+            <stop offset="0%" stop-color="white"/>
+            <stop offset="100%" stop-color="white"/>
+        </linearGradient>
+        
+        <!-- 高光渐变 -->
+        <radialGradient id="highlightGradient" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="white"/>
+            <stop offset="100%" stop-color="white" stop-opacity="0"/>
+        </radialGradient>
+    </defs>
+</svg>
