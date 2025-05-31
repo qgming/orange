@@ -1,11 +1,6 @@
 export const videoSites = {
   综合: [
     {
-      name: "橘子导航新网址",
-      url: "https://video.jdwdai.com",
-      tags: ["免费", "推荐"],
-    },
-    {
       name: "555影视",
       url: "https://www.55yy6.com",
       tags: ["推荐", "欧美剧", "动漫"],
@@ -13,7 +8,7 @@ export const videoSites = {
     {
       name: "NO影视",
       url: "https://www.novipnoad.net/",
-      tags: ["推荐","欧美剧", "日韩剧",'泰剧'],
+      tags: ["推荐", "欧美剧", "日韩剧", "泰剧"],
     },
     {
       name: "低端影视",
@@ -23,37 +18,37 @@ export const videoSites = {
     {
       name: "耐看点播",
       url: "https://www.nkdvd.com",
-      tags: ["推荐", "更新快",'简洁'],
+      tags: ["推荐", "更新快", "简洁"],
     },
     {
       name: "午夜影视",
       url: "https://jiaqjdj.one/",
-      tags: ["资源丰富","无广告","欧美剧"],
+      tags: ["资源丰富", "无广告", "欧美剧"],
     },
     {
       name: "旋风影视",
       url: "https://miao101.com/",
-      tags: ["推荐","资源丰富","体育"],
+      tags: ["推荐", "资源丰富", "体育"],
     },
     {
       name: "皮皮蛋影视",
       url: "https://ppdys.vip",
-      tags: ["电影", "电视剧","更新快"],
+      tags: ["电影", "电视剧", "更新快"],
     },
     {
       name: "LIBVIO",
       url: "https://www.libvio.me",
-      tags: ["高清", "日韩剧","欧美剧"],
+      tags: ["高清", "日韩剧", "欧美剧"],
     },
     {
       name: "素白白",
       url: "https://www.subaibai.com",
-      tags: ["资源丰富","港片"],
+      tags: ["资源丰富", "港片"],
     },
     {
       name: "快看影视",
       url: "https://www.kuaikanys.net",
-      tags: ["港台剧","资源丰富"],
+      tags: ["港台剧", "资源丰富"],
     },
     {
       name: "茶杯狐",
@@ -70,7 +65,7 @@ export const videoSites = {
       url: "https://www.hdmoli.com",
       tags: ["高清", "资源丰富"],
     },
- 
+
     {
       name: "剧迷",
       url: "https://gimy.tv",
@@ -81,12 +76,12 @@ export const videoSites = {
     {
       name: "樱花动漫",
       url: "https://88dm.fans/",
-      tags: ["推荐","动漫", "更新快"],
+      tags: ["推荐", "动漫", "更新快"],
     },
     {
       name: "AGE动漫",
       url: "https://www.agemys.org",
-      tags: ["推荐","动漫", "更新快"],
+      tags: ["推荐", "动漫", "更新快"],
     },
     {
       name: "NT动漫",
@@ -96,7 +91,7 @@ export const videoSites = {
     {
       name: "爱恋动漫",
       url: "http://www.kisssub.org/",
-      tags: ["推荐","动漫", "下载"],
+      tags: ["推荐", "动漫", "下载"],
     },
     {
       name: "girlgirl爱动漫",
@@ -136,7 +131,7 @@ export const videoSites = {
     {
       name: "D站",
       url: "https://www.5dm.link/",
-      tags: ["动漫", "弹幕","注册"],
+      tags: ["动漫", "弹幕", "注册"],
     },
   ],
   短剧: [
@@ -175,12 +170,12 @@ export const videoSites = {
     {
       name: "515直播",
       url: "https://www.515.tv/",
-      tags: ["推荐","足球", "篮球", "直播"],
+      tags: ["推荐", "足球", "篮球", "直播"],
     },
     {
       name: "JRKAN直播",
       url: "http://www.qiumi1314.com/",
-      tags: ["推荐","赛事", "直播"],
+      tags: ["推荐", "赛事", "直播"],
     },
     {
       name: "直播吧",
@@ -218,43 +213,43 @@ export const videoSites = {
       tags: ["体育", "直播"],
     },
   ],
-  电子书:[
+  电子书: [
     {
-      name :'Z-Libary',
-      url:"https://zlib.su",
-      tags:["推荐","强烈推荐"]
+      name: "Z-Libary",
+      url: "https://zlib.su",
+      tags: ["推荐", "强烈推荐"],
+    },
+    // {
+    //   name: "24h搜书",
+    //   url: "https://24hbook.daohangxie.com/",
+    //   tags: ["推荐"],
+    // },
+    {
+      name: "安娜的档案",
+      url: "https://zh.annas-archive.org/",
+      tags: ["电子书"],
     },
     {
-      name :'24h搜书',
-      url:"https://24hbook.daohangxie.com/",
-      tags:["推荐"]
-    },
-    {
-      name :'安娜的档案',
-      url:"https://zh.annas-archive.org/",
-      tags:["电子书"]
-    },
-    {
-      name :'识典古籍',
-      url:"https://www.shidianguji.com/",
-      tags:["电子书"]
+      name: "识典古籍",
+      url: "https://www.shidianguji.com/",
+      tags: ["电子书"],
     },
   ],
-  友情链接:[
+  友情链接: [
     {
-      name :'笔记卡片',
-      url:"https://card.jdwdai.com",
-      tags:["推荐"]
+      name: "笔记卡片",
+      url: "https://card.jdwdai.com",
+      tags: ["推荐"],
     },
     {
-      name :'AI写小说',
-      url:"https://book.jdwdai.com/",
-      tags:["推荐"]
+      name: "AI写小说",
+      url: "https://book.jdwdai.com/",
+      tags: ["推荐"],
     },
     {
-      name :'极点AI搜索',
-      url:"https://s.jdwdai.com/",
-      tags:["推荐"]
+      name: "极点AI搜索",
+      url: "https://s.jdwdai.com/",
+      tags: ["推荐"],
     },
   ],
 };
