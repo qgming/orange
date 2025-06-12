@@ -115,7 +115,7 @@ export const videoSites = {
     },
     {
       name: "囧次元",
-      url: "https://9ciyuan.com/",
+      url: "https://9ciyuan.cc/",
       tags: ["动漫", "推荐"],
     },
     {
