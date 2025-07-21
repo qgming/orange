@@ -65,11 +65,40 @@ export const videoSites = {
       url: "https://www.hdmoli.com",
       tags: ["高清", "资源丰富"],
     },
-
     {
       name: "剧迷",
       url: "https://gimy.tv",
       tags: ["资源丰富"],
+    },
+    {
+      name: "奈飞影视",
+      url: "https://www.nfmovies.com",
+      tags: ["高清", "Netflix", "美剧"],
+    },
+    {
+      name: "欧乐影院",
+      url: "https://www.olevod.com",
+      tags: ["高清", "欧美剧", "更新快"],
+    },
+    {
+      name: "独播库",
+      url: "https://www.duboku.tv",
+      tags: ["独播", "高清", "国产剧"],
+    },
+    {
+      name: "人人影视",
+      url: "https://www.rr.tv",
+      tags: ["美剧", "字幕组", "经典"],
+    },
+    {
+      name: "韩剧TV",
+      url: "https://www.hanju.tv",
+      tags: ["韩剧", "更新快", "高清"],
+    },
+    {
+      name: "日剧TV",
+      url: "https://www.rijutv.com",
+      tags: ["日剧", "更新快", "高清"],
     },
   ],
   动漫: [
@@ -133,6 +162,31 @@ export const videoSites = {
       url: "https://www.5dm.link/",
       tags: ["动漫", "弹幕", "注册"],
     },
+    {
+      name: "哔哩哔哩",
+      url: "https://www.bilibili.com",
+      tags: ["动漫", "弹幕", "正版"],
+    },
+    {
+      name: "腾讯动漫",
+      url: "https://ac.qq.com",
+      tags: ["动漫", "正版", "国产"],
+    },
+    {
+      name: "爱奇艺动漫",
+      url: "https://www.iqiyi.com/acg",
+      tags: ["动漫", "正版", "高清"],
+    },
+    {
+      name: "次元喵",
+      url: "https://www.acgndog.com",
+      tags: ["动漫", "更新快", "无广告"],
+    },
+    {
+      name: "动漫星球",
+      url: "https://www.dmxq.org",
+      tags: ["动漫", "资源丰富", "高清"],
+    },
   ],
   短剧: [
     {
@@ -164,6 +218,26 @@ export const videoSites = {
       name: "短剧搜",
       url: "https://www.duanjuso.com/",
       tags: ["短剧", "网盘"],
+    },
+    {
+      name: "短剧天堂",
+      url: "https://www.duanjutt.com",
+      tags: ["短剧", "在线", "更新快"],
+    },
+    {
+      name: "微短剧",
+      url: "https://www.weiduanju.com",
+      tags: ["短剧", "微剧", "网盘"],
+    },
+    {
+      name: "快手短剧",
+      url: "https://www.kuaishou.com/short-drama",
+      tags: ["短剧", "快手", "原创"],
+    },
+    {
+      name: "抖音短剧",
+      url: "https://www.douyin.com/search/短剧",
+      tags: ["短剧", "抖音", "原创"],
     },
   ],
   体育直播: [
@@ -212,6 +286,53 @@ export const videoSites = {
       url: "https://www.zb06.com/",
       tags: ["体育", "直播"],
     },
+    {
+      name: "斗球直播",
+      url: "https://www.douqiu.com",
+      tags: ["体育", "直播", "高清"],
+    },
+    {
+      name: "黑白直播",
+      url: "https://www.heibai.tv",
+      tags: ["体育", "直播", "无插件"],
+    },
+    {
+      name: "优直播",
+      url: "https://www.youzhibo.com",
+      tags: ["体育", "直播", "足球"],
+    },
+  ],
+  纪录片: [
+    {
+      name: "央视网",
+      url: "https://tv.cctv.com/lm/jlp/index.shtml",
+      tags: ["央视", "纪录片", "官方"],
+    },
+    {
+      name: "哔哩哔哩纪录片",
+      url: "https://www.bilibili.com/documentary",
+      tags: ["纪录片", "B站", "高清"],
+    },
+    {
+      name: "腾讯视频纪录片",
+      url: "https://v.qq.com/documentary",
+      tags: ["纪录片", "腾讯", "正版"],
+    },
+    {
+      name: "爱奇艺纪录片",
+      url: "https://www.iqiyi.com/jilupian",
+      tags: ["纪录片", "高清", "正版"],
+    },
+    {
+      name: "优酷纪录片",
+      url: "https://www.youku.com/documentary",
+      tags: ["纪录片", "优酷", "高清"],
+    },
+    {
+      name: "纪实台",
+      url: "https://www.jishi.tv",
+      tags: ["纪录片", "专业", "高清"],
+    },
   ],
   电子书: [
     {
@@ -233,6 +354,21 @@ export const videoSites = {
       name: "识典古籍",
       url: "https://www.shidianguji.com/",
       tags: ["电子书"],
+    },
+    {
+      name: "豆瓣阅读",
+      url: "https://read.douban.com",
+      tags: ["电子书", "正版", "文学"],
+    },
+    {
+      name: "微信读书",
+      url: "https://weread.qq.com",
+      tags: ["电子书", "正版", "社交"],
+    },
+    {
+      name: "多看阅读",
+      url: "http://www.duokan.com",
+      tags: ["电子书", "正版", "精品"],
     },
   ],
   友情链接: [
