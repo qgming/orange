@@ -5,7 +5,7 @@ import { videoSites } from '../data/videoSites'
 const activeCategory = ref('全部') // 当前选中的分类
 
 // 所有分类标签
-const categories = ['全部','推荐', '动漫', '欧美剧', '日韩剧', '高清','直播']
+const categories = ['全部', '推荐', '动漫', '欧美剧', '日韩剧', '高清', '直播']
 
 const filteredSites = (category) => {
   return videoSites[category].filter(site =>
@@ -16,11 +16,18 @@ const filteredSites = (category) => {
 
 <template>
   <div class="video-nav">
-    <div class="category-filter">
-      <button v-for="cat in categories" :key="cat" @click="activeCategory = cat"
-        :class="{ active: activeCategory === cat }" class="filter-btn">
-        {{ cat }}
-      </button>
+    <div class="nav-header">
+      <div class="category-filter">
+        <button v-for="cat in categories" :key="cat" @click="activeCategory = cat"
+          :class="{ active: activeCategory === cat }" class="filter-btn">
+          {{ cat }}
+        </button>
+      </div>
+      <div class="utility-links">
+        <router-link to="/checker" class="utility-btn">
+          🔍 网站检测
+        </router-link>
+      </div>
     </div>
 
     <div v-for="(sites, category) in videoSites" :key="category" class="category">
@@ -44,11 +51,41 @@ const filteredSites = (category) => {
   padding: 0 1rem;
 }
 
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .category-filter {
   display: flex;
   gap: 0.8rem;
   margin-top: 1rem;
   flex-wrap: wrap;
+}
+
+.utility-links {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.utility-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.utility-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .filter-btn {
@@ -66,7 +103,8 @@ const filteredSites = (category) => {
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);;
+  background: linear-gradient(135deg, #FFA07A, #FF7F50);
+  ;
   color: white;
 }
 
@@ -123,12 +161,14 @@ h3 {
 .tag {
   padding: 0.3rem 0.7rem;
   border-radius: 8px;
-  background: #fef9f5; /* 米色背景 */
+  background: #fef9f5;
+  /* 米色背景 */
   color: #666;
   font-size: 0.85rem;
   font-weight: 400;
   transition: all 0.2s ease;
-  border: 0.1px solid #FFD3B6; /* 新增浅橙色边框 */
+  border: 0.1px solid #FFD3B6;
+  /* 新增浅橙色边框 */
 }
 
 .tag:hover {
@@ -141,16 +181,26 @@ h3 {
   .video-nav {
     padding: 0 0.5rem;
   }
-  
+
+  .nav-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .utility-links {
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
   .site-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
   }
-  
+
   h2 {
     font-size: 1.3rem;
   }
-  
+
   .filter-btn {
     padding: 0.4rem 1rem;
     font-size: 0.8rem;
