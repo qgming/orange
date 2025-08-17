@@ -34,21 +34,20 @@ const handleSearch = () => {
           <span>{{ currentSiteName }}</span>
         </button>
         <div class="input-wrapper">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="搜索视频..." 
-            @keyup.enter="handleSearch" 
-          />
+          <input type="text" v-model="searchQuery" placeholder="搜索视频..." @keyup.enter="handleSearch" />
         </div>
         <button class="search-button" @click="handleSearch">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <span>搜索</span>
         </button>
       </div>
+    </div>
+    <div class="domain-notice">
+      2025年9月启用新域名v.qgming.com，请注意保存，避免丢失
     </div>
   </div>
 </template>
@@ -72,9 +71,11 @@ const handleSearch = () => {
   0% {
     transform: translateY(0px) rotate(0deg);
   }
+
   50% {
     transform: translateY(-10px) rotate(5deg);
   }
+
   100% {
     transform: translateY(0px) rotate(0deg);
   }
@@ -118,8 +119,9 @@ const handleSearch = () => {
 .toggle-button {
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);  /* 修改为更深的橙色渐变 */
-  color: #ffffff; 
+  background: linear-gradient(135deg, #FFA07A, #FF7F50);
+  /* 修改为更深的橙色渐变 */
+  color: #ffffff;
   border: none;
   cursor: pointer;
   font-weight: 600;
@@ -162,7 +164,8 @@ input::placeholder {
 .search-button {
   padding: 0.75rem 1.8rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #404040, #2d2d2d);  /* 改为明显的高级灰渐变 */
+  background: linear-gradient(135deg, #404040, #2d2d2d);
+  /* 改为明显的高级灰渐变 */
   color: white;
   border: none;
   cursor: pointer;
@@ -187,15 +190,47 @@ input::placeholder {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .toggle-button,
   .search-button {
     width: 100%;
     justify-content: center;
   }
-  
+
   .input-wrapper {
     margin: 0;
+  }
+}
+
+.domain-notice {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #FFA07A, #FF7F50);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .domain-notice {
+    margin: 1rem 1.5rem 0;
+    font-size: 0.85rem;
   }
 }
 </style>

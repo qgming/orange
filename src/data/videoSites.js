@@ -374,17 +374,12 @@ export const videoSites = {
   友情链接: [
     {
       name: "笔记卡片",
-      url: "https://card.jdwdai.com",
+      url: "https://card.qgming.com",
       tags: ["推荐"],
     },
     {
-      name: "AI写小说",
-      url: "https://book.jdwdai.com/",
-      tags: ["推荐"],
-    },
-    {
-      name: "极点AI搜索",
-      url: "https://s.jdwdai.com/",
+      name: "极点起始页",
+      url: "https://s.qgming.com/",
       tags: ["推荐"],
     },
   ],

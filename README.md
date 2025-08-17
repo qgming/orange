@@ -207,7 +207,7 @@ orange/
 - **作者**: qgming
 - **邮箱**: qgming@qq.com
 - **公众号**: 极点维度
-- **在线体验**: [video.jdwdai.com](https://video.jdwdai.com)
+- **在线体验**: [v.qgming.com](https://v.qgming.com)
 
 ## 🙏 鸣谢
 
