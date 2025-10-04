@@ -46,9 +46,9 @@ const handleSearch = () => {
         </button>
       </div>
     </div>
-    <div class="domain-notice">
+    <!-- <div class="domain-notice">
       2025年9月启用新域名v.qgming.com，请注意保存，避免丢失
-    </div>
+    </div> -->
   </div>
 </template>
 
