@@ -5,11 +5,13 @@ const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 const searchSites = [
   { name: '追影猫', url: 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=' },
-  { name: '皮皮蛋', url: 'https://ppdys.vip/vodsearch/-------------.html?wd=' },
-  { name: '来看点播', url: 'https://lkvod.me/nk/-------------.html?wd=' },
+  { name: '皮皮妖', url: 'https://pipiyao.cc/vodsearch/-------------.html?wd=' },
+  { name: 'VidHub', url: 'https://vidhub.tv/vodsearch/-------------.html?wd=' },
+
 ]
 
 const currentSiteName = computed(() => searchSites[currentSiteIndex.value].name)
+const placeholderText = computed(() => `在${searchSites[currentSiteIndex.value].name}中搜索视频`)
 
 const toggleSearchSite = () => {
   currentSiteIndex.value = (currentSiteIndex.value + 1) % searchSites.length
@@ -30,19 +32,21 @@ const handleSearch = () => {
     <h1 class="title">橘子导航</h1>
     <div class="search-box-container">
       <div class="search-box">
-        <button class="toggle-button" @click="toggleSearchSite">
-          <span>{{ currentSiteName }}</span>
-        </button>
         <div class="input-wrapper">
-          <input type="text" v-model="searchQuery" placeholder="搜索视频..." @keyup.enter="handleSearch" />
+          <input type="text" v-model="searchQuery" :placeholder="placeholderText" @keyup.enter="handleSearch" />
         </div>
-        <button class="search-button" @click="handleSearch">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        <button class="search-button-icon" @click="handleSearch">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span>搜索</span>
+        </button>
+      </div>
+      <div class="site-selector">
+        <button v-for="(site, index) in searchSites" :key="index" class="site-button"
+          :class="{ active: currentSiteIndex === index }" @click="currentSiteIndex = index">
+          {{ site.name }}
         </button>
       </div>
     </div>
@@ -116,29 +120,9 @@ const handleSearch = () => {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
 }
 
-.toggle-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);
-  /* 修改为更深的橙色渐变 */
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.toggle-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
-}
-
 .input-wrapper {
   flex: 1;
-  margin: 0 0.5rem;
+  margin-right: 0.5rem;
 }
 
 input {
@@ -161,44 +145,85 @@ input::placeholder {
   opacity: 1;
 }
 
-.search-button {
-  padding: 0.75rem 1.8rem;
+.search-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
   background: linear-gradient(135deg, #404040, #2d2d2d);
-  /* 改为明显的高级灰渐变 */
   color: white;
   border: none;
   cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
   transition: all 0.2s ease;
 }
 
-.search-button:hover {
+.search-button-icon:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.search-button svg {
+.search-button-icon svg {
   stroke: white;
+}
+
+.site-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.site-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.site-button:hover {
+  background: #eeeeee;
+  transform: translateY(-1px);
+}
+
+.site-button.active {
+  background: linear-gradient(135deg, #FFA07A, #FF7F50);
+  color: white;
+  border-color: #FF7F50;
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
 }
 
 @media (max-width: 640px) {
   .search-box {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
   }
 
-  .toggle-button,
-  .search-button {
-    width: 100%;
-    justify-content: center;
+  .input-wrapper {
+    margin-right: 0.3rem;
   }
 
-  .input-wrapper {
-    margin: 0;
+  .search-button-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .site-selector {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .site-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }
 

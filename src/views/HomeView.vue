@@ -9,7 +9,7 @@ import SearchBox from '../components/SearchBox.vue'
     <VideoNav />
     <footer class="footer">
       <div class="copyright">
-        © 2024-{{ new Date().getFullYear() }} 极点维度 版权所有
+        © 2024-{{ new Date().getFullYear() }} QGMING 版权所有
       </div>
       <router-link to="/privacy" class="privacy-link">隐私政策</router-link>
     </footer>

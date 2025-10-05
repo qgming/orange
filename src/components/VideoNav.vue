@@ -1,17 +1,34 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { videoSites } from '../data/videoSites'
 
 const activeCategory = ref('全部') // 当前选中的分类
 
 // 所有分类标签
-const categories = ['全部', '推荐', '动漫', '欧美剧', '日韩剧', '高清', '直播']
+const categories = ['全部', '推荐', '高清', '欧美剧', '日韩剧', '体育']
 
-const filteredSites = (category) => {
-  return videoSites[category].filter(site =>
-    (activeCategory.value === '全部' || site.tags.includes(activeCategory.value))
-  )
-}
+// 筛选后的网站列表
+const filteredSites = computed(() => {
+  if (activeCategory.value === '全部') {
+    // 如果选择"全部"，则显示所有网站
+    return videoSites
+  } else {
+    // 否则只显示包含选中标签的网站
+    const filtered = {}
+    Object.entries(videoSites).forEach(([category, sites]) => {
+      const categoryFilteredSites = sites.filter(site =>
+        site.tags.includes(activeCategory.value)
+      )
+      if (categoryFilteredSites.length > 0) {
+        filtered[category] = categoryFilteredSites
+      }
+    })
+    return filtered
+  }
+})
+
+// 判断是否显示分类标题
+const showCategoryTitles = computed(() => activeCategory.value === '全部')
 </script>
 
 <template>
@@ -30,11 +47,16 @@ const filteredSites = (category) => {
       </div>
     </div>
 
-    <div v-for="(sites, category) in videoSites" :key="category" class="category">
-      <h2>{{ category }}</h2>
+    <div v-for="(sites, category) in filteredSites" :key="category" class="category">
+      <h2 v-if="showCategoryTitles">{{ category }}</h2>
       <div class="site-list">
-        <a v-for="site in filteredSites(category)" :key="site.name" :href="site.url" target="_blank" class="site-card">
-          <h3>{{ site.name }}</h3>
+        <a v-for="site in sites" :key="site.name" :href="site.url" target="_blank" class="site-card">
+          <h3>
+            {{ site.name }}
+            <svg v-if="site.tags.includes('推荐')" class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          </h3>
           <div class="tags">
             <span v-for="tag in site.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
@@ -149,6 +171,17 @@ h3 {
   font-size: 1.1rem;
   font-weight: 500;
   line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.star-icon {
+  color: #FFD700;
+  margin-left: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
 }
 
 .tags {
