@@ -5,7 +5,7 @@ const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 const searchSites = [
   { name: '追影猫', url: 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=' },
-  { name: '皮皮妖', url: 'https://pipiyao.cc/vodsearch/-------------.html?wd=' },
+  { name: '搜片', url: 'https://soupian.plus/frame?movie=' },
   { name: 'VidHub', url: 'https://vidhub.tv/vodsearch/-------------.html?wd=' },
 
 ]

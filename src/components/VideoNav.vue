@@ -4,8 +4,8 @@ import { videoSites } from '../data/videoSites'
 
 const activeCategory = ref('全部') // 当前选中的分类
 
-// 所有分类标签
-const categories = ['全部', '推荐', '高清', '欧美剧', '日韩剧', '体育']
+// 简化的分类标签 - 只保留全部和推荐
+const categories = ['全部', '推荐']
 
 // 筛选后的网站列表
 const filteredSites = computed(() => {
