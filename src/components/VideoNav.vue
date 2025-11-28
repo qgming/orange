@@ -1,8 +1,75 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { videoSites } from '../data/videoSites'
+import {
+  iconService,
+  getWebsiteIcon,
+  getDomain
+} from '../utils/iconService'
 
 const activeCategory = ref('全部') // 当前选中的分类
+const siteIcons = ref(new Map()) // 存储网站图标
+const loadingIcons = ref(new Set()) // 正在加载的图标
+const isInitialLoading = ref(true) // 初始加载状态
+
+// 获取网站主机名
+const getHostname = (url) => {
+  try {
+    return new URL(url).hostname
+  } catch (e) {
+    return url
+  }
+}
+
+// 加载网站图标（优化版）
+const loadSiteIcon = async (url, siteName) => {
+  const key = `${siteName}-${url}`
+
+  // 如果已加载，直接返回
+  if (siteIcons.value.has(key)) {
+    return siteIcons.value.get(key)
+  }
+
+  // 标记为加载中
+  loadingIcons.value.add(key)
+
+  // 异步获取图标（总是返回有效值，失败时返回表情符号）
+  try {
+    const iconUrl = await getWebsiteIcon(url, { cache: true })
+    siteIcons.value.set(key, iconUrl)
+    return iconUrl
+  } catch (error) {
+    console.error(`获取图标失败 [${siteName}]:`, error)
+    // 即使出错，也尝试生成一个表情符号
+    const fallbackIcon = iconService.getRandomEmojiDataUrl(getDomain(url))
+    siteIcons.value.set(key, fallbackIcon)
+    return fallbackIcon
+  } finally {
+    loadingIcons.value.delete(key)
+  }
+}
+
+// 获取图标URL
+const getSiteIcon = (url, siteName) => {
+  const key = `${siteName}-${url}`
+  return siteIcons.value.get(key) || ''
+}
+
+// 检查图标是否已加载
+const hasIconLoaded = (url, siteName) => {
+  const key = `${siteName}-${url}`
+  return siteIcons.value.has(key) && siteIcons.value.get(key)
+}
+
+// 检查图标是否正在加载
+const isIconLoading = (url, siteName) => {
+  const key = `${siteName}-${url}`
+  return loadingIcons.value.has(key)
+}
+
+
+
+
 
 // 简化的分类标签 - 只保留全部和推荐
 const categories = ['全部', '推荐']
@@ -12,23 +79,102 @@ const filteredSites = computed(() => {
   if (activeCategory.value === '全部') {
     // 如果选择"全部"，则显示所有网站
     return videoSites
-  } else {
-    // 否则只显示包含选中标签的网站
+  } else if (activeCategory.value === '推荐') {
+    // 如果选择"推荐"，则只显示推荐的网站
     const filtered = {}
     Object.entries(videoSites).forEach(([category, sites]) => {
-      const categoryFilteredSites = sites.filter(site =>
-        site.tags.includes(activeCategory.value)
-      )
+      const categoryFilteredSites = sites.filter(site => site.isRecommended)
       if (categoryFilteredSites.length > 0) {
         filtered[category] = categoryFilteredSites
       }
     })
     return filtered
   }
+  return videoSites
+})
+
+// 计算总网站数量
+const totalSitesCount = computed(() => {
+  let count = 0
+  Object.values(videoSites).forEach(categorySites => {
+    count += categorySites.length
+  })
+  return count
+})
+
+// 计算推荐网站数量
+const recommendedSitesCount = computed(() => {
+  let count = 0
+  Object.values(videoSites).forEach(categorySites => {
+    categorySites.forEach(site => {
+      if (site.isRecommended) {
+        count++
+      }
+    })
+  })
+  return count
 })
 
 // 判断是否显示分类标题
 const showCategoryTitles = computed(() => activeCategory.value === '全部')
+
+// 智能预加载：优先加载推荐网站
+const preloadRecommendedIcons = async () => {
+  const recommendedUrls = []
+
+  Object.values(videoSites).forEach(categorySites => {
+    categorySites.forEach(site => {
+      if (site.isRecommended) {
+        recommendedUrls.push(site.url)
+      }
+    })
+  })
+
+  if (recommendedUrls.length > 0) {
+    console.log(`预加载 ${recommendedUrls.length} 个推荐网站图标...`)
+    await iconService.preloadIcons(recommendedUrls, {
+      priorityFirst: true,
+      onProgress: (current, total) => {
+        // 可以在这里更新进度条
+        if (current === total) {
+          console.log('推荐网站图标预加载完成')
+        }
+      }
+    })
+  }
+}
+
+// 加载当前分类的图标（优化版）
+const loadCurrentCategoryIcons = async () => {
+  const currentSites = filteredSites.value
+  const loadPromises = []
+
+  // 分批加载，避免一次性加载过多
+  Object.values(currentSites).forEach(categorySites => {
+    categorySites.forEach(site => {
+      loadPromises.push(loadSiteIcon(site.url, site.name))
+    })
+  })
+
+  // 并发加载，但不阻塞UI
+  Promise.all(loadPromises).then(() => {
+    isInitialLoading.value = false
+  })
+}
+
+// 组件挂载后初始化
+onMounted(async () => {
+  // 先预加载推荐网站图标
+  await preloadRecommendedIcons()
+
+  // 然后加载当前分类的所有图标
+  loadCurrentCategoryIcons()
+})
+
+// 监听分类变化，加载对应图标
+watch(activeCategory, () => {
+  loadCurrentCategoryIcons()
+})
 </script>
 
 <template>
@@ -37,13 +183,12 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
       <div class="category-filter">
         <button v-for="cat in categories" :key="cat" @click="activeCategory = cat"
           :class="{ active: activeCategory === cat }" class="filter-btn">
-          {{ cat }}
+          <span class="button-content">
+            {{ cat }}
+            <span v-if="cat === '全部'" class="count">{{ totalSitesCount }}</span>
+            <span v-else-if="cat === '推荐'" class="count">{{ recommendedSitesCount }}</span>
+          </span>
         </button>
-      </div>
-      <div class="utility-links">
-        <router-link to="/checker" class="utility-btn">
-          🔍 网站检测
-        </router-link>
       </div>
     </div>
 
@@ -51,14 +196,20 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
       <h2 v-if="showCategoryTitles">{{ category }}</h2>
       <div class="site-list">
         <a v-for="site in sites" :key="site.name" :href="site.url" target="_blank" class="site-card">
-          <h3>
-            {{ site.name }}
-            <svg v-if="site.tags.includes('推荐')" class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-            </svg>
-          </h3>
-          <div class="tags">
-            <span v-for="tag in site.tags" :key="tag" class="tag">{{ tag }}</span>
+          <div class="card-header">
+            <div class="site-icon-wrapper">
+              <!-- 加载中或未加载时显示骨架屏 -->
+              <div v-if="!hasIconLoaded(site.url, site.name)" class="icon-skeleton"></div>
+              <!-- 图标 - 只在加载完成后显示 -->
+              <img v-else :src="getSiteIcon(site.url, site.name)"
+                alt="" class="site-icon" loading="lazy" />
+            </div>
+            <div class="site-info">
+              <h3>
+                {{ site.name }}<span v-if="site.isRecommended" class="recommend-badge">♥</span>
+              </h3>
+              <p class="site-url">{{ getHostname(site.url) }}</p>
+            </div>
           </div>
         </a>
       </div>
@@ -75,7 +226,7 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
 
 .nav-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
@@ -89,45 +240,40 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
   flex-wrap: wrap;
 }
 
-.utility-links {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.utility-btn {
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
-
-.utility-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
 .filter-btn {
   padding: 0.5rem 1.2rem;
   border-radius: 8px;
   background: #ffffff;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.filter-btn:hover {
-  background: #e0e0e0;
+.button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .filter-btn.active {
   background: linear-gradient(135deg, #FFA07A, #FF7F50);
   ;
   color: white;
+}
+
+.filter-btn .count {
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75em;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}
+
+.filter-btn:not(.active) .count {
+  background: rgba(0, 0, 0, 0.08);
+  color: #666;
 }
 
 .category {
@@ -141,20 +287,86 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
 }
 
 .site-card {
-  padding: 1rem;
+  padding: 1.2rem;
   border-radius: 16px;
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
   border: 1px solid #f0f0f0;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(255, 107, 26, 0.05);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease,
+              background 0.25s ease;
+  box-shadow: 0 2px 12px rgba(255, 107, 26, 0.06);
   text-decoration: none;
   display: block;
 }
 
 .site-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
-  border-color: #ff6b00;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px -12px rgba(255, 107, 26, 0.2);
+  border-color: #FF7F50;
+  background: linear-gradient(135deg, #ffffff 0%, #fff5f2 100%);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.site-icon-wrapper {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.site-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  padding: 8px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+  /* 隐藏加载时的alt文本 */
+  color: transparent;
+  font-size: 0;
+}
+
+.site-card:hover .site-icon {
+  transform: scale(1.15) rotate(5deg);
+  border-color: #FF7F50;
+  box-shadow: 0 6px 16px rgba(255, 107, 26, 0.25);
+}
+
+/* 图标加载骨架屏 */
+.icon-skeleton {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border: 2px solid #e0e0e0;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
+.site-info {
+  flex: 1;
+  min-width: 0;
 }
 
 h2 {
@@ -166,47 +378,45 @@ h2 {
 }
 
 h3 {
-  margin-bottom: 1rem;
-  color: #404040;
+  margin: 0 0 0.3rem 0;
+  color: #2d2d2d;
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.star-icon {
-  color: #FFD700;
-  margin-left: 0.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  flex-shrink: 0;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.tag {
-  padding: 0.3rem 0.7rem;
-  border-radius: 8px;
-  background: #fef9f5;
-  /* 米色背景 */
-  color: #666;
+.site-url {
+  margin: 0;
+  color: #888;
   font-size: 0.85rem;
-  font-weight: 400;
-  transition: all 0.2s ease;
-  border: 0.1px solid #FFD3B6;
-  /* 新增浅橙色边框 */
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.tag:hover {
-  background: #ff6b00;
-  color: white;
+.recommend-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  font-size: 1.3rem;
+  color: #ff4757;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  line-height: 1.4;
+  vertical-align: baseline;
+}
+
+.site-card:hover .recommend-badge {
+  color: #ff6b81;
+  transform: scale(1.15);
 }
 
 /* 移动端适配 */
@@ -217,17 +427,35 @@ h3 {
 
   .nav-header {
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .utility-links {
-    justify-content: center;
-    margin-top: 0.5rem;
+    align-items: flex-start;
   }
 
   .site-list {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
+  }
+
+  .site-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .site-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  .site-url {
+    font-size: 0.75rem;
   }
 
   h2 {
