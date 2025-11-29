@@ -205,6 +205,13 @@ watch(activeCategory, () => {
             <span v-else-if="cat === '推荐'" class="count">{{ recommendedSitesCount }}</span>
           </span>
         </button>
+        <a href="https://github.com/qgming/orange/issues" target="_blank" rel="noopener noreferrer" class="submit-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v1z" />
+          </svg>
+          网站提交
+        </a>
       </div>
     </div>
 
@@ -254,6 +261,9 @@ watch(activeCategory, () => {
   gap: 0.8rem;
   margin-top: 1rem;
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .filter-btn {
@@ -264,6 +274,40 @@ watch(activeCategory, () => {
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #f5f5f5;
+}
+
+.submit-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  margin-left: auto;
+  border: none;
+}
+
+.submit-btn:hover {
+  background: #f5f5f5;
+}
+
+.submit-btn svg {
+  transition: transform 0.3s;
+}
+
+.submit-btn:hover svg {
+  transform: scale(1.1);
 }
 
 .button-content {

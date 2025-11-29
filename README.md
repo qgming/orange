@@ -8,7 +8,7 @@
 [![Vite](https://img.shields.io/badge/Vite-6.2+-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[在线体验](https://video.jdwdai.com) · [报告问题](https://github.com/qgming/orange/issues) · [提交网站](https://github.com/qgming/orange/issues)
+[在线体验](https://v.qgming.com) · [报告问题](https://github.com/qgming/orange/issues) · [提交网站](https://github.com/qgming/orange/issues)
 
 </div>
 
