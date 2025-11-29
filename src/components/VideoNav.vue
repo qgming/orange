@@ -7,6 +7,22 @@ import {
   getDomain
 } from '../utils/iconService'
 
+// 处理链接点击，添加来源参数
+const handleLinkClick = (event, url) => {
+  event.preventDefault()
+
+  try {
+    const urlObj = new URL(url)
+    // 添加来源参数
+    urlObj.searchParams.append('from', 'v.qgming.com')
+    // 在新标签页打开
+    window.open(urlObj.toString(), '_blank')
+  } catch (e) {
+    // 如果URL解析失败，直接打开原链接
+    window.open(url, '_blank')
+  }
+}
+
 const activeCategory = ref('全部') // 当前选中的分类
 const siteIcons = ref(new Map()) // 存储网站图标
 const loadingIcons = ref(new Set()) // 正在加载的图标
@@ -195,14 +211,14 @@ watch(activeCategory, () => {
     <div v-for="(sites, category) in filteredSites" :key="category" class="category">
       <h2 v-if="showCategoryTitles">{{ category }}</h2>
       <div class="site-list">
-        <a v-for="site in sites" :key="site.name" :href="site.url" target="_blank" class="site-card">
+        <a v-for="site in sites" :key="site.name" :href="site.url" @click="handleLinkClick($event, site.url)"
+          class="site-card">
           <div class="card-header">
             <div class="site-icon-wrapper">
               <!-- 加载中或未加载时显示骨架屏 -->
               <div v-if="!hasIconLoaded(site.url, site.name)" class="icon-skeleton"></div>
               <!-- 图标 - 只在加载完成后显示 -->
-              <img v-else :src="getSiteIcon(site.url, site.name)"
-                alt="" class="site-icon" loading="lazy" />
+              <img v-else :src="getSiteIcon(site.url, site.name)" alt="" class="site-icon" loading="lazy" />
             </div>
             <div class="site-info">
               <h3>
@@ -292,9 +308,9 @@ watch(activeCategory, () => {
   background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
   border: 1px solid #f0f0f0;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.25s ease,
-              border-color 0.25s ease,
-              background 0.25s ease;
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
   box-shadow: 0 2px 12px rgba(255, 107, 26, 0.06);
   text-decoration: none;
   display: block;
@@ -329,8 +345,8 @@ watch(activeCategory, () => {
   border: 2px solid #e0e0e0;
   padding: 8px;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-              border-color 0.25s ease,
-              box-shadow 0.25s ease;
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
   /* 隐藏加载时的alt文本 */
   color: transparent;
   font-size: 0;

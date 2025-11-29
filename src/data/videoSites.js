@@ -1,23 +1,13 @@
 export const videoSites = {
   影视: [
     {
-      name: "555影视",
-      url: "https://www.55yy6.com",
-      isRecommended: true,
-    },
-    {
-      name: "VidHub",
-      url: "https://vidhub.tv/",
-      isRecommended: true,
-    },
-    {
       name: "电影先生",
       url: "https://dyxs39.com/",
       isRecommended: true,
     },
     {
-      name: "火车太堵",
-      url: "https://www.tdgo.shop/",
+      name: "555影视",
+      url: "https://www.55yy6.com",
       isRecommended: true,
     },
     {
@@ -26,20 +16,32 @@ export const videoSites = {
       isRecommended: true,
     },
     {
-      name: "NO视频",
-      url: "https://www.novipnoad.net/",
+      name: "KVideo",
+      url: "https://kvideo.vercel.app/",
       isRecommended: true,
     },
     {
-      name: "NunFlix",
-      url: "https://5movies.store/",
+      name: "火车太堵",
+      url: "https://www.tdgo.shop/",
+      isRecommended: true,
+    },
+    {
+      name: "NO视频",
+      url: "https://www.novipnoad.net/",
       isRecommended: true,
     },
     {
       name: "独播库",
       url: "https://www.dbkk.cc/",
     },
-
+    {
+      name: "NunFlix",
+      url: "https://5movies.store/",
+    },
+    {
+      name: "VidHub",
+      url: "https://vidhub.tv/",
+    },
     {
       name: "厂长资源",
       url: "https://www.cz233.com/",
@@ -118,10 +120,6 @@ export const videoSites = {
       url: "https://v.ikanbot.com/",
     },
     {
-      name: "KVideo",
-      url: "https://kvideo.vercel.app/",
-    },
-    {
       name: "枫林网",
       url: "https://imaple8.co/",
     },
@@ -137,7 +135,7 @@ export const videoSites = {
   二次元: [
     {
       name: "樱花动漫",
-      url: "https://88dm.fans/",
+      url: "https://www.857fans.com/",
       isRecommended: true,
     },
     {
@@ -158,12 +156,10 @@ export const videoSites = {
     {
       name: "AnFuns动漫",
       url: "https://www.anfuns.org/",
-      isRecommended: true,
     },
     {
       name: "233动漫",
       url: "https://www.233dm.com/",
-      isRecommended: true,
     },
     {
       name: "NT动漫",
@@ -257,19 +253,10 @@ export const videoSites = {
     {
       name: "微信读书",
       url: "https://weread.qq.com",
-      isRecommended: true,
     },
     {
       name: "多看阅读",
       url: "http://www.duokan.com",
-    },
-    {
-      name: "京东读书",
-      url: "https://e.jd.com/",
-    },
-    {
-      name: "豆瓣读书",
-      url: "https://book.douban.com/",
     },
     {
       name: "书格",
