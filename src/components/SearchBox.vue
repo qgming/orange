@@ -1,16 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { searchSites, performSearch, getSearchSiteName } from '../utils/searchService'
 
 const searchQuery = ref('')
 const currentSiteIndex = ref(0)
-const searchSites = [
-  { name: '追影猫', url: 'https://zhuiyingmao5.com/vodsearch/-------------.html?wd=' },
-  { name: '搜片', url: 'https://soupian.plus/frame?movie=' },
-  { name: 'VidHub', url: 'https://vidhub.tv/vodsearch/-------------.html?wd=' },
 
-]
-
-const currentSiteName = computed(() => searchSites[currentSiteIndex.value].name)
+const currentSiteName = computed(() => getSearchSiteName(currentSiteIndex.value))
 const placeholderText = computed(() => `在${searchSites[currentSiteIndex.value].name}中搜索视频`)
 
 const toggleSearchSite = () => {
@@ -18,11 +13,7 @@ const toggleSearchSite = () => {
 }
 
 const handleSearch = () => {
-  const query = searchQuery.value.trim()
-  if (query) {
-    const searchUrl = searchSites[currentSiteIndex.value].url + encodeURIComponent(query)
-    window.open(searchUrl, '_blank')
-  }
+  performSearch(searchQuery.value, currentSiteIndex.value)
 }
 </script>
 

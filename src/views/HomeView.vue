@@ -1,11 +1,13 @@
 <script setup>
 import VideoNav from '../components/VideoNav.vue'
 import SearchBox from '../components/SearchBox.vue'
+import RealtimeRanking from '../components/RealtimeRanking.vue'
 </script>
 
 <template>
   <div class="home-view">
     <SearchBox />
+    <RealtimeRanking />
     <VideoNav />
     <footer class="footer">
       <div class="footer-links">
