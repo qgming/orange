@@ -53,10 +53,11 @@ const handleSearch = () => {
 }
 
 .logo {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 0.8rem;
+  width: 70px;
+  height: 70px;
+  margin-bottom: 1rem;
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 8px 16px rgba(255, 255, 255, 0.3));
 }
 
 @keyframes float {
@@ -65,7 +66,7 @@ const handleSearch = () => {
   }
 
   50% {
-    transform: translateY(-10px) rotate(5deg);
+    transform: translateY(-15px) rotate(5deg);
   }
 
   100% {
@@ -74,13 +75,14 @@ const handleSearch = () => {
 }
 
 .title {
-  color: #1a1a1a;
-  font-size: 3rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin-bottom: 2.5rem;
+  color: #ffffff;
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 3rem;
   position: relative;
-  background: linear-gradient(45deg, #ff6b00, #ff8f00);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -95,17 +97,24 @@ const handleSearch = () => {
   display: flex;
   max-width: 800px;
   margin: 0 auto;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 107, 0, 0.15);
-  background: #ffffff;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 8px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 10px;
+  position: relative;
 }
 
 .search-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 16px 48px rgba(31, 38, 135, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .input-wrapper {
@@ -115,21 +124,24 @@ const handleSearch = () => {
 
 input {
   width: 100%;
-  padding: 0.9rem 1.2rem;
+  padding: 1rem 1.5rem;
   border: none;
   font-size: 1.05rem;
   background: transparent;
-  border-radius: 12px;
+  border-radius: 16px;
   transition: all 0.2s ease;
+  color: #2d3748;
+  font-weight: 500;
 }
 
 input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 input::placeholder {
-  color: #a0a0a0;
+  color: rgba(45, 55, 72, 0.6);
   opacity: 1;
 }
 
@@ -137,81 +149,160 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #404040, #2d2d2d);
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.15);
 }
 
 .search-button-icon:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.25);
+}
+
+.search-button-icon:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .search-button-icon svg {
-  stroke: white;
+  stroke: #2d3748;
+  stroke-width: 2.5;
 }
 
 .site-selector {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .site-button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 30px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #e0e0e0;
+  padding: 0.7rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(45, 55, 72, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
 .site-button:hover {
-  background: #eeeeee;
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .site-button.active {
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);
-  color: white;
-  border-color: #FF7F50;
-  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+  background: rgba(255, 255, 255, 0.4);
+  color: #2d3748;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Liquid Glass 特效增强 */
+.search-box::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.3) 100%);
+  border-radius: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.search-box:hover::before {
+  opacity: 1;
+}
+
+.site-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.05) 100%);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.site-button:hover::before {
+  opacity: 1;
 }
 
 @media (max-width: 640px) {
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
   .search-box {
     flex-direction: row;
     gap: 0.5rem;
+    border-radius: 20px;
+    padding: 8px;
   }
 
   .input-wrapper {
     margin-right: 0.3rem;
   }
 
+  input {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
   .search-button-icon {
     width: 44px;
     height: 44px;
+    border-radius: 14px;
   }
 
   .site-selector {
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.8rem;
   }
 
   .site-button {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
+    border-radius: 14px;
   }
 }
 

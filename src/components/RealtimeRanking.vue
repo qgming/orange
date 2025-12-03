@@ -114,18 +114,12 @@ onUnmounted(() => {
   <div class="realtime-ranking">
     <div class="ranking-header">
       <div class="ranking-tabs">
-        <button
-          :class="['tab-btn', { active: activeTab === 'web' }]"
-          @click="activeTab = 'web'"
-        >
+        <button :class="['tab-btn', { active: activeTab === 'web' }]" @click="activeTab = 'web'">
           <span class="button-content">
             网剧热度榜
           </span>
         </button>
-        <button
-          :class="['tab-btn', { active: activeTab === 'tv' }]"
-          @click="activeTab = 'tv'"
-        >
+        <button :class="['tab-btn', { active: activeTab === 'tv' }]" @click="activeTab = 'tv'">
           <span class="button-content">
             电视收视榜
           </span>
@@ -133,7 +127,9 @@ onUnmounted(() => {
       </div>
       <button class="expand-btn" @click="toggleExpand">
         {{ isExpanded ? '收起' : '展开' }}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :class="{ rotated: isExpanded }">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          :class="{ rotated: isExpanded }">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
@@ -151,13 +147,8 @@ onUnmounted(() => {
     <div v-else class="ranking-content">
       <!-- 网剧榜单 -->
       <div v-show="activeTab === 'web'" class="ranking-list" :class="{ collapsed: !isExpanded }">
-        <div
-          v-for="(item, index) in webRanking.slice(0, 28)"
-          :key="item.series_id"
-          class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }"
-          @click="handleCardClick(item.series_name)"
-        >
+        <div v-for="(item, index) in webRanking.slice(0, 28)" :key="item.series_id" class="ranking-card"
+          :class="{ hidden: !isExpanded && index >= 4 }" @click="handleCardClick(item.series_name)">
           <div :class="['rank-badge', getRankingClass(index + 1)]">
             {{ index + 1 }}
           </div>
@@ -173,20 +164,16 @@ onUnmounted(() => {
 
       <!-- 电视榜单 -->
       <div v-show="activeTab === 'tv'" class="ranking-list" :class="{ collapsed: !isExpanded }">
-        <div
-          v-for="(item, index) in tvRanking.slice(0, 28)"
-          :key="index"
-          class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }"
-          @click="handleCardClick(item.programme_name)"
-        >
+        <div v-for="(item, index) in tvRanking.slice(0, 28)" :key="index" class="ranking-card"
+          :class="{ hidden: !isExpanded && index >= 4 }" @click="handleCardClick(item.programme_name)">
           <div :class="['rank-badge', getRankingClass(index + 1)]">
             {{ index + 1 }}
           </div>
           <div class="ranking-info">
             <h3 class="ranking-name">{{ item.programme_name }}</h3>
             <div class="ranking-meta">
-              <span v-if="item.market_rate" class="meta-item rating">{{ item.market_rate_desc || item.market_rate }}</span>
+              <span v-if="item.market_rate" class="meta-item rating">{{ item.market_rate_desc || item.market_rate
+              }}</span>
               <span v-if="item.channel_name" class="meta-item channel">{{ item.channel_name }}</span>
             </div>
           </div>
@@ -207,7 +194,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -219,24 +206,33 @@ onUnmounted(() => {
 }
 
 .tab-btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 8px;
-  background: #ffffff;
-  border: none;
+  padding: 0.7rem 1.8rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: all 0.3s ease;
-  color: #666;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(45, 55, 72, 0.9);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .tab-btn:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);
-  color: white;
+  background: rgba(255, 255, 255, 0.45);
+  color: #2d3748;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
 }
 
 .button-content {
@@ -246,23 +242,28 @@ onUnmounted(() => {
 }
 
 .expand-btn {
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  background: #ffffff;
-  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: all 0.3s ease;
-  color: #666;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(45, 55, 72, 0.9);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .expand-btn:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .expand-btn svg {
@@ -276,31 +277,39 @@ onUnmounted(() => {
 .loading {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #FF7F50;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
   text-align: center;
   padding: 2rem;
-  color: #e74c3c;
+  color: #fff;
   font-size: 1.1rem;
-  background: #fff5f5;
-  border-radius: 12px;
+  background: rgba(231, 76, 60, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
 }
 
 .ranking-content {
@@ -309,25 +318,23 @@ onUnmounted(() => {
 
 .ranking-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.2rem;
 }
 
 .ranking-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.2rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-  border: 1px solid #f0f0f0;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease,
-    opacity 0.3s ease,
-    max-height 0.3s ease;
-  box-shadow: 0 2px 12px rgba(255, 107, 26, 0.06);
+  gap: 1.2rem;
+  padding: 1.2rem 1.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   cursor: pointer;
 }
 
@@ -336,47 +343,68 @@ onUnmounted(() => {
 }
 
 .ranking-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 12px 28px rgba(255, 107, 26, 0.15);
-  border-color: #FF7F50;
-  background: linear-gradient(135deg, #ffffff 0%, #fff5f2 100%);
+  transform: translateY(-6px) scale(1.02);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 16px 40px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .rank-badge {
-  min-width: 36px;
-  height: 36px;
+  min-width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #999;
-  background: #f5f5f5;
-  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: rgba(45, 55, 72, 0.7);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
   flex-shrink: 0;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .ranking-card:hover .rank-badge {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .rank-first {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 237, 78, 0.4));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #b8860b;
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  font-weight: 900;
 }
 
 .rank-second {
-  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-  color: #666;
-  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.4), rgba(232, 232, 232, 0.4));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #708090;
+  border-color: rgba(192, 192, 192, 0.5);
+  box-shadow: 0 6px 16px rgba(192, 192, 192, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  font-weight: 900;
 }
 
 .rank-third {
-  background: linear-gradient(135deg, #cd7f32, #e6a857);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.4), rgba(230, 168, 87, 0.4));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #8b4513;
+  border-color: rgba(205, 127, 50, 0.5);
+  box-shadow: 0 6px 16px rgba(205, 127, 50, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  font-weight: 900;
 }
 
 .ranking-info {
@@ -385,42 +413,102 @@ onUnmounted(() => {
 }
 
 .ranking-name {
-  margin: 0 0 0.5rem 0;
-  color: #2d2d2d;
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 0 0 0.6rem 0;
+  color: #2d3748;
+  font-size: 1.05rem;
+  font-weight: 700;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .ranking-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  gap: 0.6rem;
+  font-size: 0.85rem;
 }
 
 .meta-item {
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  background: #f5f5f5;
-  color: #666;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #2d3748;
   white-space: nowrap;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
 }
 
 .meta-item.heat,
 .meta-item.rating {
-  background: linear-gradient(135deg, #fff5f0, #ffe8dc);
-  color: #ff6b1a;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.4);
+  color: #e67e22;
+  border-color: rgba(230, 126, 34, 0.3);
+  font-weight: 700;
 }
 
 .meta-item.platform,
 .meta-item.channel {
-  background: #f0f4ff;
-  color: #5b8def;
+  background: rgba(255, 255, 255, 0.35);
+  color: #3498db;
+  border-color: rgba(52, 152, 219, 0.3);
+}
+
+/* Liquid Glass 光泽效果 */
+.ranking-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px 20px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.ranking-card:hover::before {
+  opacity: 1;
+}
+
+.ranking-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-btn,
+.expand-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-btn::after,
+.expand-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%);
+  transition: left 0.5s ease;
+}
+
+.tab-btn:hover::after,
+.expand-btn:hover::after {
+  left: 100%;
 }
 
 @media (max-width: 768px) {
@@ -440,36 +528,42 @@ onUnmounted(() => {
   }
 
   .tab-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .expand-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
 
   .ranking-list {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+    gap: 1rem;
   }
 
   .ranking-card {
-    padding: 0.9rem 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 18px;
   }
 
   .rank-badge {
-    min-width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
+    min-width: 38px;
+    height: 38px;
+    font-size: 1rem;
   }
 
   .ranking-name {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .ranking-meta {
-    font-size: 0.75rem;
-    gap: 0.4rem;
+    font-size: 0.8rem;
+    gap: 0.5rem;
   }
 
   .meta-item {
-    padding: 0.15rem 0.5rem;
+    padding: 0.25rem 0.6rem;
   }
 }
 

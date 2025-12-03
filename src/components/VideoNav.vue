@@ -253,12 +253,12 @@ watch(activeCategory, () => {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .category-filter {
   display: flex;
-  gap: 0.8rem;
+  gap: 1rem;
   margin-top: 1rem;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -267,47 +267,58 @@ watch(activeCategory, () => {
 }
 
 .filter-btn {
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  background: #ffffff;
-  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(45, 55, 72, 0.9);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .filter-btn:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .submit-btn {
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  background: #ffffff;
-  color: inherit;
+  padding: 0.7rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(45, 55, 72, 0.9);
   text-decoration: none;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: all 0.3s ease;
+  gap: 0.4rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-left: auto;
-  border: none;
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .submit-btn:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
 .submit-btn svg {
-  transition: transform 0.3s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .submit-btn:hover svg {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
 }
 
 .button-content {
@@ -317,100 +328,112 @@ watch(activeCategory, () => {
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #FFA07A, #FF7F50);
-  ;
-  color: white;
+  background: rgba(255, 255, 255, 0.45);
+  color: #2d3748;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
 }
 
 .filter-btn .count {
-  padding: 0.1rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.75em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8em;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .filter-btn:not(.active) .count {
-  background: rgba(0, 0, 0, 0.08);
-  color: #666;
+  background: rgba(45, 55, 72, 0.15);
+  color: rgba(45, 55, 72, 0.8);
+  border-color: rgba(45, 55, 72, 0.1);
 }
 
 .category {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 .site-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
 .site-card {
-  padding: 1.2rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-  border: 1px solid #f0f0f0;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
-  box-shadow: 0 2px 12px rgba(255, 107, 26, 0.06);
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   text-decoration: none;
   display: block;
 }
 
 .site-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px -12px rgba(255, 107, 26, 0.2);
-  border-color: #FF7F50;
-  background: linear-gradient(135deg, #ffffff 0%, #fff5f2 100%);
+  transform: translateY(-8px) scale(1.03);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 48px rgba(31, 38, 135, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .site-icon-wrapper {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   flex-shrink: 0;
 }
 
 .site-icon {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   object-fit: contain;
-  background: #f5f5f5;
-  border: 2px solid #e0e0e0;
-  padding: 8px;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-  /* 隐藏加载时的alt文本 */
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
   color: transparent;
   font-size: 0;
 }
 
 .site-card:hover .site-icon {
-  transform: scale(1.15) rotate(5deg);
-  border-color: #FF7F50;
-  box-shadow: 0 6px 16px rgba(255, 107, 26, 0.25);
+  transform: scale(1.15) rotate(8deg);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.2);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* 图标加载骨架屏 */
 .icon-skeleton {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  border-radius: 14px;
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.2) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 @keyframes skeleton-loading {
@@ -423,25 +446,26 @@ watch(activeCategory, () => {
   }
 }
 
-
 .site-info {
   flex: 1;
   min-width: 0;
 }
 
 h2 {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-  color: #2d2d2d;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.02em;
 }
 
 h3 {
-  margin: 0 0 0.3rem 0;
-  color: #2d2d2d;
+  margin: 0 0 0.4rem 0;
+  color: #2d3748;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
   display: flex;
   align-items: center;
@@ -449,16 +473,18 @@ h3 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .site-url {
   margin: 0;
-  color: #888;
+  color: rgba(45, 55, 72, 0.7);
   font-size: 0.85rem;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 .recommend-badge {
@@ -466,17 +492,71 @@ h3 {
   align-items: center;
   justify-content: center;
   margin-left: 0.5rem;
-  font-size: 1.3rem;
-  color: #ff4757;
+  font-size: 1.4rem;
+  color: #ff6b81;
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1.4;
   vertical-align: baseline;
+  filter: drop-shadow(0 2px 4px rgba(255, 107, 129, 0.3));
 }
 
 .site-card:hover .recommend-badge {
-  color: #ff6b81;
-  transform: scale(1.15);
+  color: #ff4757;
+  transform: scale(1.2) rotate(10deg);
+  filter: drop-shadow(0 4px 8px rgba(255, 71, 87, 0.4));
+}
+
+/* Liquid Glass 光泽效果 */
+.site-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.site-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px 20px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.site-card:hover::before {
+  opacity: 1;
+}
+
+.filter-btn,
+.submit-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn::after,
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%);
+  transition: left 0.5s ease;
+}
+
+.filter-btn:hover::after,
+.submit-btn:hover::after {
+  left: 100%;
 }
 
 /* 移动端适配 */
@@ -492,22 +572,23 @@ h3 {
 
   .site-list {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
+    gap: 1.2rem;
   }
 
   .site-card {
-    padding: 1rem;
+    padding: 1.2rem;
+    border-radius: 18px;
   }
 
   .card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.8rem;
   }
 
   .site-icon-wrapper {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   h3 {
@@ -515,16 +596,19 @@ h3 {
   }
 
   .site-url {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   h2 {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
-  .filter-btn {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
+  .filter-btn,
+  .submit-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 14px;
   }
 }
 </style>

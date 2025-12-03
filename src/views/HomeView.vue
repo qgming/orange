@@ -32,50 +32,64 @@ import RealtimeRanking from '../components/RealtimeRanking.vue'
   max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
-  padding: 2rem 0;
+  padding: 3rem 0;
   position: relative;
 }
 
 .footer {
   text-align: center;
-  padding: 1.5rem 0;
-  margin-top: 10rem;
-  color: #666;
-  font-size: 0.9rem;
+  padding: 2rem 0;
+  margin-top: 8rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  position: relative;
 }
 
 .footer-links {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
 .footer-link {
-  color: #ff6b1a;
+  color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
 }
 
 .footer-link svg {
-  transition: transform 0.3s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-link:hover {
-  color: #ff8c3d;
-  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+  text-decoration: none;
 }
 
 .footer-link:hover svg {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
 }
 
 .copyright {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  font-weight: 500;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: rgba(255, 255, 255, 0.85);
 }
 </style>
