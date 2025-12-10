@@ -6,8 +6,13 @@ export const videoSites = {
       isRecommended: true,
     },
     {
-      name: "555影视",
-      url: "https://www.55yy6.com",
+      name: "简单TV",
+      url: "https://jiandantv.com/",
+      isRecommended: true,
+    },
+    {
+      name: "网飞猫",
+      url: "https://www.ncat22.com/",
       isRecommended: true,
     },
     {
@@ -29,6 +34,19 @@ export const videoSites = {
       name: "NO视频",
       url: "https://www.novipnoad.net/",
       isRecommended: true,
+    },
+    {
+      name: "3Q影视",
+      url: "https://qqqys.com/",
+      isRecommended: true,
+    },
+    {
+      name: "555影视",
+      url: "https://www.55yy6.com",
+    },
+    {
+      name: "爱看机器人",
+      url: "https://v.ikanbot.com/",
     },
     {
       name: "独播库",
@@ -114,10 +132,6 @@ export const videoSites = {
     {
       name: "黑夜影视",
       url: "https://darkvod.com/",
-    },
-    {
-      name: "爱看机器人",
-      url: "https://v.ikanbot.com/",
     },
     {
       name: "枫林网",

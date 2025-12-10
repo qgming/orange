@@ -5,7 +5,7 @@ export const searchSites = [
     name: "追影猫",
     url: "https://zhuiyingmao5.com/vodsearch/-------------.html?wd=",
   },
-  { name: "VidHub", url: "https://vidhub.tv/vodsearch/-------------.html?wd=" },
+  { name: "简单TV", url: "https://jiandantv.com/?key=" },
 ];
 
 /**
