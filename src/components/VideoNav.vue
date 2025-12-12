@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { videoSites } from '../data/videoSites'
 import {
   iconService,
@@ -87,16 +87,16 @@ const isIconLoading = (url, siteName) => {
 
 
 
-// 简化的分类标签 - 只保留全部和推荐
-const categories = ['全部', '推荐']
+// 动态分类标签
+const categories = computed(() => {
+  return ['全部', '推荐', ...Object.keys(videoSites)]
+})
 
 // 筛选后的网站列表
 const filteredSites = computed(() => {
   if (activeCategory.value === '全部') {
-    // 如果选择"全部"，则显示所有网站
     return videoSites
   } else if (activeCategory.value === '推荐') {
-    // 如果选择"推荐"，则只显示推荐的网站
     const filtered = {}
     Object.entries(videoSites).forEach(([category, sites]) => {
       const categoryFilteredSites = sites.filter(site => site.isRecommended)
@@ -105,8 +105,11 @@ const filteredSites = computed(() => {
       }
     })
     return filtered
+  } else {
+    // 具体分类
+    const sites = videoSites[activeCategory.value]
+    return sites ? { [activeCategory.value]: sites } : {}
   }
-  return videoSites
 })
 
 // 计算总网站数量
@@ -190,29 +193,58 @@ onMounted(async () => {
 // 监听分类变化，加载对应图标
 watch(activeCategory, () => {
   loadCurrentCategoryIcons()
+  // 滑动到选择栏顶部
+  const categoryTabs = document.querySelector('.category-tabs')
+  if (categoryTabs) {
+    categoryTabs.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    })
+  }
+})
+
+// 返回顶部功能
+const showBackToTop = ref(false)
+
+const checkScroll = () => {
+  showBackToTop.value = window.scrollY > 500
+}
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', checkScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', checkScroll)
 })
 </script>
 
 <template>
   <div class="video-nav">
     <div class="nav-header">
-      <div class="category-filter">
+      <div class="category-tabs">
         <button v-for="cat in categories" :key="cat" @click="activeCategory = cat"
-          :class="{ active: activeCategory === cat }" class="filter-btn">
+          :class="{ active: activeCategory === cat }" class="tab-btn">
           <span class="button-content">
             {{ cat }}
             <span v-if="cat === '全部'" class="count">{{ totalSitesCount }}</span>
             <span v-else-if="cat === '推荐'" class="count">{{ recommendedSitesCount }}</span>
+            <span v-else class="count">{{ videoSites[cat]?.length || 0 }}</span>
           </span>
         </button>
-        <a href="https://github.com/qgming/orange/issues" target="_blank" rel="noopener noreferrer" class="submit-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v1z" />
-          </svg>
-          网站提交
-        </a>
       </div>
+      <a href="https://github.com/qgming/orange/issues" target="_blank" rel="noopener noreferrer" class="submit-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v1z" />
+        </svg>
+        网站提交
+      </a>
     </div>
 
     <div v-for="(sites, category) in filteredSites" :key="category" class="category">
@@ -229,14 +261,32 @@ watch(activeCategory, () => {
             </div>
             <div class="site-info">
               <h3>
-                {{ site.name }}<span v-if="site.isRecommended" class="recommend-badge">♥</span>
+                {{ site.name }}
               </h3>
               <p class="site-url">{{ getHostname(site.url) }}</p>
+            </div>
+            <!-- 推荐角标 -->
+            <div v-if="site.isRecommended" class="ribbon-badge" title="推荐站点">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              <span>精选</span>
             </div>
           </div>
         </a>
       </div>
     </div>
+
+    <!-- 返回顶部按钮 -->
+    <Transition name="fade">
+      <button v-show="showBackToTop" @click="scrollToTop" class="back-to-top" aria-label="返回顶部">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 15l-6-6-6 6" />
+        </svg>
+      </button>
+    </Transition>
   </div>
 </template>
 
@@ -249,25 +299,23 @@ watch(activeCategory, () => {
 
 .nav-header {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.category-filter {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
 }
 
-.filter-btn {
-  padding: 0.7rem 1.5rem;
+.category-tabs {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 0.7rem 1.8rem;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
@@ -279,55 +327,17 @@ watch(activeCategory, () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: rgba(45, 55, 72, 0.9);
   box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  position: relative;
+  z-index: 11;
 }
 
-.filter-btn:hover {
+.tab-btn:hover {
   background: rgba(255, 255, 255, 0.35);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
 }
 
-.submit-btn {
-  padding: 0.7rem 1.5rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: rgba(45, 55, 72, 0.9);
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: auto;
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
-}
-
-.submit-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
-}
-
-.submit-btn svg {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.submit-btn:hover svg {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.button-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.filter-btn.active {
+.tab-btn.active {
   background: rgba(255, 255, 255, 0.45);
   color: #2d3748;
   border-color: rgba(255, 255, 255, 0.5);
@@ -336,7 +346,13 @@ watch(activeCategory, () => {
   transform: translateY(-2px);
 }
 
-.filter-btn .count {
+.button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab-btn .count {
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
   font-size: 0.8em;
@@ -346,10 +362,41 @@ watch(activeCategory, () => {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.filter-btn:not(.active) .count {
-  background: rgba(45, 55, 72, 0.15);
-  color: rgba(45, 55, 72, 0.8);
-  border-color: rgba(45, 55, 72, 0.1);
+.tab-btn:not(.active) .count {
+  background: rgba(255, 255, 255, 0.25);
+  color: rgba(45, 55, 72, 0.7);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.submit-btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(45, 55, 72, 0.9);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  position: relative;
+  z-index: 11;
+  text-decoration: none;
+}
+
+.submit-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+}
+
+.submit-btn svg {
+  transition: transform 0.3s ease;
 }
 
 .category {
@@ -382,6 +429,12 @@ watch(activeCategory, () => {
   box-shadow: 0 20px 48px rgba(31, 38, 135, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+.site-card:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.4);
+  transition-duration: 0.1s;
 }
 
 .card-header {
@@ -487,24 +540,28 @@ h3 {
   font-weight: 500;
 }
 
-.recommend-badge {
-  display: inline-flex;
+.ribbon-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b81, #ff4757);
+  color: white;
+  padding: 4px 8px;
+  border-bottom-left-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  margin-left: 0.5rem;
-  font-size: 1.4rem;
-  color: #ff6b81;
-  flex-shrink: 0;
+  gap: 2px;
+  box-shadow: -2px 2px 8px rgba(255, 71, 87, 0.2);
+  z-index: 2;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  line-height: 1.4;
-  vertical-align: baseline;
-  filter: drop-shadow(0 2px 4px rgba(255, 107, 129, 0.3));
 }
 
-.site-card:hover .recommend-badge {
-  color: #ff4757;
-  transform: scale(1.2) rotate(10deg);
-  filter: drop-shadow(0 4px 8px rgba(255, 71, 87, 0.4));
+.site-card:hover .ribbon-badge {
+  padding-right: 10px;
+  padding-left: 6px;
+  box-shadow: -4px 4px 12px rgba(255, 71, 87, 0.3);
 }
 
 /* Liquid Glass 光泽效果 */
@@ -533,13 +590,13 @@ h3 {
   opacity: 1;
 }
 
-.filter-btn,
+.tab-btn,
 .submit-btn {
   position: relative;
   overflow: hidden;
 }
 
-.filter-btn::after,
+.tab-btn::after,
 .submit-btn::after {
   content: '';
   position: absolute;
@@ -554,7 +611,7 @@ h3 {
   transition: left 0.5s ease;
 }
 
-.filter-btn:hover::after,
+.tab-btn:hover::after,
 .submit-btn:hover::after {
   left: 100%;
 }
@@ -568,6 +625,16 @@ h3 {
   .nav-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .category-tabs {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .submit-btn {
+    margin-left: 0;
+    align-self: flex-end;
   }
 
   .site-list {
@@ -604,11 +671,50 @@ h3 {
     margin-bottom: 1.5rem;
   }
 
-  .filter-btn,
+  .tab-btn,
   .submit-btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
     border-radius: 14px;
   }
+}
+
+/* 返回顶部按钮样式 */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c3e50;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+  transform: translateY(-4px);
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  color: #ff6b81;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
