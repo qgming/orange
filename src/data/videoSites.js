@@ -1,8 +1,13 @@
 export const videoSites = {
   影视: [
     {
-      name: "电影先生",
-      url: "https://dyxs39.com/",
+      name: "3Q影视",
+      url: "https://qqqys.com/",
+      isRecommended: true,
+    },
+    {
+      name: "555影视",
+      url: "https://www.55yy6.com",
       isRecommended: true,
     },
     {
@@ -21,11 +26,6 @@ export const videoSites = {
       isRecommended: true,
     },
     {
-      name: "KVideo",
-      url: "https://kvideo.vercel.app/",
-      isRecommended: true,
-    },
-    {
       name: "火车太堵",
       url: "https://www.tdgo.shop/",
       isRecommended: true,
@@ -36,13 +36,8 @@ export const videoSites = {
       isRecommended: true,
     },
     {
-      name: "3Q影视",
-      url: "https://qqqys.com/",
-      isRecommended: true,
-    },
-    {
-      name: "555影视",
-      url: "https://www.55yy6.com",
+      name: "电影先生",
+      url: "https://dyxs39.com/",
     },
     {
       name: "爱看机器人",
@@ -55,10 +50,6 @@ export const videoSites = {
     {
       name: "NunFlix",
       url: "https://5movies.store/",
-    },
-    {
-      name: "VidHub",
-      url: "https://vidhub.tv/",
     },
     {
       name: "厂长资源",

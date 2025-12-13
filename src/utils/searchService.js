@@ -1,11 +1,15 @@
 // 搜索站点配置
 export const searchSites = [
+  { name: "简单TV", url: "https://jiandantv.com/?key=" },
   { name: "搜片", url: "https://soupian.plus/frame?movie=" },
   {
     name: "追影猫",
     url: "https://zhuiyingmao5.com/vodsearch/-------------.html?wd=",
   },
-  { name: "简单TV", url: "https://jiandantv.com/?key=" },
+  {
+    name: "奈飞工厂",
+    url: "https://www.netflixgc.com/vodsearch/-------------.html?wd=",
+  },
 ];
 
 /**
