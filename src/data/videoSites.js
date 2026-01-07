@@ -6,8 +6,8 @@ export const videoSites = {
       isRecommended: true,
     },
     {
-      name: "555影视",
-      url: "https://www.55yy6.com",
+      name: "剧圈圈",
+      url: "https://www.jqqzx.top/",
       isRecommended: true,
     },
     {
@@ -34,6 +34,24 @@ export const videoSites = {
       name: "NO视频",
       url: "https://www.novipnoad.net/",
       isRecommended: true,
+    },
+    {
+      name: "蚂蚁4K",
+      url: "https://www.mayi4k.com/",
+      isRecommended: true,
+    },
+    {
+      name: "飞快TV",
+      url: "https://feikuai.tv/",
+      isRecommended: true,
+    },
+    {
+      name: "555影视",
+      url: "https://www.55yy6.com",
+    },
+    {
+      name: "大米星球",
+      url: "https://www.dma9v6c0c2.shop/index/home.html",
     },
     {
       name: "电影先生",

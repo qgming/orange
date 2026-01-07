@@ -27,7 +27,7 @@
   );
 
   /* 柔和渐变背景 */
-  --gradient-background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  --gradient-background: linear-gradient(135deg, #7dd3c0 0%, #8ec5fc 100%);
   --gradient-overlay: radial-gradient(
       circle at 20% 50%,
       rgba(255, 255, 255, 0.2) 0%,
@@ -41,7 +41,7 @@
 
   /* 主题色 - 柔和色调 */
   --color-primary: #8ec5fc;
-  --color-secondary: #e0c3fc;
+  --color-secondary: #7dd3c0;
   --color-accent: #a8e6cf;
 }
 
@@ -85,7 +85,7 @@ body::before {
   height: 200%;
   background: radial-gradient(
       circle at 20% 30%,
-      rgba(224, 195, 252, 0.4) 0%,
+      rgba(125, 211, 192, 0.4) 0%,
       transparent 50%
     ),
     radial-gradient(
@@ -105,15 +105,19 @@ body::before {
 @keyframes liquidFlow {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) scale(1) rotate(0deg);
     opacity: 0.6;
   }
-  33% {
-    transform: translate(3%, -3%) scale(1.05);
-    opacity: 0.8;
+  25% {
+    transform: translate(4%, -2%) scale(1.08) rotate(3deg);
+    opacity: 0.75;
   }
-  66% {
-    transform: translate(-3%, 3%) scale(0.95);
+  50% {
+    transform: translate(-2%, 4%) scale(0.92) rotate(-2deg);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(3%, 3%) scale(1.05) rotate(4deg);
     opacity: 0.7;
   }
 }
