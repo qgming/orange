@@ -1,221 +1,93 @@
 <div align="center">
 
-# 🍊 橘子导航
+<img src="public/favicon.svg" alt="橘子导航 Logo" width="120" height="120" />
+
+# 橘子导航
 
 **简洁优雅的视频资源聚合平台**
 
-[![Vue](https://img.shields.io/badge/Vue-3.5.13-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.3.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Pinia](https://img.shields.io/badge/Pinia-3.0.1-FFD859?style=for-the-badge&logo=pinia&logoColor=black)](https://pinia.vuejs.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Vue 3](https://img.shields.io/badge/Vue-3.5-42b883?style=flat&logo=vue.js)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.3-646cff?style=flat&logo=vite)](https://vitejs.dev/)
+[![License](https://img.shields.io/badge/License-MIT-orange?style=flat)](LICENSE)
 
-[🌐 在线体验](https://v.qgming.com) · [🐛 报告问题](https://github.com/qgming/orange/issues) · [➕ 提交网站](https://github.com/qgming/orange/issues)
-
-![Screenshot](https://via.placeholder.com/800x400/FF6B35/FFFFFF?text=Orange+Navigation)
+[🌐 在线体验](https://v.qgming.com) · [🐛 问题反馈](https://github.com/qgming/orange/issues) · [➕ 提交网站](https://github.com/qgming/orange/issues)
 
 </div>
 
----
+## ✨ 特性
 
-## ✨ 特性亮点
-
-<table>
-<tr>
-<td width="50%">
-
-### 🎯 资源丰富
-收录 **60+ 优质网站**，涵盖影视、动漫、短剧、阅读等多个领域，持续更新中
-
-</td>
-<td width="50%">
-
-### 🔍 智能搜索
-支持关键词搜索和标签筛选，毫秒级响应，快速定位目标资源
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 📱 响应式设计
-完美适配 PC、平板、手机等多种设备，流畅的交互体验
-
-</td>
-<td width="50%">
-
-### ⚡ 极速访问
-无广告干扰，一键直达目标网站，告别繁琐的搜索过程
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🎨 现代 UI
-采用液态玻璃设计系统，清爽简洁的界面，赏心悦目
-
-</td>
-<td width="50%">
-
-### 🔒 隐私保护
-无需注册登录，不收集任何个人信息，保护您的隐私安全
-
-</td>
-</tr>
-</table>
+- 🎯 **资源丰富** - 收录 60+ 优质网站，涵盖影视、动漫、短剧、阅读等领域
+- 🔍 **智能搜索** - 关键词搜索 + 标签筛选，毫秒级响应
+- 📱 **响应式设计** - 完美适配桌面端、平板、移动设备
+- 🎨 **现代 UI** - 液态玻璃设计系统，清爽简洁
+- ⚡ **极速访问** - 无广告干扰，一键直达
+- 🔒 **隐私保护** - 无需注册，不收集个人信息
 
 ## 🚀 快速开始
-
-### 环境要求
-
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-
-### 本地开发
 
 ```bash
 # 克隆项目
 git clone https://github.com/qgming/orange.git
-
-# 进入项目目录
-cd orange
 
 # 安装依赖
 npm install
 
 # 启动开发服务器
 npm run dev
-```
 
-访问 [http://localhost:5173](http://localhost:5173) 即可预览
-
-### 构建部署
-
-```bash
 # 生产构建
 npm run build
-
-# 预览构建结果
-npm run preview
 ```
-
-构建产物位于 `dist` 目录，可直接部署到任何静态托管服务
 
 ## 📦 技术栈
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| [Vue 3](https://vuejs.org/) | 3.5.13 | 渐进式 JavaScript 框架，使用 Composition API |
-| [Vue Router](https://router.vuejs.org/) | 4.5.0 | 官方路由管理器 |
-| [Pinia](https://pinia.vuejs.org/) | 3.0.1 | 新一代状态管理库 |
-| [Vite](https://vitejs.dev/) | 7.3.0 | 下一代前端构建工具 |
-| [Vue DevTools](https://devtools.vuejs.org/) | 8.0.5 | Vue 开发者工具 |
+- **框架**: Vue 3.5 + TypeScript 5.7
+- **构建**: Vite 7.3
+- **路由**: Vue Router 4.5
+- **状态**: Pinia 3.0
+- **样式**: 原生 CSS + 设计系统
 
-## 📁 项目结构
+## 📂 项目结构
 
 ```
-orange/
-├── public/                    # 静态资源目录
-│   └── favicon.ico           # 网站图标
-├── src/
-│   ├── components/           # 可复用组件
-│   │   ├── SearchBox.vue    # 搜索框组件
-│   │   └── VideoNav.vue     # 视频导航组件
-│   ├── data/                # 数据配置
-│   │   └── videoSites.js    # 网站数据源
-│   ├── router/              # 路由配置
-│   │   └── index.js         # 路由定义
-│   ├── stores/              # Pinia 状态管理
-│   ├── utils/               # 工具函数
-│   │   └── iconService.js   # 图标服务
-│   ├── views/               # 页面组件
-│   │   ├── HomeView.vue     # 首页
-│   │   └── PrivacyPolicy.vue # 隐私政策页
-│   ├── App.vue              # 根组件
-│   └── main.js              # 应用入口
-├── index.html               # HTML 模板
-├── package.json             # 项目配置
-├── vite.config.js           # Vite 配置
-└── README.md                # 项目文档
+src/
+├── assets/              # 静态资源
+│   └── design-system/  # 设计系统
+├── components/         # 组件
+├── composables/        # 组合式函数
+├── data/              # 数据配置
+├── router/            # 路由
+├── stores/            # 状态管理
+├── types/             # 类型定义
+├── utils/             # 工具函数
+└── views/             # 页面
 ```
 
-## 🎯 核心功能
+## 🤝 贡献
 
-### 📂 资源分类
+欢迎提交 Issue 和 Pull Request！
 
-| 分类 | 说明 | 代表网站 |
-|------|------|----------|
-| 🎬 影视 | 优质影视资源平台 | 电影先生、555影视、奈飞工厂 |
-| 🎨 二次元 | 动漫爱好者聚集地 | 樱花动漫、AGE动漫、风铃动漫 |
-| 📺 短剧 | 短视频剧集资源 | 55短剧、短剧狗 |
-| 📚 阅读 | 电子书资源库 | Z-Library、安娜的档案 |
+**添加新网站**: 编辑 [src/data/videoSites.ts](src/data/videoSites.ts)
 
-### 💡 使用说明
-
-1. **浏览网站** - 首页按分类展示所有网站，点击卡片即可访问
-2. **搜索筛选** - 使用顶部搜索框输入关键词快速查找
-3. **推荐标识** - 带有 ⭐ 推荐标签的网站经过精心筛选，质量更优
-
-## 🤝 贡献指南
-
-欢迎提交 Issue 和 Pull Request 来帮助改进项目！
-
-### 添加新网站
-
-编辑 [src/data/videoSites.js](src/data/videoSites.js) 文件，按以下格式添加：
-
-```javascript
+```typescript
 {
   name: "网站名称",
   url: "https://example.com",
-  isRecommended: true  // 可选：是否推荐
+  category: "影视",
+  tags: ["标签1", "标签2"],
+  isRecommended: true
 }
 ```
 
-### 开发规范
-
-- 遵循 Vue 3 Composition API 最佳实践
-- 保持代码简洁，避免过度工程化
-- 提交前确保代码通过构建测试
-
-## 📊 项目统计
-
-- ⭐ 收录网站：60+
-- 🏷️ 分类标签：4 大类
-- 📱 支持设备：全平台响应式
-- 🚀 构建大小：< 500KB (gzip)
-
-## 💬 联系方式
-
-<div align="center">
-
-**作者**: qgming
-
-📧 [qgming@qq.com](mailto:qgming@qq.com) · 🌐 [v.qgming.com](https://v.qgming.com)
-
-**公众号**: 极点维度
-
-</div>
-
-## 🙏 致谢
-
-感谢以下优秀的开源项目和服务：
-
-- [Vue.js](https://vuejs.org/) - 渐进式 JavaScript 框架
-- [Vite](https://vitejs.dev/) - 下一代前端构建工具
-- [Pinia](https://pinia.vuejs.org/) - 轻量级状态管理
-- [Vercel](https://vercel.com/) - 提供免费部署托管服务
-
 ## 📄 开源协议
 
-本项目采用 [MIT](LICENSE) 协议开源
+[MIT](LICENSE) © [qgming](https://github.com/qgming)
 
 ---
 
 <div align="center">
 
-**如果这个项目对你有帮助，请给一个 ⭐️ Star 支持一下！**
-
-Made with ❤️ by [qgming](https://github.com/qgming)
+**如果觉得有帮助，请给个 ⭐️ Star 支持一下！**
 
 </div>

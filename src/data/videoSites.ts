@@ -1,4 +1,6 @@
-export const videoSites = {
+import type { VideoSiteCategory } from '@/types'
+
+export const videoSites: VideoSiteCategory = {
   影视: [
     {
       name: "247看",

@@ -1,0 +1,35 @@
+:root {
+  /* 主色调 */
+  --color-primary: #667eea;
+  --color-secondary: #764ba2;
+  --color-accent: #f093fb;
+
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-warm: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-cool: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+
+  /* 背景 */
+  --bg-primary: #f7f9fc;
+  --bg-secondary: #ffffff;
+
+  /* 文字 */
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-inverse: #ffffff;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.20);
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* 过渡 */
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}

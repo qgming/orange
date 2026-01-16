@@ -157,6 +157,7 @@ onMounted(() => {
   color: #2c3e50;
   margin: 0;
   background: linear-gradient(135deg, #2c3e50 0%, #3b82f6 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

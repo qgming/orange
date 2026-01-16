@@ -1,14 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { videoSites } from '../data/videoSites'
-import {
-  iconService,
-  getWebsiteIcon,
-  getDomain
-} from '../utils/iconService'
+import type { VideoSite, VideoSiteCategory } from '@/types'
+import { getWebsiteIcon } from '../utils/iconService'
 
 // 处理链接点击，添加来源参数
-const handleLinkClick = (event, url) => {
+const handleLinkClick = (event: MouseEvent, url: string) => {
   event.preventDefault()
 
   try {
@@ -24,12 +21,13 @@ const handleLinkClick = (event, url) => {
 }
 
 const activeCategory = ref('全部') // 当前选中的分类
-const siteIcons = ref(new Map()) // 存储网站图标
-const loadingIcons = ref(new Set()) // 正在加载的图标
+const siteIcons = ref(new Map<string, string>()) // 存储网站图标
+const loadingIcons = ref(new Set<string>()) // 正在加载的图标
 const isInitialLoading = ref(true) // 初始加载状态
+const categoryTabsRef = ref<HTMLElement | null>(null) // 分类标签引用
 
 // 获取网站主机名
-const getHostname = (url) => {
+const getHostname = (url: string): string => {
   try {
     return new URL(url).hostname
   } catch (e) {
@@ -38,12 +36,12 @@ const getHostname = (url) => {
 }
 
 // 加载网站图标（优化版）
-const loadSiteIcon = async (url, siteName) => {
+const loadSiteIcon = async (url: string, siteName: string): Promise<string> => {
   const key = `${siteName}-${url}`
 
   // 如果已加载，直接返回
   if (siteIcons.value.has(key)) {
-    return siteIcons.value.get(key)
+    return siteIcons.value.get(key)!
   }
 
   // 标记为加载中
@@ -56,8 +54,8 @@ const loadSiteIcon = async (url, siteName) => {
     return iconUrl
   } catch (error) {
     console.error(`获取图标失败 [${siteName}]:`, error)
-    // 即使出错，也尝试生成一个表情符号
-    const fallbackIcon = iconService.getRandomEmojiDataUrl(getDomain(url))
+    // 使用站点名称首字母作为 fallback
+    const fallbackIcon = siteName.charAt(0)
     siteIcons.value.set(key, fallbackIcon)
     return fallbackIcon
   } finally {
@@ -66,21 +64,15 @@ const loadSiteIcon = async (url, siteName) => {
 }
 
 // 获取图标URL
-const getSiteIcon = (url, siteName) => {
+const getSiteIcon = (url: string, siteName: string): string => {
   const key = `${siteName}-${url}`
   return siteIcons.value.get(key) || ''
 }
 
 // 检查图标是否已加载
-const hasIconLoaded = (url, siteName) => {
+const hasIconLoaded = (url: string, siteName: string): boolean => {
   const key = `${siteName}-${url}`
-  return siteIcons.value.has(key) && siteIcons.value.get(key)
-}
-
-// 检查图标是否正在加载
-const isIconLoading = (url, siteName) => {
-  const key = `${siteName}-${url}`
-  return loadingIcons.value.has(key)
+  return siteIcons.value.has(key) && !!siteIcons.value.get(key)
 }
 
 
@@ -93,11 +85,11 @@ const categories = computed(() => {
 })
 
 // 筛选后的网站列表
-const filteredSites = computed(() => {
+const filteredSites = computed((): VideoSiteCategory => {
   if (activeCategory.value === '全部') {
     return videoSites
   } else if (activeCategory.value === '推荐') {
-    const filtered = {}
+    const filtered: VideoSiteCategory = {}
     Object.entries(videoSites).forEach(([category, sites]) => {
       const categoryFilteredSites = sites.filter(site => site.isRecommended)
       if (categoryFilteredSites.length > 0) {
@@ -139,37 +131,32 @@ const showCategoryTitles = computed(() => activeCategory.value === '全部')
 
 // 智能预加载：优先加载推荐网站
 const preloadRecommendedIcons = async () => {
-  const recommendedUrls = []
+  const recommendedSites: VideoSite[] = []
 
   Object.values(videoSites).forEach(categorySites => {
     categorySites.forEach(site => {
       if (site.isRecommended) {
-        recommendedUrls.push(site.url)
+        recommendedSites.push(site)
       }
     })
   })
 
-  if (recommendedUrls.length > 0) {
-    console.log(`预加载 ${recommendedUrls.length} 个推荐网站图标...`)
-    await iconService.preloadIcons(recommendedUrls, {
-      priorityFirst: true,
-      onProgress: (current, total) => {
-        // 可以在这里更新进度条
-        if (current === total) {
-          console.log('推荐网站图标预加载完成')
-        }
-      }
-    })
+  if (recommendedSites.length > 0) {
+    console.log(`预加载 ${recommendedSites.length} 个推荐网站图标...`)
+    // 并发加载推荐网站图标
+    const promises = recommendedSites.map(site => loadSiteIcon(site.url, site.name))
+    await Promise.allSettled(promises)
+    console.log('推荐网站图标预加载完成')
   }
 }
 
 // 加载当前分类的图标（优化版）
 const loadCurrentCategoryIcons = async () => {
   const currentSites = filteredSites.value
-  const loadPromises = []
+  const loadPromises: Promise<string>[] = []
 
   // 分批加载，避免一次性加载过多
-  Object.values(currentSites).forEach(categorySites => {
+  Object.values(currentSites).forEach((categorySites: VideoSite[]) => {
     categorySites.forEach(site => {
       loadPromises.push(loadSiteIcon(site.url, site.name))
     })
@@ -180,29 +167,6 @@ const loadCurrentCategoryIcons = async () => {
     isInitialLoading.value = false
   })
 }
-
-// 组件挂载后初始化
-onMounted(async () => {
-  // 先预加载推荐网站图标
-  await preloadRecommendedIcons()
-
-  // 然后加载当前分类的所有图标
-  loadCurrentCategoryIcons()
-})
-
-// 监听分类变化，加载对应图标
-watch(activeCategory, () => {
-  loadCurrentCategoryIcons()
-  // 滑动到选择栏顶部
-  const categoryTabs = document.querySelector('.category-tabs')
-  if (categoryTabs) {
-    categoryTabs.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'nearest'
-    })
-  }
-})
 
 // 返回顶部功能
 const showBackToTop = ref(false)
@@ -215,19 +179,40 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onMounted(() => {
+// 组件挂载后初始化（合并两个 onMounted）
+onMounted(async () => {
+  // 先预加载推荐网站图标
+  await preloadRecommendedIcons()
+
+  // 然后加载当前分类的所有图标
+  loadCurrentCategoryIcons()
+
+  // 添加滚动监听
   window.addEventListener('scroll', checkScroll)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', checkScroll)
 })
+
+// 监听分类变化，加载对应图标
+watch(activeCategory, () => {
+  loadCurrentCategoryIcons()
+  // 滑动到选择栏顶部
+  if (categoryTabsRef.value) {
+    categoryTabsRef.value.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    })
+  }
+})
 </script>
 
 <template>
   <div class="video-nav">
     <div class="nav-header">
-      <div class="category-tabs">
+      <div ref="categoryTabsRef" class="category-tabs">
         <button v-for="cat in categories" :key="cat" @click="activeCategory = cat"
           :class="{ active: activeCategory === cat }" class="tab-btn">
           <span class="button-content">

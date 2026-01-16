@@ -1,16 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
-import { searchSites, performSearch, getSearchSiteName } from '../utils/searchService'
+import { searchSites, performSearch } from '../utils/searchService'
 
 const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 
-const currentSiteName = computed(() => getSearchSiteName(currentSiteIndex.value))
 const placeholderText = computed(() => `在${searchSites[currentSiteIndex.value].name}中搜索视频`)
-
-const toggleSearchSite = () => {
-  currentSiteIndex.value = (currentSiteIndex.value + 1) % searchSites.length
-}
 
 const handleSearch = () => {
   performSearch(searchQuery.value, currentSiteIndex.value)

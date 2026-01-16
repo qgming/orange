@@ -7,7 +7,13 @@
       "Skill(frontend-design)",
       "Skill(frontend-design:*)",
       "Bash(wc:*)",
-      "Bash(npm run dev)"
+      "Bash(npm run dev)",
+      "Bash(npm install:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "Bash(find src/utils -name \"*.js\" -type f -delete)",
+      "Bash(tree:*)"
     ]
   }
 }
