@@ -3,7 +3,11 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(npm outdated)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Skill(frontend-design)",
+      "Skill(frontend-design:*)",
+      "Bash(wc:*)",
+      "Bash(npm run dev)"
     ]
   }
 }

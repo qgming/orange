@@ -1,5 +1,6 @@
 // 搜索站点配置
 export const searchSites = [
+  { name: "247看", url: "https://247kan.com/search?q=" },
   { name: "简单TV", url: "https://jiandantv.com/?key=" },
   { name: "搜片", url: "https://soupian.plus/frame?movie=" },
   {

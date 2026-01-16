@@ -250,7 +250,8 @@ onUnmounted(() => {
     <div v-for="(sites, category) in filteredSites" :key="category" class="category">
       <h2 v-if="showCategoryTitles">{{ category }}</h2>
       <div class="site-list">
-        <a v-for="site in sites" :key="site.name" :href="site.url" @click="handleLinkClick($event, site.url)"
+        <a v-for="(site, index) in sites" :key="site.name" :href="site.url" @click="handleLinkClick($event, site.url)"
+          :style="{ '--card-index': index }"
           class="site-card">
           <div class="card-header">
             <div class="site-icon-wrapper">
@@ -412,22 +413,35 @@ onUnmounted(() => {
 .site-card {
   padding: 1.5rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-light);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-lg), var(--highlight-subtle);
   text-decoration: none;
   display: block;
+  animation: cardEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation-delay: calc(var(--card-index) * 0.03s);
+}
+
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .site-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 48px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-12px) scale(1.04) rotate(1deg);
+  background: var(--glass-medium);
+  box-shadow: var(--shadow-2xl),
+    0 8px 16px rgba(31, 38, 135, 0.15),
+    var(--highlight-strong);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
@@ -460,14 +474,14 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(8px);
   border: 2px solid rgba(255, 255, 255, 0.4);
   padding: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
   color: transparent;
   font-size: 0;
 }
 
 .site-card:hover .site-icon {
-  transform: scale(1.15) rotate(8deg);
+  transform: scale(1.2) rotate(12deg);
   border-color: rgba(255, 255, 255, 0.6);
   box-shadow: 0 8px 20px rgba(31, 38, 135, 0.2);
   background: rgba(255, 255, 255, 0.4);

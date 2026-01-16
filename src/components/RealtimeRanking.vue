@@ -148,7 +148,9 @@ onUnmounted(() => {
       <!-- 网剧榜单 -->
       <div v-show="activeTab === 'web'" class="ranking-list" :class="{ collapsed: !isExpanded }">
         <div v-for="(item, index) in webRanking.slice(0, 28)" :key="item.series_id" class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }" @click="handleCardClick(item.series_name)">
+          :class="{ hidden: !isExpanded && index >= 4 }"
+          :style="{ '--rank-index': index }"
+          @click="handleCardClick(item.series_name)">
           <div :class="['rank-badge', getRankingClass(index + 1)]">
             {{ index + 1 }}
           </div>
@@ -165,7 +167,9 @@ onUnmounted(() => {
       <!-- 电视榜单 -->
       <div v-show="activeTab === 'tv'" class="ranking-list" :class="{ collapsed: !isExpanded }">
         <div v-for="(item, index) in tvRanking.slice(0, 28)" :key="index" class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }" @click="handleCardClick(item.programme_name)">
+          :class="{ hidden: !isExpanded && index >= 4 }"
+          :style="{ '--rank-index': index }"
+          @click="handleCardClick(item.programme_name)">
           <div :class="['rank-badge', getRankingClass(index + 1)]">
             {{ index + 1 }}
           </div>
@@ -328,14 +332,26 @@ onUnmounted(() => {
   gap: 1.2rem;
   padding: 1.2rem 1.5rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-light);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-lg), var(--highlight-subtle);
   cursor: pointer;
+  animation: rankingEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--rank-index) * 0.05s);
+}
+
+@keyframes rankingEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .ranking-card.hidden {
@@ -343,10 +359,11 @@ onUnmounted(() => {
 }
 
 .ranking-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 16px 40px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-8px) scale(1.02) rotate(0.5deg);
+  background: var(--glass-medium);
+  box-shadow: var(--shadow-xl),
+    0 8px 16px rgba(31, 38, 135, 0.15),
+    var(--highlight-strong);
   border-color: rgba(255, 255, 255, 0.4);
 }
 

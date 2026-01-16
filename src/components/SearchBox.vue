@@ -76,16 +76,17 @@ const handleSearch = () => {
 
 .title {
   color: #ffffff;
-  font-size: 3.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 3rem;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-bottom: var(--space-3xl);
   position: relative;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-family: 'Space Grotesk', 'DM Sans', sans-serif;
 }
 
 .search-box-container {
@@ -98,22 +99,22 @@ const handleSearch = () => {
   max-width: 800px;
   margin: 0 auto;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--glass-medium);
+  backdrop-filter: var(--liquid-glass-blur);
+  -webkit-backdrop-filter: var(--liquid-glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-lg), var(--highlight-subtle);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   padding: 10px;
   position: relative;
 }
 
 .search-box:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 16px 48px rgba(31, 38, 135, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-6px);
+  background: var(--glass-strong);
+  box-shadow: var(--shadow-xl),
+    0 0 40px rgba(142, 197, 252, 0.2),
+    var(--highlight-strong);
   border-color: rgba(255, 255, 255, 0.4);
 }
 

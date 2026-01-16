@@ -1,6 +1,11 @@
 export const videoSites = {
   影视: [
     {
+      name: "247看",
+      url: "https://247kan.com/",
+      isRecommended: true,
+    },
+    {
       name: "3Q影视",
       url: "https://qqqys.com/",
       isRecommended: true,
@@ -153,6 +158,10 @@ export const videoSites = {
     {
       name: "好好看",
       url: "https://www.hhkan0.com/",
+    },
+    {
+      name: "金牌影院",
+      url: "https://www.x8kb9k8.com/",
     },
   ],
   二次元: [
