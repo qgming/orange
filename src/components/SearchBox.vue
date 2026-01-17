@@ -76,8 +76,8 @@ const handleSearch = () => {
   letter-spacing: var(--letter-spacing-tight);
   margin-bottom: var(--space-3xl);
   position: relative;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+  text-shadow: 0 0 30px rgba(255, 160, 122, 0.5), 0 0 60px rgba(255, 160, 122, 0.3);
+  background: linear-gradient(135deg, #ffa07a 0%, #ffb88c 50%, #ffffff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -94,11 +94,13 @@ const handleSearch = () => {
   max-width: 800px;
   margin: 0 auto;
   border-radius: 24px;
-  background: var(--glass-medium);
-  backdrop-filter: var(--liquid-glass-blur);
-  -webkit-backdrop-filter: var(--liquid-glass-blur);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: var(--shadow-lg), var(--highlight-subtle);
+  background: rgba(30, 30, 50, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 160, 122, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 160, 122, 0.1) inset,
+    0 0 40px rgba(255, 160, 122, 0.1);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   padding: 10px;
   position: relative;
@@ -106,11 +108,11 @@ const handleSearch = () => {
 
 .search-box:hover {
   transform: translateY(-6px);
-  background: var(--glass-strong);
-  box-shadow: var(--shadow-xl),
-    0 0 40px rgba(142, 197, 252, 0.2),
-    var(--highlight-strong);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(40, 40, 60, 0.7);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 160, 122, 0.3) inset,
+    0 0 60px rgba(255, 160, 122, 0.3);
+  border-color: rgba(255, 160, 122, 0.5);
 }
 
 .input-wrapper {
@@ -126,18 +128,18 @@ input {
   background: transparent;
   border-radius: 16px;
   transition: all 0.2s ease;
-  color: #2d3748;
+  color: #ffffff;
   font-weight: 500;
 }
 
 input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  background: rgba(255, 160, 122, 0.1);
+  box-shadow: 0 0 0 2px rgba(255, 160, 122, 0.3);
 }
 
 input::placeholder {
-  color: rgba(45, 55, 72, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   opacity: 1;
 }
 
@@ -148,20 +150,20 @@ input::placeholder {
   width: 52px;
   height: 52px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(255, 160, 122, 0.8), rgba(255, 184, 140, 0.8));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 160, 122, 0.5);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 4px 16px rgba(255, 160, 122, 0.3);
 }
 
 .search-button-icon:hover {
   transform: translateY(-2px) scale(1.05);
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.25);
+  background: linear-gradient(135deg, rgba(255, 160, 122, 1), rgba(255, 184, 140, 1));
+  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.5);
 }
 
 .search-button-icon:active {
@@ -169,7 +171,7 @@ input::placeholder {
 }
 
 .search-button-icon svg {
-  stroke: #2d3748;
+  stroke: #ffffff;
   stroke-width: 2.5;
 }
 
@@ -186,31 +188,32 @@ input::placeholder {
 .site-button {
   padding: 0.7rem 1.5rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: rgba(45, 55, 72, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
 }
 
 .site-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 160, 122, 0.2);
+  border-color: rgba(255, 160, 122, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
 }
 
 .site-button.active {
-  background: rgba(255, 255, 255, 0.4);
-  color: #2d3748;
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 160, 122, 0.6), rgba(255, 184, 140, 0.6));
+  color: #ffffff;
+  border-color: rgba(255, 160, 122, 0.8);
+  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -223,9 +226,9 @@ input::placeholder {
   right: -1px;
   bottom: -1px;
   background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      rgba(255, 255, 255, 0.3) 100%);
+      rgba(255, 160, 122, 0.3) 0%,
+      rgba(255, 184, 140, 0.2) 50%,
+      rgba(255, 160, 122, 0.3) 100%);
   border-radius: 24px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -245,8 +248,8 @@ input::placeholder {
   right: 0;
   bottom: 0;
   background: linear-gradient(to bottom,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.05) 100%);
+      rgba(255, 160, 122, 0.2) 0%,
+      rgba(255, 160, 122, 0.05) 100%);
   border-radius: inherit;
   opacity: 0;
   transition: opacity 0.3s ease;

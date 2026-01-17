@@ -47,20 +47,11 @@ const loadSiteIcon = async (url: string, siteName: string): Promise<string> => {
   // 标记为加载中
   loadingIcons.value.add(key)
 
-  // 异步获取图标（总是返回有效值，失败时返回表情符号）
-  try {
-    const iconUrl = await getWebsiteIcon(url, { cache: true })
-    siteIcons.value.set(key, iconUrl)
-    return iconUrl
-  } catch (error) {
-    console.error(`获取图标失败 [${siteName}]:`, error)
-    // 使用站点名称首字母作为 fallback
-    const fallbackIcon = siteName.charAt(0)
-    siteIcons.value.set(key, fallbackIcon)
-    return fallbackIcon
-  } finally {
-    loadingIcons.value.delete(key)
-  }
+  // 异步获取图标（总是返回有效值，失败时返回 emoji）
+  const iconUrl = await getWebsiteIcon(url, { cache: true, siteName })
+  siteIcons.value.set(key, iconUrl)
+  loadingIcons.value.delete(key)
+  return iconUrl
 }
 
 // 获取图标URL
@@ -223,13 +214,6 @@ watch(activeCategory, () => {
           </span>
         </button>
       </div>
-      <a href="https://github.com/qgming/orange/issues" target="_blank" rel="noopener noreferrer" class="submit-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v1z" />
-        </svg>
-        网站提交
-      </a>
     </div>
 
     <div v-for="(sites, category) in filteredSites" :key="category" class="category">
@@ -243,7 +227,14 @@ watch(activeCategory, () => {
               <!-- 加载中或未加载时显示骨架屏 -->
               <div v-if="!hasIconLoaded(site.url, site.name)" class="icon-skeleton"></div>
               <!-- 图标 - 只在加载完成后显示 -->
-              <img v-else :src="getSiteIcon(site.url, site.name)" alt="" class="site-icon" loading="lazy" />
+              <template v-else>
+                <!-- 如果是 emoji (单个字符),直接显示文本 -->
+                <div v-if="getSiteIcon(site.url, site.name).length <= 2" class="site-icon-emoji">
+                  {{ getSiteIcon(site.url, site.name) }}
+                </div>
+                <!-- 否则显示图片 -->
+                <img v-else :src="getSiteIcon(site.url, site.name)" alt="" class="site-icon" loading="lazy" />
+              </template>
             </div>
             <div class="site-info">
               <h3>
@@ -303,32 +294,33 @@ watch(activeCategory, () => {
 .tab-btn {
   padding: 0.7rem 1.8rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(45, 55, 72, 0.9);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 11;
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 160, 122, 0.2);
+  border-color: rgba(255, 160, 122, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
 }
 
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.45);
-  color: #2d3748;
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 160, 122, 0.6), rgba(255, 184, 140, 0.6));
+  color: #ffffff;
+  border-color: rgba(255, 160, 122, 0.8);
+  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -343,67 +335,36 @@ watch(activeCategory, () => {
   border-radius: 12px;
   font-size: 0.8em;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   color: inherit;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .tab-btn:not(.active) .count {
-  background: rgba(255, 255, 255, 0.25);
-  color: rgba(45, 55, 72, 0.7);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.submit-btn {
-  padding: 0.7rem 1.5rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(45, 55, 72, 0.9);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
-  position: relative;
-  z-index: 11;
-  text-decoration: none;
-}
-
-.submit-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
-}
-
-.submit-btn svg {
-  transition: transform 0.3s ease;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .category {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .site-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
 }
 
 .site-card {
-  padding: 1.5rem;
+  padding: 1.8rem;
   border-radius: 20px;
-  background: var(--glass-light);
+  background: rgba(30, 30, 50, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 160, 122, 0.15);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: var(--shadow-lg), var(--highlight-subtle);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   text-decoration: none;
   display: block;
   animation: cardEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
@@ -422,12 +383,12 @@ watch(activeCategory, () => {
 }
 
 .site-card:hover {
-  transform: translateY(-12px) scale(1.04) rotate(1deg);
-  background: var(--glass-medium);
-  box-shadow: var(--shadow-2xl),
-    0 8px 16px rgba(31, 38, 135, 0.15),
-    var(--highlight-strong);
-  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(40, 40, 60, 0.5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 160, 122, 0.4) inset,
+    0 0 40px rgba(255, 160, 122, 0.15);
+  border-color: rgba(255, 160, 122, 0.4);
 }
 
 .site-card:active {
@@ -454,22 +415,22 @@ watch(activeCategory, () => {
   height: 100%;
   border-radius: 14px;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 160, 122, 0.3);
   padding: 10px;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   color: transparent;
   font-size: 0;
 }
 
 .site-card:hover .site-icon {
-  transform: scale(1.2) rotate(12deg);
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.2);
-  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1) rotate(5deg);
+  border-color: rgba(255, 160, 122, 0.5);
+  box-shadow: 0 6px 16px rgba(255, 160, 122, 0.3);
+  background: rgba(255, 160, 122, 0.15);
 }
 
 /* 图标加载骨架屏 */
@@ -478,12 +439,12 @@ watch(activeCategory, () => {
   height: 100%;
   border-radius: 14px;
   background: linear-gradient(90deg,
-      rgba(255, 255, 255, 0.2) 25%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 255, 255, 0.2) 75%);
+      rgba(255, 255, 255, 0.1) 25%,
+      rgba(255, 160, 122, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 160, 122, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -498,24 +459,50 @@ watch(activeCategory, () => {
   }
 }
 
+/* Emoji 图标样式 */
+.site-icon-emoji {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 160, 122, 0.3);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.site-card:hover .site-icon-emoji {
+  transform: scale(1.1) rotate(5deg);
+  border-color: rgba(255, 160, 122, 0.5);
+  box-shadow: 0 6px 16px rgba(255, 160, 122, 0.3);
+  background: rgba(255, 160, 122, 0.15);
+}
+
 .site-info {
   flex: 1;
   min-width: 0;
 }
 
 h2 {
-  margin-top: 1.5rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2.5rem;
   color: #ffffff;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 2rem;
+  font-weight: 800;
+  text-shadow: 0 0 20px rgba(255, 160, 122, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
   letter-spacing: -0.02em;
+  padding-left: 1rem;
+  border-left: 4px solid rgba(255, 160, 122, 0.8);
 }
 
 h3 {
   margin: 0 0 0.4rem 0;
-  color: #2d3748;
+  color: #ffffff;
   font-size: 1.1rem;
   font-weight: 700;
   line-height: 1.4;
@@ -525,12 +512,12 @@ h3 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .site-url {
   margin: 0;
-  color: rgba(45, 55, 72, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.85rem;
   line-height: 1.3;
   white-space: nowrap;
@@ -577,8 +564,8 @@ h3 {
   right: 0;
   height: 50%;
   background: linear-gradient(to bottom,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 100%);
+      rgba(255, 160, 122, 0.15) 0%,
+      rgba(255, 160, 122, 0) 100%);
   border-radius: 20px 20px 0 0;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -686,25 +673,25 @@ h3 {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 160, 122, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 160, 122, 0.5);
+  box-shadow: 0 4px 16px rgba(255, 160, 122, 0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2c3e50;
+  color: #ffffff;
   z-index: 100;
   transition: all 0.3s ease;
 }
 
 .back-to-top:hover {
   transform: translateY(-4px);
-  background: white;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  color: #ff6b81;
+  background: rgba(255, 160, 122, 1);
+  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.6);
+  color: #ffffff;
 }
 
 .fade-enter-active,

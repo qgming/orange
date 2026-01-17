@@ -36,6 +36,7 @@ export type RankingTab = 'web' | 'tv'
 export interface IconServiceOptions {
   cache?: boolean
   timeout?: number
+  siteName?: string
 }
 
 export interface IconCacheEntry {

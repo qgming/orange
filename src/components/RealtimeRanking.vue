@@ -200,7 +200,6 @@ onUnmounted(() => {
   align-items: center;
   margin-bottom: 2rem;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .ranking-tabs {
@@ -212,30 +211,31 @@ onUnmounted(() => {
 .tab-btn {
   padding: 0.7rem 1.8rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(45, 55, 72, 0.9);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 160, 122, 0.2);
+  border-color: rgba(255, 160, 122, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
 }
 
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.45);
-  color: #2d3748;
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 160, 122, 0.6), rgba(255, 184, 140, 0.6));
+  color: #ffffff;
+  border-color: rgba(255, 160, 122, 0.8);
+  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -248,26 +248,27 @@ onUnmounted(() => {
 .expand-btn {
   padding: 0.7rem 1.5rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(45, 55, 72, 0.9);
+  color: rgba(255, 255, 255, 0.9);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .expand-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 160, 122, 0.3);
+  border-color: rgba(255, 160, 122, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
 }
 
 .expand-btn svg {
@@ -332,12 +333,13 @@ onUnmounted(() => {
   gap: 1.2rem;
   padding: 1.2rem 1.5rem;
   border-radius: 20px;
-  background: var(--glass-light);
+  background: rgba(30, 30, 50, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 160, 122, 0.2);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: var(--shadow-lg), var(--highlight-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 160, 122, 0.1) inset;
   cursor: pointer;
   animation: rankingEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: calc(var(--rank-index) * 0.05s);
@@ -360,11 +362,11 @@ onUnmounted(() => {
 
 .ranking-card:hover {
   transform: translateY(-8px) scale(1.02) rotate(0.5deg);
-  background: var(--glass-medium);
-  box-shadow: var(--shadow-xl),
-    0 8px 16px rgba(31, 38, 135, 0.15),
-    var(--highlight-strong);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(40, 40, 60, 0.6);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 160, 122, 0.3) inset,
+    0 0 60px rgba(255, 160, 122, 0.2);
+  border-color: rgba(255, 160, 122, 0.4);
 }
 
 .rank-badge {
@@ -375,15 +377,15 @@ onUnmounted(() => {
   justify-content: center;
   font-size: 1.1rem;
   font-weight: 800;
-  color: rgba(45, 55, 72, 0.7);
-  background: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .ranking-card:hover .rank-badge {
@@ -392,34 +394,34 @@ onUnmounted(() => {
 }
 
 .rank-first {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 237, 78, 0.4));
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 237, 78, 0.6));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: #b8860b;
-  border-color: rgba(255, 215, 0, 0.5);
-  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.3),
+  color: #ffd700;
+  border-color: rgba(255, 215, 0, 0.6);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   font-weight: 900;
 }
 
 .rank-second {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.4), rgba(232, 232, 232, 0.4));
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.6), rgba(232, 232, 232, 0.6));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: #708090;
-  border-color: rgba(192, 192, 192, 0.5);
-  box-shadow: 0 6px 16px rgba(192, 192, 192, 0.3),
+  color: #e8e8e8;
+  border-color: rgba(192, 192, 192, 0.6);
+  box-shadow: 0 6px 16px rgba(192, 192, 192, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   font-weight: 900;
 }
 
 .rank-third {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.4), rgba(230, 168, 87, 0.4));
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.6), rgba(230, 168, 87, 0.6));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: #8b4513;
-  border-color: rgba(205, 127, 50, 0.5);
-  box-shadow: 0 6px 16px rgba(205, 127, 50, 0.3),
+  color: #e6a857;
+  border-color: rgba(205, 127, 50, 0.6);
+  box-shadow: 0 6px 16px rgba(205, 127, 50, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   font-weight: 900;
 }
@@ -431,14 +433,14 @@ onUnmounted(() => {
 
 .ranking-name {
   margin: 0 0 0.6rem 0;
-  color: #2d3748;
+  color: #ffffff;
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .ranking-meta {
@@ -451,29 +453,29 @@ onUnmounted(() => {
 .meta-item {
   padding: 0.3rem 0.8rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #2d3748;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .meta-item.heat,
 .meta-item.rating {
-  background: rgba(255, 255, 255, 0.4);
-  color: #e67e22;
-  border-color: rgba(230, 126, 34, 0.3);
+  background: rgba(255, 160, 122, 0.3);
+  color: #ffb88c;
+  border-color: rgba(255, 160, 122, 0.4);
   font-weight: 700;
 }
 
 .meta-item.platform,
 .meta-item.channel {
-  background: rgba(255, 255, 255, 0.35);
-  color: #3498db;
-  border-color: rgba(52, 152, 219, 0.3);
+  background: rgba(142, 197, 252, 0.2);
+  color: #8ec5fc;
+  border-color: rgba(142, 197, 252, 0.3);
 }
 
 /* Liquid Glass 光泽效果 */
@@ -485,8 +487,8 @@ onUnmounted(() => {
   right: 0;
   height: 50%;
   background: linear-gradient(to bottom,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 100%);
+      rgba(255, 160, 122, 0.15) 0%,
+      rgba(255, 160, 122, 0) 100%);
   border-radius: 20px 20px 0 0;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -535,23 +537,25 @@ onUnmounted(() => {
   }
 
   .ranking-header {
-    flex-direction: column;
-    align-items: flex-start;
+    gap: 0.8rem;
   }
 
-  .expand-btn {
-    margin-left: 0;
-    align-self: flex-end;
+  .ranking-tabs {
+    flex: 1;
+    min-width: 0;
   }
 
   .tab-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 12px;
   }
 
   .expand-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    flex-shrink: 0;
   }
 
   .ranking-list {
