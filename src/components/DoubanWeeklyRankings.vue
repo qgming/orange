@@ -74,7 +74,8 @@ const getTrendClass = (trend: string) => {
   return 'trend-flat'
 }
 
-const { containerRef: tabStripRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
+// @ts-expect-error containerRef 在模板中作为 ref 使用
+const { containerRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
 
 const fetchApiData = async <T>(endpoint: string): Promise<T | null> => {
   for (let i = 0; i < apiHosts.length; i++) {
@@ -154,7 +155,7 @@ onMounted(fetchAll)
           <span class="weekly-badge">周更</span>
         </div>
       </div>
-      <div ref="tabStripRef" class="tab-strip" @wheel="handleTabStripWheel">
+      <div ref="containerRef" class="tab-strip" @wheel="handleTabStripWheel">
         <button v-for="tab in tabs" :key="tab.key" class="tab-chip" :class="{ active: activeTab === tab.key }"
           @click="activeTab = tab.key">
           {{ tab.label }}

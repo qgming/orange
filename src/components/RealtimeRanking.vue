@@ -267,7 +267,8 @@ const featuredCard = computed<FeaturedCard | null>(() => {
   }
 })
 
-const { containerRef: tabStripRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
+// @ts-expect-error containerRef 在模板中作为 ref 使用
+const { containerRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
 
 const listRows = computed<RankingRow[]>(() => {
   if (activeTab.value === 'web') {
@@ -390,7 +391,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div ref="tabStripRef" class="tab-strip" @wheel="handleTabStripWheel">
+      <div ref="containerRef" class="tab-strip" @wheel="handleTabStripWheel">
         <button
           v-for="tab in tabConfigs"
           :key="tab.key"
