@@ -1,16 +1,100 @@
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+<script setup lang="ts">
+/**
+ * RealtimeRanking - 实时排行榜
+ * 统一为与豆瓣周榜一致的卡片化榜单结构
+ */
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useHorizontalWheelScroll } from '@/composables/useHorizontalWheelScroll'
+import type {
+  MovieRankingData,
+  MovieRankingItem,
+  RankingTab,
+  TvRankingData,
+  TvRankingItem,
+  WebRankingData,
+  WebRankingItem,
+} from '@/types'
 import { performSearch } from '../utils/searchService'
 
-const webRanking = ref([])
-const tvRanking = ref([])
-const loading = ref(true)
-const error = ref(null)
-const activeTab = ref('web') // 'web' or 'tv'
-const autoRefreshInterval = ref(null)
-const isExpanded = ref(false) // 是否展开
+interface ApiEnvelope<T> {
+  data?: T
+}
 
-// API备用地址列表
+interface RealtimeTabConfig {
+  key: RankingTab
+  label: string
+  eyebrow: string
+  badge: string
+  emptyTitle: string
+}
+
+interface RankingMetric {
+  label: string
+  value: string
+  note: string
+}
+
+interface FeaturedCard {
+  searchName: string
+  title: string
+  subtitle: string
+  primaryLabel: string
+  primaryValue: string
+  secondaryLabel: string
+  secondaryValue: string
+  metaLeft: string
+  metaRight: string
+  tags: string[]
+}
+
+interface RankingRow {
+  key: string
+  rank: number
+  searchName: string
+  title: string
+  subtitle: string
+  score: string
+  footer: string
+  chip: string
+  chipTone: 'accent' | 'neutral'
+}
+
+const tabConfigs: RealtimeTabConfig[] = [
+  {
+    key: 'web',
+    label: '网剧热度榜',
+    eyebrow: 'Streaming Heat',
+    badge: '实时热播',
+    emptyTitle: '网剧热度榜暂时不可用',
+  },
+  {
+    key: 'tv',
+    label: '电视收视榜',
+    eyebrow: 'TV Audience',
+    badge: '同步收视',
+    emptyTitle: '电视收视榜暂时不可用',
+  },
+  {
+    key: 'movie',
+    label: '电影票房榜',
+    eyebrow: 'Box Office',
+    badge: '票房实时',
+    emptyTitle: '电影票房榜暂时不可用',
+  },
+]
+
+const webData = ref<WebRankingData | null>(null)
+const tvData = ref<TvRankingData | null>(null)
+const movieData = ref<MovieRankingData | null>(null)
+const loading = ref(true)
+const activeTab = ref<RankingTab>('web')
+const errorMessages = ref<Record<RankingTab, string | null>>({
+  web: null,
+  tv: null,
+  movie: null,
+})
+let refreshInterval: number | null = null
+
 const apiHosts = [
   'https://60s.viki.moe',
   'https://60api.09cdn.xyz',
@@ -20,577 +104,870 @@ const apiHosts = [
   'https://api.yanyua.icu',
   'https://60s.tmini.net',
   'https://60s.7se.cn',
-  'https://60s.mizhoubaobei.top'
+  'https://60s.mizhoubaobei.top',
 ]
 
 let currentHostIndex = 0
 
-const fetchWebRanking = async () => {
+const webRanking = computed<WebRankingItem[]>(() => webData.value?.list ?? [])
+const tvRanking = computed<TvRankingItem[]>(() => tvData.value?.list ?? [])
+const movieRanking = computed<MovieRankingItem[]>(() => movieData.value?.list ?? [])
+
+const activeConfig = computed(() => tabConfigs.find((tab) => tab.key === activeTab.value) ?? tabConfigs[0])
+const activeError = computed(() => errorMessages.value[activeTab.value])
+
+const formatCompactNumber = (value?: number) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return '--'
+  }
+
+  return new Intl.NumberFormat('zh-CN', {
+    notation: value >= 10000 ? 'compact' : 'standard',
+    maximumFractionDigits: value >= 100 ? 0 : 1,
+  }).format(value)
+}
+
+const formatRate = (value?: number) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return '--'
+  }
+
+  return `${value.toFixed(2)}%`
+}
+
+const activeMetrics = computed<RankingMetric[]>(() => {
+  if (activeTab.value === 'web' && webData.value) {
+    const topItem = webRanking.value[0]
+    return [
+      {
+        label: '最近更新',
+        value: webData.value.updated || '--',
+        note: `约 ${webData.value.update_gap_second} 秒刷新`,
+      },
+      {
+        label: '榜首热度',
+        value: topItem?.curr_heat_desc || '--',
+        note: topItem ? `实时热度 ${formatCompactNumber(topItem.curr_heat)}` : '等待同步',
+      },
+      {
+        label: '头部平台',
+        value: topItem?.platform_desc || '--',
+        note: topItem?.release_info || '等待同步',
+      },
+    ]
+  }
+
+  if (activeTab.value === 'tv' && tvData.value) {
+    const topItem = tvRanking.value[0]
+    return [
+      {
+        label: '最近更新',
+        value: tvData.value.updated || '--',
+        note: `约 ${tvData.value.update_gap_second} 秒刷新`,
+      },
+      {
+        label: '榜首市占率',
+        value: topItem?.market_rate_desc || '--',
+        note: topItem ? `原始值 ${formatRate(topItem.market_rate)}` : '等待同步',
+      },
+      {
+        label: '榜首关注度',
+        value: topItem?.attention_rate_desc || '--',
+        note: topItem?.channel_name || '等待同步',
+      },
+    ]
+  }
+
+  if (movieData.value) {
+    return [
+      {
+        label: '实时总票房',
+        value: `${movieData.value.box_office}${movieData.value.box_office_unit}`,
+        note: movieData.value.updated || '--',
+      },
+      {
+        label: '分账票房',
+        value: `${movieData.value.split_box_office}${movieData.value.split_box_office_unit}`,
+        note: movieData.value.show_count_desc || '等待同步',
+      },
+      {
+        label: '场均人次',
+        value: movieRanking.value[0]?.avg_show_view || '--',
+        note: movieData.value.view_count_desc || '等待同步',
+      },
+    ]
+  }
+
+  return []
+})
+
+const featuredCard = computed<FeaturedCard | null>(() => {
+  if (activeTab.value === 'web') {
+    const item = webRanking.value[0]
+    if (!item || !webData.value) return null
+
+    return {
+      searchName: item.series_name,
+      title: item.series_name,
+      subtitle: item.release_info || item.platform_desc || '实时热度持续刷新中',
+      primaryLabel: '当前热度',
+      primaryValue: item.curr_heat_desc || '--',
+      secondaryLabel: '热度指数',
+      secondaryValue: formatCompactNumber(item.bar_value),
+      metaLeft: `平台 ${item.platform_desc || '--'}`,
+      metaRight: `更新于 ${webData.value.updated || '--'}`,
+      tags: [
+        `${webData.value.update_gap_second} 秒刷新`,
+        `实时热度 ${formatCompactNumber(item.curr_heat)}`,
+        item.release_info || '热播中',
+      ],
+    }
+  }
+
+  if (activeTab.value === 'tv') {
+    const item = tvRanking.value[0]
+    if (!item || !tvData.value) return null
+
+    return {
+      searchName: item.programme_name,
+      title: item.programme_name,
+      subtitle: item.channel_name || '电视收视实时同步中',
+      primaryLabel: '市场占比',
+      primaryValue: item.market_rate_desc || '--',
+      secondaryLabel: '关注度',
+      secondaryValue: item.attention_rate_desc || '--',
+      metaLeft: `频道 ${item.channel_name || '--'}`,
+      metaRight: `更新于 ${tvData.value.updated || '--'}`,
+      tags: [
+        `${tvData.value.update_gap_second} 秒刷新`,
+        `原始收视 ${formatRate(item.market_rate)}`,
+        `原始关注 ${formatRate(item.attention_rate)}`,
+      ],
+    }
+  }
+
+  const item = movieRanking.value[0]
+  if (!item || !movieData.value) return null
+
+  return {
+    searchName: item.movie_name,
+    title: item.movie_name,
+    subtitle: item.release_info || '电影票房实时同步中',
+    primaryLabel: '实时票房',
+    primaryValue: item.box_office_desc || '--',
+    secondaryLabel: '票房占比',
+    secondaryValue: item.box_office_rate || '--',
+    metaLeft: item.split_box_office_desc || '分账票房待同步',
+    metaRight: `更新于 ${movieData.value.updated || '--'}`,
+    tags: [
+      `${movieData.value.update_gap_second} 秒刷新`,
+      item.sum_box_desc || '累计票房待同步',
+      `场均人次 ${item.avg_show_view || '--'}`,
+    ],
+  }
+})
+
+const { containerRef: tabStripRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
+
+const listRows = computed<RankingRow[]>(() => {
+  if (activeTab.value === 'web') {
+    return webRanking.value.slice(1, 10).map((item, index) => ({
+      key: String(item.series_id),
+      rank: index + 2,
+      searchName: item.series_name,
+      title: item.series_name,
+      subtitle: item.release_info || '网剧热度实时追踪中',
+      score: item.curr_heat_desc || '--',
+      footer: item.platform_desc || '--',
+      chip: `指数 ${formatCompactNumber(item.bar_value)}`,
+      chipTone: 'accent',
+    }))
+  }
+
+  if (activeTab.value === 'tv') {
+    return tvRanking.value.slice(1, 10).map((item, index) => ({
+      key: `${item.programme_name}-${index}`,
+      rank: index + 2,
+      searchName: item.programme_name,
+      title: item.programme_name,
+      subtitle: item.channel_name || '频道信息暂缺',
+      score: item.market_rate_desc || '--',
+      footer: `关注度 ${item.attention_rate_desc || '--'}`,
+      chip: `收视 ${formatRate(item.market_rate)}`,
+      chipTone: 'neutral',
+    }))
+  }
+
+  return movieRanking.value.slice(1, 10).map((item, index) => ({
+    key: String(item.movie_id),
+    rank: index + 2,
+    searchName: item.movie_name,
+    title: item.movie_name,
+    subtitle: item.release_info || '电影票房实时追踪中',
+    score: item.box_office_desc || '--',
+    footer: item.split_box_office_desc || '分账票房待同步',
+    chip: item.box_office_rate || '--',
+    chipTone: 'accent',
+  }))
+})
+
+const fetchApiData = async <T>(endpoint: string): Promise<T | null> => {
   for (let i = 0; i < apiHosts.length; i++) {
     try {
       const host = apiHosts[(currentHostIndex + i) % apiHosts.length]
-      const response = await fetch(`${host}/v2/maoyan/realtime/web`, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: AbortSignal.timeout(5000) // 5秒超时
+      const response = await fetch(`${host}${endpoint}`, {
+        signal: AbortSignal.timeout(5000),
       })
-      const result = await response.json()
-      webRanking.value = result.data?.list || []
-      // 请求成功，更新当前主机索引
+
+      if (!response.ok) {
+        continue
+      }
+
+      const result = (await response.json()) as T
       currentHostIndex = (currentHostIndex + i) % apiHosts.length
-      return
-    } catch (err) {
-      console.warn(`获取网剧榜单失败 (${apiHosts[(currentHostIndex + i) % apiHosts.length]}):`, err)
-      // 继续尝试下一个地址
+      return result
+    } catch {
+      continue
     }
   }
-  console.error('所有API地址均不可用')
+
+  return null
 }
 
-const fetchTvRanking = async () => {
-  for (let i = 0; i < apiHosts.length; i++) {
-    try {
-      const host = apiHosts[(currentHostIndex + i) % apiHosts.length]
-      const response = await fetch(`${host}/v2/maoyan/realtime/tv`, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: AbortSignal.timeout(5000) // 5秒超时
-      })
-      const result = await response.json()
-      tvRanking.value = result.data?.list || []
-      // 请求成功，更新当前主机索引
-      currentHostIndex = (currentHostIndex + i) % apiHosts.length
-      return
-    } catch (err) {
-      console.warn(`获取电视榜单失败 (${apiHosts[(currentHostIndex + i) % apiHosts.length]}):`, err)
-      // 继续尝试下一个地址
-    }
-  }
-  console.error('所有API地址均不可用')
+const fetchRankingData = async <T>(endpoint: string): Promise<T | null> => {
+  const result = await fetchApiData<ApiEnvelope<T>>(endpoint)
+  return result?.data ?? null
 }
 
-const fetchAllRankings = async () => {
+const fetchAll = async () => {
   loading.value = true
-  error.value = null
-  try {
-    await Promise.all([fetchWebRanking(), fetchTvRanking()])
-  } catch (err) {
-    error.value = '加载失败，请稍后重试'
-  } finally {
-    loading.value = false
+
+  const [web, tv, movie] = await Promise.all([
+    fetchRankingData<WebRankingData>('/v2/maoyan/realtime/web'),
+    fetchRankingData<TvRankingData>('/v2/maoyan/realtime/tv'),
+    fetchRankingData<MovieRankingData>('/v2/maoyan/realtime/movie'),
+  ])
+
+  if (web) webData.value = web
+  if (tv) tvData.value = tv
+  if (movie) movieData.value = movie
+
+  errorMessages.value = {
+    web: web || webData.value ? null : '这一份实时榜暂时连接不上，可能是上游接口波动。',
+    tv: tv || tvData.value ? null : '这一份实时榜暂时连接不上，可能是上游接口波动。',
+    movie: movie || movieData.value ? null : '这一份实时榜暂时连接不上，可能是上游接口波动。',
   }
+
+  loading.value = false
 }
 
-const getRankingClass = (rank) => {
-  if (rank === 1) return 'rank-first'
-  if (rank === 2) return 'rank-second'
-  if (rank === 3) return 'rank-third'
-  return ''
+const setActiveTab = (tab: RankingTab) => {
+  activeTab.value = tab
 }
 
-const toggleExpand = () => {
-  isExpanded.value = !isExpanded.value
-}
-
-const handleCardClick = (name) => {
-  // 使用搜索服务进行搜索，默认使用追影猫（索引 0）
+const handleClick = (name: string) => {
   performSearch(name, 0)
 }
 
 onMounted(() => {
-  fetchAllRankings()
-  // 每5分钟自动刷新一次
-  autoRefreshInterval.value = setInterval(fetchAllRankings, 5 * 60 * 1000)
+  fetchAll()
+  refreshInterval = setInterval(fetchAll, 5 * 60 * 1000) as unknown as number
 })
 
 onUnmounted(() => {
-  if (autoRefreshInterval.value) {
-    clearInterval(autoRefreshInterval.value)
-  }
+  if (refreshInterval) clearInterval(refreshInterval)
 })
 </script>
 
 <template>
-  <div class="realtime-ranking">
-    <div class="ranking-header">
-      <div class="ranking-tabs">
-        <button :class="['tab-btn', { active: activeTab === 'web' }]" @click="activeTab = 'web'">
-          <span class="button-content">
-            网剧热度榜
-          </span>
-        </button>
-        <button :class="['tab-btn', { active: activeTab === 'tv' }]" @click="activeTab = 'tv'">
-          <span class="button-content">
-            电视收视榜
-          </span>
+  <section class="realtime-section">
+    <div class="section-header">
+      <div class="title-stack">
+        <span class="section-kicker">{{ activeConfig.eyebrow }}</span>
+        <div class="title-row">
+          <h2 class="section-title">实时排行榜</h2>
+          <span class="weekly-badge">{{ activeConfig.badge }}</span>
+        </div>
+      </div>
+
+      <div ref="tabStripRef" class="tab-strip" @wheel="handleTabStripWheel">
+        <button
+          v-for="tab in tabConfigs"
+          :key="tab.key"
+          type="button"
+          class="tab-chip"
+          :class="{ active: activeTab === tab.key }"
+          @click="setActiveTab(tab.key)"
+        >
+          {{ tab.label }}
         </button>
       </div>
-      <button class="expand-btn" @click="toggleExpand">
-        {{ isExpanded ? '收起' : '展开' }}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          :class="{ rotated: isExpanded }">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
     </div>
 
-    <div v-if="loading" class="loading">
+    <div v-if="loading" class="loading-state">
       <div class="loading-spinner"></div>
-      <p>加载中...</p>
+      <div class="state-copy">
+        <strong>实时榜单加载中</strong>
+        <span>正在同步最新热度、收视和票房数据。</span>
+      </div>
     </div>
 
-    <div v-else-if="error" class="error">
-      {{ error }}
+    <div v-else-if="activeError && !featuredCard" class="empty-state error-state">
+      <div class="state-copy">
+        <strong>{{ activeConfig.emptyTitle }}</strong>
+        <span>{{ activeError }}</span>
+        <span>你可以先切到别的榜单，或者稍后重新刷新。</span>
+      </div>
+      <button type="button" class="retry-btn" @click="fetchAll">重新加载</button>
     </div>
 
-    <div v-else class="ranking-content">
-      <!-- 网剧榜单 -->
-      <div v-show="activeTab === 'web'" class="ranking-list" :class="{ collapsed: !isExpanded }">
-        <div v-for="(item, index) in webRanking.slice(0, 28)" :key="item.series_id" class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }"
-          :style="{ '--rank-index': index }"
-          @click="handleCardClick(item.series_name)">
-          <div :class="['rank-badge', getRankingClass(index + 1)]">
-            {{ index + 1 }}
+    <div v-else-if="featuredCard" class="ranking-shell">
+      <button type="button" class="featured-card" @click="handleClick(featuredCard.searchName)">
+        <div class="featured-topline">
+          <div class="featured-rank">#1</div>
+          <span class="featured-status">{{ activeConfig.label }}</span>
+        </div>
+
+        <h3 class="featured-title">{{ featuredCard.title }}</h3>
+
+        <div class="featured-main">
+          <p class="featured-subtitle">{{ featuredCard.subtitle }}</p>
+
+          <div class="featured-score">
+            <span>{{ featuredCard.primaryLabel }}</span>
+            <strong>{{ featuredCard.primaryValue }}</strong>
+            <em>{{ featuredCard.secondaryLabel }} {{ featuredCard.secondaryValue }}</em>
           </div>
-          <div class="ranking-info">
-            <h3 class="ranking-name">{{ item.series_name }}</h3>
-            <div class="ranking-meta">
-              <span v-if="item.curr_heat_desc" class="meta-item heat">{{ item.curr_heat_desc }}</span>
-              <span v-if="item.platform_desc" class="meta-item platform">{{ item.platform_desc }}</span>
-            </div>
-          </div>
+        </div>
+
+        <div class="featured-meta-row">
+          <span class="good-rate">{{ featuredCard.metaLeft }}</span>
+          <span class="rating-count">{{ featuredCard.metaRight }}</span>
+        </div>
+
+        <div class="featured-tags">
+          <span v-for="tag in featuredCard.tags" :key="tag" class="tag-pill">{{ tag }}</span>
+        </div>
+      </button>
+
+      <div v-if="activeTab === 'movie' && activeMetrics.length" class="ranking-summary">
+        <div v-for="metric in activeMetrics" :key="metric.label" class="summary-card">
+          <span class="summary-label">{{ metric.label }}</span>
+          <strong class="summary-value">{{ metric.value }}</strong>
+          <span class="summary-note">{{ metric.note }}</span>
         </div>
       </div>
 
-      <!-- 电视榜单 -->
-      <div v-show="activeTab === 'tv'" class="ranking-list" :class="{ collapsed: !isExpanded }">
-        <div v-for="(item, index) in tvRanking.slice(0, 28)" :key="index" class="ranking-card"
-          :class="{ hidden: !isExpanded && index >= 4 }"
-          :style="{ '--rank-index': index }"
-          @click="handleCardClick(item.programme_name)">
-          <div :class="['rank-badge', getRankingClass(index + 1)]">
-            {{ index + 1 }}
-          </div>
-          <div class="ranking-info">
-            <h3 class="ranking-name">{{ item.programme_name }}</h3>
-            <div class="ranking-meta">
-              <span v-if="item.market_rate" class="meta-item rating">{{ item.market_rate_desc || item.market_rate
-              }}</span>
-              <span v-if="item.channel_name" class="meta-item channel">{{ item.channel_name }}</span>
+      <div class="ranking-list">
+        <button
+          v-for="item in listRows"
+          :key="item.key"
+          type="button"
+          class="rank-row"
+          @click="handleClick(item.searchName)"
+        >
+          <div class="row-rank">{{ item.rank }}</div>
+          <div class="row-main">
+            <div class="row-title-line">
+              <h3 class="row-title">{{ item.title }}</h3>
+              <span class="row-score">{{ item.score }}</span>
+            </div>
+            <p class="row-subtitle">{{ item.subtitle }}</p>
+            <div class="row-footer">
+              <span class="row-count">{{ item.footer }}</span>
+              <span class="trend-chip" :class="item.chipTone">{{ item.chip }}</span>
             </div>
           </div>
-        </div>
+        </button>
       </div>
     </div>
-  </div>
+
+    <div v-else class="empty-state">
+      <div class="state-copy">
+        <strong>{{ activeConfig.emptyTitle }}</strong>
+        <span>接口已经连通，但这份榜单此刻没有返回条目。</span>
+        <span>可以先切换别的榜单看看，或者稍后再回来刷新。</span>
+      </div>
+      <button type="button" class="retry-btn" @click="fetchAll">再试一次</button>
+    </div>
+  </section>
 </template>
 
 <style scoped>
-.realtime-ranking {
-  max-width: 1440px;
-  margin: 2rem auto 3rem;
-  padding: 0 1rem;
+.realtime-section {
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 80%, transparent), var(--bg-surface));
+  border: 1px solid color-mix(in srgb, var(--c-accent) 22%, var(--border-default));
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
 }
 
-.ranking-header {
+.section-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-default);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 88%, transparent), transparent);
+}
+
+.title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.section-kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-accent-light);
+}
+
+.title-row {
+  display: flex;
   align-items: center;
-  margin-bottom: 2rem;
-  gap: 1rem;
-}
-
-.ranking-tabs {
-  display: flex;
-  gap: 1rem;
+  gap: var(--sp-2);
   flex-wrap: wrap;
 }
 
-.tab-btn {
-  padding: 0.7rem 1.8rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.section-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.weekly-badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--c-accent) 16%, transparent);
+  color: var(--c-accent-light);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tab-strip {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.tab-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-chip,
+.retry-btn,
+.featured-card,
+.rank-row {
+  border: none;
+  outline: none;
+  font: inherit;
+}
+
+.tab-chip {
+  flex: 0 0 auto;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
-.tab-btn:hover {
-  background: rgba(255, 160, 122, 0.2);
-  border-color: rgba(255, 160, 122, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
+.tab-chip:hover {
+  transform: translateY(-1px);
+  color: var(--text-primary);
 }
 
-.tab-btn.active {
-  background: linear-gradient(135deg, rgba(255, 160, 122, 0.6), rgba(255, 184, 140, 0.6));
-  color: #ffffff;
-  border-color: rgba(255, 160, 122, 0.8);
-  box-shadow: 0 8px 24px rgba(255, 160, 122, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+.tab-chip.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 85%, transparent), color-mix(in srgb, var(--c-accent-light) 70%, transparent));
+  color: white;
 }
 
-.button-content {
-  display: inline-flex;
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-}
-
-.expand-btn {
-  padding: 0.7rem 1.5rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(255, 255, 255, 0.9);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.expand-btn:hover {
-  background: rgba(255, 160, 122, 0.3);
-  border-color: rgba(255, 160, 122, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 160, 122, 0.3);
-}
-
-.expand-btn svg {
-  transition: transform 0.3s ease;
-}
-
-.expand-btn svg.rotated {
-  transform: rotate(180deg);
-}
-
-.loading {
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 320px;
+  padding: var(--sp-6);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
   text-align: center;
-  padding: 3rem;
-  color: rgba(255, 255, 255, 0.9);
+}
+
+.state-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: 360px;
+}
+
+.state-copy strong {
+  color: var(--text-primary);
+  font-size: var(--text-base);
+}
+
+.error-state .state-copy strong {
+  color: #fca5a5;
+}
+
+.retry-btn {
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--c-accent) 24%, var(--border-default));
+  background: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.retry-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--c-accent) 46%, var(--border-hover));
+  background: color-mix(in srgb, var(--bg-hover) 92%, transparent);
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid rgba(255, 255, 255, 0.9);
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--c-accent);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+.ranking-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.featured-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: calc(var(--radius-xl) - 4px);
+  border: 1px solid color-mix(in srgb, var(--c-accent) 18%, var(--border-default));
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 38%),
+    color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.featured-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--c-accent) 34%, var(--border-hover));
+  box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.7);
+}
+
+.featured-topline,
+.featured-meta-row,
+.row-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.featured-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  background: rgb(15 23 42 / 0.72);
+  color: white;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.featured-status {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+.featured-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.featured-title,
+.row-title {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.featured-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  line-height: 1.2;
+}
+
+.featured-subtitle,
+.row-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.featured-subtitle,
+.row-subtitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-subtitle {
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+}
+
+.row-subtitle {
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+}
+
+.featured-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.featured-score span {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.featured-score strong {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1;
+  color: var(--c-accent-light);
+}
+
+.featured-score em {
+  font-style: normal;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.good-rate,
+.row-score {
+  color: var(--c-accent-light);
+  font-weight: var(--font-semibold);
+}
+
+.rating-count,
+.row-count {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+.featured-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.tag-pill,
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}
+
+.tag-pill {
+  background: color-mix(in srgb, var(--bg-hover) 82%, transparent);
+  color: var(--text-secondary);
+}
+
+.ranking-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-3);
+  border: 1px solid color-mix(in srgb, var(--c-accent) 10%, var(--border-default));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
+}
+
+.summary-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.summary-value {
+  font-size: var(--text-base);
+  color: var(--text-primary);
+}
+
+.summary-note {
+  font-size: var(--text-xs);
+  color: var(--c-accent-light);
+}
+
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.rank-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  padding: var(--sp-3);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-elevated) 78%, transparent);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.rank-row:hover {
+  transform: translateX(2px);
+  border-color: color-mix(in srgb, var(--c-accent) 20%, var(--border-hover));
+  background: color-mix(in srgb, var(--bg-hover) 92%, transparent);
+}
+
+.row-rank {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 18%, transparent), color-mix(in srgb, var(--bg-hover) 82%, transparent));
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+}
+
+.row-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row-title-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.row-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trend-chip.accent {
+  background: color-mix(in srgb, var(--c-accent) 14%, transparent);
+  color: var(--c-accent-light);
+}
+
+.trend-chip.neutral {
+  background: rgb(148 163 184 / 0.14);
+  color: #cbd5e1;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
-.error {
-  text-align: center;
-  padding: 2rem;
-  color: #fff;
-  font-size: 1.1rem;
-  background: rgba(231, 76, 60, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-}
-
-.ranking-content {
-  width: 100%;
-}
-
-.ranking-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.2rem;
-}
-
-.ranking-card {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  padding: 1.2rem 1.5rem;
-  border-radius: 20px;
-  background: rgba(30, 30, 50, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 160, 122, 0.2);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 160, 122, 0.1) inset;
-  cursor: pointer;
-  animation: rankingEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: calc(var(--rank-index) * 0.05s);
-}
-
-@keyframes rankingEnter {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.ranking-card.hidden {
-  display: none;
-}
-
-.ranking-card:hover {
-  transform: translateY(-8px) scale(1.02) rotate(0.5deg);
-  background: rgba(40, 40, 60, 0.6);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 160, 122, 0.3) inset,
-    0 0 60px rgba(255, 160, 122, 0.2);
-  border-color: rgba(255, 160, 122, 0.4);
-}
-
-.rank-badge {
-  min-width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.ranking-card:hover .rank-badge {
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.15);
-}
-
-.rank-first {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 237, 78, 0.6));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #ffd700;
-  border-color: rgba(255, 215, 0, 0.6);
-  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  font-weight: 900;
-}
-
-.rank-second {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.6), rgba(232, 232, 232, 0.6));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #e8e8e8;
-  border-color: rgba(192, 192, 192, 0.6);
-  box-shadow: 0 6px 16px rgba(192, 192, 192, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  font-weight: 900;
-}
-
-.rank-third {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.6), rgba(230, 168, 87, 0.6));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #e6a857;
-  border-color: rgba(205, 127, 50, 0.6);
-  box-shadow: 0 6px 16px rgba(205, 127, 50, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  font-weight: 900;
-}
-
-.ranking-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.ranking-name {
-  margin: 0 0 0.6rem 0;
-  color: #ffffff;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.ranking-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  font-size: 0.85rem;
-}
-
-.meta-item {
-  padding: 0.3rem 0.8rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.meta-item.heat,
-.meta-item.rating {
-  background: rgba(255, 160, 122, 0.3);
-  color: #ffb88c;
-  border-color: rgba(255, 160, 122, 0.4);
-  font-weight: 700;
-}
-
-.meta-item.platform,
-.meta-item.channel {
-  background: rgba(142, 197, 252, 0.2);
-  color: #8ec5fc;
-  border-color: rgba(142, 197, 252, 0.3);
-}
-
-/* Liquid Glass 光泽效果 */
-.ranking-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to bottom,
-      rgba(255, 160, 122, 0.15) 0%,
-      rgba(255, 160, 122, 0) 100%);
-  border-radius: 20px 20px 0 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.ranking-card:hover::before {
-  opacity: 1;
-}
-
-.ranking-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.tab-btn,
-.expand-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.tab-btn::after,
-.expand-btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.3) 50%,
-      transparent 100%);
-  transition: left 0.5s ease;
-}
-
-.tab-btn:hover::after,
-.expand-btn:hover::after {
-  left: 100%;
-}
-
 @media (max-width: 768px) {
-  .realtime-ranking {
-    padding: 0 0.5rem;
-    margin: 1.5rem auto 2rem;
+  .section-header,
+  .ranking-shell {
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
   }
 
-  .ranking-header {
-    gap: 0.8rem;
-  }
-
-  .ranking-tabs {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .tab-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    border-radius: 12px;
-  }
-
-  .expand-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-
-  .ranking-list {
+  .featured-main {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
 
-  .ranking-card {
-    padding: 1rem 1.2rem;
-    border-radius: 18px;
+  .featured-score {
+    align-items: flex-start;
+    text-align: left;
   }
 
-  .rank-badge {
-    min-width: 38px;
-    height: 38px;
-    font-size: 1rem;
-  }
-
-  .ranking-name {
-    font-size: 1rem;
-  }
-
-  .ranking-meta {
-    font-size: 0.8rem;
-    gap: 0.5rem;
-  }
-
-  .meta-item {
-    padding: 0.25rem 0.6rem;
+  .ranking-summary {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .ranking-list {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 640px) {
+  .section-header {
+    padding-top: var(--sp-4);
+    padding-bottom: var(--sp-4);
+  }
+
+  .ranking-shell {
+    gap: var(--sp-2);
+  }
+
+  .featured-card,
+  .rank-row {
+    padding: var(--sp-3);
+  }
+
+  .row-title-line,
+  .row-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 </style>

@@ -1,218 +1,346 @@
+/* ========================================
+   橘子导航 - 简洁现代设计系统
+   参考：Linear, Vercel, Notion 风格
+   ======================================== */
+
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-black: #181818;
-  --vt-c-indigo: #2c3e50;
-
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-md: 1.125rem;   /* 18px */
-  --font-size-lg: 1.25rem;    /* 20px */
-  --font-size-xl: 1.5rem;     /* 24px */
-  --font-size-2xl: 2rem;      /* 32px */
-  --font-size-3xl: 2.5rem;    /* 40px */
-  --font-size-4xl: 3.5rem;    /* 56px */
-
-  /* Line Heights */
-  --line-height-tight: 1.2;
-  --line-height-snug: 1.4;
-  --line-height-normal: 1.6;
-  --line-height-relaxed: 1.75;
-
-  /* Font Weights */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-
-  /* Letter Spacing */
-  --letter-spacing-tight: -0.02em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.02em;
-
-  /* Spacing Scale */
-  --space-xs: 0.25rem;   /* 4px */
-  --space-sm: 0.5rem;    /* 8px */
-  --space-md: 0.75rem;   /* 12px */
-  --space-lg: 1rem;      /* 16px */
-  --space-xl: 1.5rem;    /* 24px */
-  --space-2xl: 2rem;     /* 32px */
-  --space-3xl: 3rem;     /* 48px */
-  --space-4xl: 4rem;     /* 64px */
-  --space-5xl: 6rem;     /* 96px */
-
-  /* Liquid Glass 设计系统变量 */
-  --liquid-glass-bg: rgba(255, 255, 255, 0.08);
-  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.12);
-  --liquid-glass-border: rgba(255, 255, 255, 0.18);
-  --liquid-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-  --liquid-glass-shadow-hover: 0 16px 48px 0 rgba(0, 0, 0, 0.15);
-  --liquid-glass-blur: blur(20px);
-  --liquid-glass-blur-strong: blur(40px);
-
-  /* Glassmorphism Layers */
-  --glass-subtle: rgba(255, 255, 255, 0.08);
-  --glass-light: rgba(255, 255, 255, 0.15);
-  --glass-medium: rgba(255, 255, 255, 0.25);
-  --glass-strong: rgba(255, 255, 255, 0.35);
-  --glass-intense: rgba(255, 255, 255, 0.45);
-
-  /* Shadow System */
-  --shadow-sm: 0 2px 8px rgba(31, 38, 135, 0.08);
-  --shadow-md: 0 4px 16px rgba(31, 38, 135, 0.12);
-  --shadow-lg: 0 8px 24px rgba(31, 38, 135, 0.15);
-  --shadow-xl: 0 16px 48px rgba(31, 38, 135, 0.2);
-  --shadow-2xl: 0 24px 64px rgba(31, 38, 135, 0.25);
-
-  /* Inset Highlights */
-  --highlight-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  --highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-
-  /* Liquid Glass 光泽效果 */
-  --liquid-shine: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0.2) 100%
-  );
-  --liquid-reflection: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-
-  /* 纯色网格背景 */
-  --grid-background: #1a1a2e;
-  --grid-line-color: rgba(255, 255, 255, 0.1);
-  --grid-size: 40px;
-
-  /* 主题色 - 柔和色调 + 暖色调 */
-  --color-primary: #8ec5fc;
-  --color-secondary: #7dd3c0;
-  --color-accent: #ffa07a;       /* Light coral - warmer accent */
-  --color-accent-alt: #ffb88c;   /* Peach */
-
-  /* Text Colors - Optimized for dark grid background */
-  --text-primary: #ffffff;
-  --text-secondary: #e0e0e0;
-  --text-tertiary: #b0b0b0;
-  --text-on-dark: #ffffff;
-
-  /* Z-Index Layering */
-  --z-background: -1;
-  --z-base: 0;
-  --z-content: 1;
-  --z-elevated: 10;
-  --z-sticky: 50;
-  --z-overlay: 100;
-  --z-modal: 1000;
+  /* 颜色系统 - 简洁明亮 */
+  --c-white: #ffffff;
+  --c-black: #000000;
+  
+  /* 灰度色阶 */
+  --c-gray-50: #fafafa;
+  --c-gray-100: #f4f4f5;
+  --c-gray-200: #e4e4e7;
+  --c-gray-300: #d4d4d8;
+  --c-gray-400: #a1a1aa;
+  --c-gray-500: #71717a;
+  --c-gray-600: #52525b;
+  --c-gray-700: #3f3f46;
+  --c-gray-800: #27272a;
+  --c-gray-900: #18181b;
+  --c-gray-950: #09090b;
+  
+  /* 主题色 - 简洁单一 */
+  --c-primary: #18181b;
+  --c-primary-hover: #27272a;
+  
+  /* 强调色 - 柔和橙色 */
+  --c-accent: #f97316;
+  --c-accent-light: #fb923c;
+  --c-accent-dark: #ea580c;
+  
+  /* 语义色 */
+  --c-success: #22c55e;
+  --c-warning: #f59e0b;
+  --c-error: #ef4444;
+  --c-info: #3b82f6;
+  
+  /* 排版 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  
+  /* 字号 */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  
+  /* 字重 */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* 行高 */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  
+  /* 间距 */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+  --sp-20: 5rem;
+  
+  /* 圆角 */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+  
+  /* 阴影 - 极简 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* 动画 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  
+  /* Z-index */
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-tooltip: 300;
 }
 
-/* 项目语义颜色变量 */
-:root {
-  --color-background: var(--grid-background);
-  --color-text: #e0e0e0;
+/* ========================================
+   暗色主题（默认）
+   ======================================== */
+:root,
+[data-theme="dark"] {
+  --bg-base: #09090b;
+  --bg-surface: #18181b;
+  --bg-elevated: #27272a;
+  --bg-hover: #3f3f46;
+  
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  
+  --border-default: #27272a;
+  --border-hover: #3f3f46;
+  
+  --c-primary: #fafafa;
+  --c-primary-hover: #e4e4e7;
 }
 
-*,
-*::before,
-*::after {
+/* ========================================
+   亮色主题
+   ======================================== */
+[data-theme="light"] {
+  --bg-base: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-elevated: #f4f4f5;
+  --bg-hover: #e4e4e7;
+  
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+  
+  --border-default: #e4e4e7;
+  --border-hover: #d4d4d8;
+  
+  --c-primary: #18181b;
+  --c-primary-hover: #27272a;
+}
+
+/* ========================================
+   全局重置
+   ======================================== */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
-  font-weight: normal;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-base);
   min-height: 100vh;
-  color: var(--color-text);
-  background-color: var(--grid-background);
-  background-image:
-    linear-gradient(var(--grid-line-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-  background-attachment: fixed;
-  line-height: var(--line-height-normal);
-  font-family: 'DM Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-normal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  overflow-x: hidden;
 }
 
-
-/* 通用 Liquid Glass 效果类 */
-.liquid-glass {
-  background: var(--liquid-glass-bg);
-  backdrop-filter: var(--liquid-glass-blur);
-  -webkit-backdrop-filter: var(--liquid-glass-blur);
-  border: 1px solid var(--liquid-glass-border);
-  box-shadow: var(--liquid-glass-shadow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.liquid-glass::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--liquid-reflection);
-  border-radius: inherit;
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.liquid-glass:hover {
-  background: var(--liquid-glass-bg-hover);
-  box-shadow: var(--liquid-glass-shadow-hover);
-  transform: translateY(-2px);
-}
-
-/* Enhanced focus indicators for accessibility */
-*:focus-visible {
-  outline: 3px solid rgba(255, 165, 0, 0.6);
-  outline-offset: 3px;
-  border-radius: 8px;
-  transition: outline-offset 0.2s ease;
-}
-
-/* Skip to content link */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--text-primary);
-  color: var(--text-on-dark);
-  padding: 0.75rem 1.5rem;
-  border-radius: 0 0 8px 0;
-  z-index: var(--z-modal);
-  transition: top 0.3s ease;
+a {
+  color: inherit;
   text-decoration: none;
-  font-weight: var(--font-weight-semibold);
 }
 
-.skip-link:focus {
-  top: 0;
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
 }
 
-/* Screen reader only class */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+input, textarea, select {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ========================================
+   工具类
+   ======================================== */
+
+/* 布局 */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: var(--sp-1); }
+.gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); }
+.gap-4 { gap: var(--sp-4); }
+.gap-6 { gap: var(--sp-6); }
+.gap-8 { gap: var(--sp-8); }
+
+/* 间距 */
+.p-2 { padding: var(--sp-2); }
+.p-3 { padding: var(--sp-3); }
+.p-4 { padding: var(--sp-4); }
+.p-6 { padding: var(--sp-6); }
+.px-4 { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+.py-2 { padding-top: var(--sp-2); padding-bottom: var(--sp-2); }
+.py-3 { padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+
+.m-0 { margin: 0; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); }
+.mt-8 { margin-top: var(--sp-8); }
+.mb-4 { margin-bottom: var(--sp-4); }
+.mb-6 { margin-bottom: var(--sp-6); }
+
+/* 文本 */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+
+.font-medium { font-weight: var(--font-medium); }
+.font-semibold { font-weight: var(--font-semibold); }
+.font-bold { font-weight: var(--font-bold); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+.text-center { text-align: center; }
+
+/* 圆角 */
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* 显示 */
+.hidden { display: none; }
+.block { display: block; }
+.inline-flex { display: inline-flex; }
+
+/* 尺寸 */
+.w-full { width: 100%; }
+.max-w-screen-xl { max-width: 80rem; }
+
+/* 动画 */
+.transition { 
+  transition: all var(--duration-normal) var(--ease-out); 
+}
+
+/* 截断 */
+.truncate {
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  text-overflow: ellipsis;
   white-space: nowrap;
-  border-width: 0;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ========================================
+   滚动条
+   ======================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* ========================================
+   选中文本
+   ======================================== */
+::selection {
+  background: var(--c-accent);
+  color: var(--c-white);
+}
+
+/* ========================================
+   焦点样式
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   减少动画
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   主题切换过渡
+   ======================================== */
+.theme-transition,
+.theme-transition * {
+  transition: background-color var(--duration-slow) var(--ease-out),
+              border-color var(--duration-slow) var(--ease-out),
+              color var(--duration-slow) var(--ease-out) !important;
 }

@@ -43,11 +43,6 @@ export const videoSites: VideoSiteCategory = {
       isRecommended: true,
     },
     {
-      name: "蚂蚁4K",
-      url: "https://www.mayi4k.com/",
-      isRecommended: true,
-    },
-    {
       name: "飞快TV",
       url: "https://feikuai.tv/",
       isRecommended: true,
@@ -61,20 +56,12 @@ export const videoSites: VideoSiteCategory = {
       url: "https://www.dma9v6c0c2.shop/index/home.html",
     },
     {
-      name: "电影先生",
-      url: "https://dyxs39.com/",
-    },
-    {
       name: "爱看机器人",
       url: "https://v.ikanbot.com/",
     },
     {
       name: "独播库",
       url: "https://www.dbkk.cc/",
-    },
-    {
-      name: "NunFlix",
-      url: "https://5movies.store/",
     },
     {
       name: "厂长资源",
@@ -146,10 +133,6 @@ export const videoSites: VideoSiteCategory = {
       url: "http://www.hao6v.com",
     },
     {
-      name: "黑夜影视",
-      url: "https://darkvod.com/",
-    },
-    {
       name: "枫林网",
       url: "https://imaple8.co/",
     },
@@ -165,13 +148,16 @@ export const videoSites: VideoSiteCategory = {
       name: "金牌影院",
       url: "https://www.x8kb9k8.com/",
     },
+    {
+      name: "耐看点播",
+      url: "https://nkvod.me/",
+    },
+    {
+      name: "LIVIBO",
+      url: "https://www.libvio.vip/",
+    },
   ],
   二次元: [
-    {
-      name: "樱花动漫",
-      url: "https://www.857fans.com/",
-      isRecommended: true,
-    },
     {
       name: "AGE动漫",
       url: "https://www.agedm.org/",
@@ -183,29 +169,12 @@ export const videoSites: VideoSiteCategory = {
       isRecommended: true,
     },
     {
-      name: "趣动漫",
-      url: "https://www.qdm66.com/",
-      isRecommended: true,
-    },
-    {
-      name: "AnFuns动漫",
-      url: "https://www.anfuns.org/",
-    },
-    {
       name: "233动漫",
       url: "https://www.233dm.com/",
     },
     {
-      name: "NT动漫",
-      url: "https://www.ntdm9.com/",
-    },
-    {
       name: "路漫漫",
       url: "https://i.qg50.com/",
-    },
-    {
-      name: "萌道动漫",
-      url: "https://www.mengdaow.org/",
     },
     {
       name: "柒番",
@@ -247,6 +216,18 @@ export const videoSites: VideoSiteCategory = {
       name: "动漫花园",
       url: "https://www.dmhy.org/",
     },
+    {
+      name: "嗷呜动漫",
+      url: "https://www.aowu.tv/",
+    },
+    {
+      name: "MuteFun",
+      url: "https://www.mutedm.com/",
+    },
+    {
+      name: "西瓜卡通",
+      url: "https://www.xgcartoon.com/",
+    },
   ],
   短剧: [
     {
@@ -278,7 +259,7 @@ export const videoSites: VideoSiteCategory = {
     },
     {
       name: "安娜的档案",
-      url: "https://zh.annas-archive.org/",
+      url: "https://zh.annas-archive.gl/",
     },
     {
       name: "识典古籍",
@@ -295,6 +276,48 @@ export const videoSites: VideoSiteCategory = {
     {
       name: "书格",
       url: "https://new.shuge.org/",
+    },
+  ],
+  工具: [
+    {
+      name: "draw.io",
+      url: "https://app.diagrams.net/",
+    },
+    {
+      name: "Excalidraw",
+      url: "https://excalidraw.com/",
+    },
+    {
+      name: "Canva",
+      url: "https://www.canva.com/",
+    },
+    {
+      name: "Photopea",
+      url: "https://www.photopea.com/",
+    },
+    {
+      name: "Remove.bg",
+      url: "https://www.remove.bg/",
+    },
+    {
+      name: "iLovePDF",
+      url: "https://www.ilovepdf.com/",
+    },
+    {
+      name: "TinyPNG",
+      url: "https://tinypng.com/",
+    },
+    {
+      name: "DeepSeek",
+      url: "https://chat.deepseek.com/",
+    },
+    {
+      name: "Kimi",
+      url: "https://kimi.moonshot.cn/",
+    },
+    {
+      name: "即梦AI",
+      url: "https://jimeng.jianying.com/",
     },
   ],
 };
