@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import type { DoubanWeeklyItem, DoubanWeeklyTab } from '@/types'
 import { useHorizontalWheelScroll } from '@/composables/useHorizontalWheelScroll'
+import { performSearch } from '../utils/searchService'
 
 interface ApiEnvelope<T> {
   data?: T
@@ -77,6 +78,10 @@ const getTrendClass = (trend: string) => {
 // @ts-expect-error containerRef 在模板中作为 ref 使用
 const { containerRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
 
+const handleClick = (name: string) => {
+  performSearch(name, 0)
+}
+
 const fetchApiData = async <T>(endpoint: string): Promise<T | null> => {
   for (let i = 0; i < apiHosts.length; i++) {
     try {
@@ -147,13 +152,11 @@ onMounted(fetchAll)
 
 <template>
   <section class="douban-section">
+    <!-- 标题栏：与导航组件风格统一 -->
     <div class="section-header">
-      <div class="title-stack">
-        <span class="section-kicker">Curated Weekly</span>
-        <div class="title-row">
-          <h2 class="section-title">豆瓣排行榜</h2>
-          <span class="weekly-badge">周更</span>
-        </div>
+      <div class="header-left">
+        <h2 class="section-title">豆瓣排行榜</h2>
+        <span class="header-badge">周更</span>
       </div>
       <div ref="containerRef" class="tab-strip" @wheel="handleTabStripWheel">
         <button v-for="tab in tabs" :key="tab.key" class="tab-chip" :class="{ active: activeTab === tab.key }"
@@ -163,136 +166,119 @@ onMounted(fetchAll)
       </div>
     </div>
 
+    <!-- 加载中 -->
     <div v-if="loading" class="loading-state">
       <div class="loading-spinner"></div>
-      <div class="state-copy">
-        <strong>豆瓣周榜加载中</strong>
-        <span>正在同步本周片单、剧集和综艺口碑。</span>
-      </div>
+      <span>正在加载周榜...</span>
     </div>
 
-    <div v-else-if="activeError" class="empty-state error-state">
-      <div class="state-copy">
-        <strong>{{ activeConfig.label }}暂时不可用</strong>
-        <span>{{ activeError }}</span>
-        <span>你可以先切到别的榜单，或者稍后重新刷新。</span>
-      </div>
+    <!-- 错误 -->
+    <div v-else-if="activeError" class="empty-state">
+      <span class="empty-title">{{ activeConfig.label }}暂时不可用</span>
+      <span class="empty-desc">{{ activeError }}</span>
       <button class="retry-btn" @click="fetchAll">重新加载</button>
     </div>
 
-    <div v-else-if="featuredItem" class="ranking-shell">
-      <a :href="featuredItem.url" target="_blank" rel="noopener noreferrer" class="featured-card">
+    <!-- 榜单内容 -->
+    <div v-else-if="featuredItem" class="ranking-body">
+      <!-- 榜首卡片 -->
+      <button type="button" class="featured-card" @click="handleClick(featuredItem.title)">
         <div class="featured-cover-wrap">
           <img :src="featuredItem.cover_proxy || featuredItem.cover" :alt="featuredItem.title" class="featured-cover"
             loading="lazy" />
           <div class="featured-overlay"></div>
-          <div class="featured-rank">#{{ featuredItem.rank }}</div>
-          <div class="featured-score">
+          <span class="featured-rank">#1</span>
+          <div class="featured-score-overlay">
             <strong>{{ formatRating(featuredItem.rating) }}</strong>
-            <span>{{ activeConfig.eyebrow }}</span>
+            <span>{{ formatCount(featuredItem.rating_count) }}人评</span>
           </div>
         </div>
-        <div class="featured-body">
-          <div class="featured-meta-row">
-            <span class="good-rate">好评 {{ featuredItem.good_rate }}%</span>
-            <span class="rating-count">{{ formatCount(featuredItem.rating_count) }} 人评价</span>
-          </div>
+        <div class="featured-info">
           <h3 class="featured-title">{{ featuredItem.title }}</h3>
-          <p class="featured-subtitle">{{ featuredItem.card_subtitle }}</p>
-          <p class="featured-desc">{{ featuredItem.description }}</p>
-          <div class="featured-tags">
-            <span v-for="tag in featuredItem.tags.slice(0, 2)" :key="tag" class="tag-pill">{{ tag }}</span>
+          <p class="featured-sub">{{ featuredItem.card_subtitle }}</p>
+          <div class="featured-bottom">
+            <span class="featured-rate">好评 {{ featuredItem.good_rate }}%</span>
+            <div class="featured-tags">
+              <span v-for="tag in featuredItem.tags.slice(0, 2)" :key="tag" class="tag-pill">{{ tag }}</span>
+            </div>
           </div>
         </div>
-      </a>
+      </button>
 
+      <!-- 排名列表 -->
       <div class="ranking-list">
-        <a v-for="item in listItems" :key="item.id" :href="item.url" target="_blank" rel="noopener noreferrer"
-          class="rank-row">
-          <div class="row-rank">{{ item.rank }}</div>
-          <div class="row-main">
-            <div class="row-title-line">
-              <h3 class="row-title">{{ item.title }}</h3>
-              <span class="row-score">{{ formatRating(item.rating) }}</span>
-            </div>
-            <p class="row-subtitle">{{ item.card_subtitle }}</p>
-            <div class="row-footer">
-              <span class="row-count">{{ formatCount(item.rating_count) }} 人</span>
-              <span class="trend-chip" :class="getTrendClass(item.trend)">{{ getTrendLabel(item.trend, item.rank_change)
-                }}</span>
-            </div>
+        <button v-for="item in listItems" :key="item.id" type="button"
+          class="rank-row" @click="handleClick(item.title)">
+          <span class="rank-num" :class="{ 'top-3': item.rank <= 3 }">{{ item.rank }}</span>
+          <div class="rank-info">
+            <span class="rank-name">{{ item.title }}</span>
+            <span class="rank-sub">{{ item.card_subtitle }}</span>
           </div>
-        </a>
+          <div class="rank-right">
+            <span class="rank-score">{{ formatRating(item.rating) }}</span>
+            <span class="rank-trend" :class="getTrendClass(item.trend)">{{ getTrendLabel(item.trend, item.rank_change) }}</span>
+          </div>
+        </button>
       </div>
     </div>
 
+    <!-- 空数据 -->
     <div v-else class="empty-state">
-      <div class="state-copy">
-        <strong>{{ activeConfig.label }}本周暂时还没有同步</strong>
-        <span>接口已经连通，但这份榜单此刻没有返回条目。</span>
-        <span>可以先切换别的榜单看看，或者稍后再回来刷新。</span>
-      </div>
+      <span class="empty-title">{{ activeConfig.label }}暂无数据</span>
+      <span class="empty-desc">可以先切换别的榜单看看</span>
       <button class="retry-btn" @click="fetchAll">再试一次</button>
     </div>
   </section>
 </template>
 
 <style scoped>
+/* 外框：与导航组件统一 */
 .douban-section {
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 42%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 80%, transparent), var(--bg-surface));
-  border: 1px solid color-mix(in srgb, var(--c-accent) 22%, var(--border-default));
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  position: relative;
 }
 
+/* 标题栏 */
 .section-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--border-default);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 88%, transparent), transparent);
+  flex-wrap: wrap;
 }
 
-.section-kicker {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--c-accent-light);
-}
-
-.title-row {
+.header-left {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .section-title {
   margin: 0;
-  font-size: var(--text-xl);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
 }
 
-.weekly-badge {
-  padding: 4px 10px;
+.header-badge {
+  padding: 2px 8px;
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--c-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--c-accent) 14%, transparent);
   color: var(--c-accent-light);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.06em;
 }
 
+/* Tab 条 */
 .tab-strip {
   display: flex;
-  gap: var(--sp-2);
+  gap: 2px;
   overflow-x: auto;
-  padding-bottom: 2px;
   scrollbar-width: none;
 }
 
@@ -302,334 +288,303 @@ onMounted(fetchAll)
 
 .tab-chip {
   flex: 0 0 auto;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
-  color: var(--text-secondary);
+  padding: 5px var(--sp-2);
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
   font-size: var(--text-xs);
-  transition: transform var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .tab-chip:hover {
-  transform: translateY(-1px);
   color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .tab-chip.active {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 85%, transparent), color-mix(in srgb, var(--c-accent-light) 70%, transparent));
-  color: white;
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
+/* 加载 / 空状态 */
 .loading-state,
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-4);
-  min-height: 320px;
+  gap: var(--sp-3);
+  min-height: 240px;
   padding: var(--sp-6);
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   font-size: var(--text-sm);
   text-align: center;
 }
 
-.state-copy {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  max-width: 340px;
-}
-
-.state-copy strong {
-  color: var(--text-primary);
-  font-size: var(--text-base);
-}
-
-.error-state .state-copy strong {
-  color: #fca5a5;
-}
-
-.retry-btn {
-  padding: 10px 16px;
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--c-accent) 24%, var(--border-default));
-  background: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
-}
-
-.retry-btn:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--c-accent) 46%, var(--border-hover));
-  background: color-mix(in srgb, var(--bg-hover) 92%, transparent);
-}
-
 .loading-spinner {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid var(--border-default);
   border-top-color: var(--c-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-.ranking-shell {
+.empty-title {
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.empty-desc {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+.retry-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.retry-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* 榜单内容 */
+.ranking-body {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
 }
 
+/* 榜首卡片 */
 .featured-card {
-  border-radius: calc(var(--radius-xl) - 4px);
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--c-accent) 18%, var(--border-default));
-  background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
-  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  background: var(--bg-elevated);
+  border: none;
+  outline: none;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .featured-card:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--c-accent) 34%, var(--border-hover));
-  box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.7);
 }
 
 .featured-cover-wrap {
   position: relative;
-  aspect-ratio: 16 / 10;
   overflow: hidden;
 }
 
 .featured-cover {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .featured-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 0.7));
-}
-
-.featured-rank,
-.featured-score {
-  position: absolute;
-  z-index: 1;
+  background: linear-gradient(180deg, transparent 40%, rgb(0 0 0 / 0.75));
 }
 
 .featured-rank {
-  top: var(--sp-3);
-  left: var(--sp-3);
-  padding: 6px 10px;
-  border-radius: var(--radius-full);
-  background: rgb(0 0 0 / 0.56);
+  position: absolute;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  padding: 3px 8px;
+  border-radius: var(--radius-md);
+  background: rgb(0 0 0 / 0.5);
   color: white;
   font-size: 11px;
-  letter-spacing: 0.12em;
+  font-weight: var(--font-semibold);
 }
 
-.featured-score {
-  right: var(--sp-3);
-  bottom: var(--sp-3);
+.featured-score-overlay {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: var(--sp-2);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   color: white;
 }
 
-.featured-score strong {
-  font-size: var(--text-2xl);
+.featured-score-overlay strong {
+  font-size: var(--text-xl);
   line-height: 1;
 }
 
-.featured-score span {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0.82;
+.featured-score-overlay span {
+  font-size: 10px;
+  opacity: 0.8;
 }
 
-.featured-body {
+.featured-info {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-4);
-}
-
-.featured-meta-row,
-.row-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
-}
-
-.good-rate,
-.row-score {
-  color: var(--c-accent-light);
-  font-weight: var(--font-semibold);
-}
-
-.rating-count,
-.row-count {
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-}
-
-.featured-title,
-.row-title {
-  margin: 0;
-  color: var(--text-primary);
+  gap: var(--sp-1);
+  padding: var(--sp-3);
 }
 
 .featured-title {
-  font-size: var(--text-lg);
-}
-
-.featured-subtitle,
-.row-subtitle,
-.featured-desc {
-  color: var(--text-secondary);
+  margin: 0;
   font-size: var(--text-sm);
-  line-height: 1.65;
-}
-
-.featured-subtitle,
-.featured-desc,
-.row-subtitle {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.featured-subtitle {
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-}
-
-.featured-desc {
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
-}
-
-.row-subtitle {
-  line-clamp: 1;
-  -webkit-line-clamp: 1;
-}
-
-.featured-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.tag-pill,
-.trend-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 9px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-}
-
-.tag-pill {
-  background: color-mix(in srgb, var(--bg-hover) 82%, transparent);
-  color: var(--text-secondary);
-}
-
-.ranking-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-}
-
-.rank-row {
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: var(--sp-3);
-  align-items: start;
-  padding: var(--sp-3);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--bg-elevated) 78%, transparent);
-  border: 1px solid transparent;
-  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
-}
-
-.rank-row:hover {
-  transform: translateX(2px);
-  border-color: color-mix(in srgb, var(--c-accent) 20%, var(--border-hover));
-  background: color-mix(in srgb, var(--bg-hover) 92%, transparent);
-}
-
-.row-rank {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 18%, transparent), color-mix(in srgb, var(--bg-hover) 82%, transparent));
-  color: var(--text-primary);
   font-weight: var(--font-semibold);
-}
-
-.row-main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.row-title-line {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-2);
-}
-
-.row-title {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.trend-chip.trend-up {
-  background: rgb(34 197 94 / 0.14);
+.featured-sub {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featured-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.featured-rate {
+  font-size: 11px;
+  color: var(--c-accent-light);
+  font-weight: var(--font-medium);
+}
+
+.featured-tags {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.tag-pill {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+/* 排名列表 */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--radius-md);
+  border: none;
+  outline: none;
+  font: inherit;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.rank-row:hover {
+  background: var(--bg-hover);
+}
+
+.rank-num {
+  width: 24px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-tertiary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rank-num.top-3 {
+  color: var(--c-accent);
+}
+
+.rank-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rank-name {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.rank-score {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--c-accent-light);
+}
+
+.rank-trend {
+  font-size: 10px;
+}
+
+.rank-trend.trend-up {
   color: #4ade80;
 }
 
-.trend-chip.trend-down {
-  background: rgb(239 68 68 / 0.14);
+.rank-trend.trend-down {
   color: #f87171;
 }
 
-.trend-chip.trend-flat {
-  background: rgb(148 163 184 / 0.14);
-  color: #cbd5e1;
+.rank-trend.trend-flat {
+  color: var(--text-tertiary);
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 640px) {
-
-  .section-header,
-  .ranking-shell {
-    padding-left: var(--sp-4);
-    padding-right: var(--sp-4);
-  }
-
-  .featured-cover-wrap {
-    aspect-ratio: 4 / 3;
+  .ranking-body {
+    padding: var(--sp-3);
   }
 }
 </style>

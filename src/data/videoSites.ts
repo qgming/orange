@@ -1,4 +1,4 @@
-import type { VideoSiteCategory } from '@/types'
+import type { VideoSiteCategory } from "@/types";
 
 export const videoSites: VideoSiteCategory = {
   影视: [
@@ -8,8 +8,8 @@ export const videoSites: VideoSiteCategory = {
       isRecommended: true,
     },
     {
-      name: "3Q影视",
-      url: "https://qqqys.com/",
+      name: "布布影视",
+      url: "https://bbys.app/",
       isRecommended: true,
     },
     {
@@ -279,6 +279,11 @@ export const videoSites: VideoSiteCategory = {
     },
   ],
   工具: [
+    {
+      name: "认知自我",
+      url: "https://know.qgming.com/",
+      isRecommended: true,
+    },
     {
       name: "draw.io",
       url: "https://app.diagrams.net/",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * VideoNav - 网站导航
- * 紧凑卡片风格
+ * 自包含分类 Tab + 站点卡片网格
  */
 import { ref, computed, onMounted, watch } from 'vue'
 import { videoSites } from '../data/videoSites'
@@ -33,7 +33,6 @@ const getHostname = (url: string) => {
 const loadIcon = async (url: string, name: string) => {
   const key = `${name}-${url}`
   if (siteIcons.value.has(key)) return
-
   const icon = await getWebsiteIcon(url, { cache: true, siteName: name })
   siteIcons.value.set(key, icon)
 }
@@ -94,6 +93,7 @@ watch(activeCategory, loadIcons)
 
 <template>
   <section class="nav-section">
+    <!-- 分类导航 -->
     <div class="section-header">
       <h2 class="section-title">网站导航</h2>
       <div class="category-tabs">
@@ -112,6 +112,7 @@ watch(activeCategory, loadIcons)
       </div>
     </div>
 
+    <!-- 站点网格 -->
     <div class="sites-container">
       <div v-for="(sites, category) in filteredSites" :key="category" class="category-block">
         <h3 v-if="showTitles" class="category-title">{{ category }}</h3>
@@ -164,32 +165,32 @@ watch(activeCategory, loadIcons)
 .section-header {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5);
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--border-default);
   flex-wrap: wrap;
 }
 
 .section-title {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
   margin: 0;
+  flex-shrink: 0;
 }
 
 .category-tabs {
   display: flex;
-  gap: var(--sp-1);
+  gap: 2px;
   flex-wrap: wrap;
-  margin-left: auto;
 }
 
 .cat-btn {
   display: flex;
   align-items: center;
   gap: var(--sp-1);
-  padding: var(--sp-1) var(--sp-3);
-  font-size: var(--text-sm);
+  padding: 5px var(--sp-2);
+  font-size: var(--text-xs);
   color: var(--text-tertiary);
   border-radius: var(--radius-md);
   transition: all var(--duration-fast) var(--ease-out);
@@ -206,9 +207,9 @@ watch(activeCategory, loadIcons)
 }
 
 .cat-btn .count {
-  font-size: var(--text-xs);
+  font-size: 10px;
   color: var(--text-tertiary);
-  padding: 0 var(--sp-1);
+  padding: 0 4px;
   background: var(--bg-elevated);
   border-radius: var(--radius-sm);
 }
@@ -219,11 +220,11 @@ watch(activeCategory, loadIcons)
 }
 
 .sites-container {
-  padding: var(--sp-4) var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
 }
 
 .category-block {
-  margin-bottom: var(--sp-6);
+  margin-bottom: var(--sp-5);
 }
 
 .category-block:last-child {
@@ -231,27 +232,29 @@ watch(activeCategory, loadIcons)
 }
 
 .category-title {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: var(--font-medium);
   color: var(--text-tertiary);
-  margin: 0 0 var(--sp-3) 0;
+  margin: 0 0 var(--sp-2) 0;
   padding-bottom: var(--sp-2);
   border-bottom: 1px solid var(--border-default);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .sites-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-3);
+  gap: var(--sp-2);
 }
 
 .site-card {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3);
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
   background: var(--bg-elevated);
-  border: 1px solid var(--border-default);
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   transition: all var(--duration-fast) var(--ease-out);
   position: relative;
@@ -260,11 +263,12 @@ watch(activeCategory, loadIcons)
 .site-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-hover);
+  transform: translateY(-1px);
 }
 
 .site-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -299,7 +303,7 @@ watch(activeCategory, loadIcons)
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   color: white;
   border-radius: var(--radius-md);
@@ -310,7 +314,7 @@ watch(activeCategory, loadIcons)
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .site-name {
@@ -323,7 +327,7 @@ watch(activeCategory, loadIcons)
 }
 
 .site-url {
-  font-size: var(--text-xs);
+  font-size: 11px;
   color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -334,15 +338,16 @@ watch(activeCategory, loadIcons)
   position: absolute;
   top: 0;
   right: 0;
-  padding: 2px 6px;
-  font-size: 10px;
+  padding: 1px 5px;
+  font-size: 9px;
   font-weight: var(--font-medium);
   color: white;
   background: var(--c-accent);
-  border-radius: 0 var(--radius-lg) 0 var(--radius-md);
+  border-radius: 0 var(--radius-lg) 0 var(--radius-sm);
 }
 
-@media (max-width: 1200px) {
+/* 在侧边栏中作为中间列时，降为2列 */
+@media (max-width: 1220px) {
   .sites-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -350,8 +355,22 @@ watch(activeCategory, loadIcons)
 
 @media (max-width: 768px) {
   .sites-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-2);
+  }
+
+  .section-header {
+    padding: var(--sp-3);
+  }
+
+  .sites-container {
+    padding: var(--sp-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .sites-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .site-card {
@@ -359,14 +378,8 @@ watch(activeCategory, loadIcons)
   }
 
   .site-icon {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-@media (max-width: 480px) {
-  .sites-grid {
-    grid-template-columns: 1fr 1fr;
+    width: 28px;
+    height: 28px;
   }
 }
 </style>

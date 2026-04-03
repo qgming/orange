@@ -13,7 +13,9 @@
       "Bash(npm run build:*)",
       "Bash(find:*)",
       "Bash(find src/utils -name \"*.js\" -type f -delete)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(git add:*)"
     ]
   }
 }
