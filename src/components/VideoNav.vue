@@ -4,12 +4,56 @@
  * 自包含分类 Tab + 站点卡片网格
  */
 import { ref, computed, onMounted, watch } from 'vue'
-import { videoSites } from '../data/videoSites'
+import videoSitesData from '../data/videoSites.json'
 import type { VideoSiteCategory } from '@/types'
 import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '../utils/iconService'
 
+const REMOTE_SITES_URL = '/orange/sites.json'
+
+const localVideoSites = videoSitesData as VideoSiteCategory
+const videoSites = ref<VideoSiteCategory>({})
+const isLoadingSites = ref(true)
 const activeCategory = ref('全部')
 const siteIcons = ref(new Map<string, string>())
+
+const isVideoSiteCategory = (data: unknown): data is VideoSiteCategory => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false
+
+  return Object.values(data).every(sites => {
+    if (!Array.isArray(sites)) return false
+
+    return sites.every(site => {
+      if (!site || typeof site !== 'object' || Array.isArray(site)) return false
+
+      const siteData = site as Record<string, unknown>
+      const hasValidBase = typeof siteData.name === 'string' && typeof siteData.url === 'string'
+      const hasValidRecommend =
+        siteData.isRecommended === undefined || typeof siteData.isRecommended === 'boolean'
+
+      return hasValidBase && hasValidRecommend
+    })
+  })
+}
+
+const fetchRemoteVideoSites = async () => {
+  try {
+    const response = await fetch(REMOTE_SITES_URL, { cache: 'no-cache' })
+    if (!response.ok) return null
+
+    const data = await response.json()
+    if (isVideoSiteCategory(data)) return data
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+const loadVideoSites = async () => {
+  const remoteSites = await fetchRemoteVideoSites()
+  videoSites.value = remoteSites ?? localVideoSites
+  isLoadingSites.value = false
+}
 
 const handleLinkClick = (event: MouseEvent, url: string) => {
   event.preventDefault()
@@ -55,28 +99,30 @@ const getInitialData = (url: string, name: string) => {
   return parseInitialIcon(icon)
 }
 
-const categories = computed(() => ['全部', '推荐', ...Object.keys(videoSites)])
+const categories = computed(() => ['全部', '推荐', ...Object.keys(videoSites.value)])
 
 const filteredSites = computed(() => {
-  if (activeCategory.value === '全部') return videoSites
+  if (activeCategory.value === '全部') return videoSites.value
   if (activeCategory.value === '推荐') {
     const filtered: VideoSiteCategory = {}
-    Object.entries(videoSites).forEach(([cat, sites]) => {
+    Object.entries(videoSites.value).forEach(([cat, sites]) => {
       const rec = sites.filter(s => s.isRecommended)
       if (rec.length > 0) filtered[cat] = rec
     })
     return filtered
   }
-  const sites = videoSites[activeCategory.value]
+  const sites = videoSites.value[activeCategory.value]
   return sites ? { [activeCategory.value]: sites } : {}
 })
 
 const totalCount = computed(() => {
-  return Object.values(videoSites).reduce((sum, sites) => sum + sites.length, 0)
+  return Object.values(videoSites.value).reduce((sum, sites) => sum + sites.length, 0)
 })
 
 const recCount = computed(() => {
-  return Object.values(videoSites).reduce((sum, sites) => sum + sites.filter(s => s.isRecommended).length, 0)
+  return Object.values(videoSites.value).reduce((sum, sites) => {
+    return sum + sites.filter(s => s.isRecommended).length
+  }, 0)
 })
 
 const showTitles = computed(() => activeCategory.value === '全部')
@@ -87,8 +133,8 @@ const loadIcons = () => {
   })
 }
 
-onMounted(loadIcons)
-watch(activeCategory, loadIcons)
+onMounted(loadVideoSites)
+watch([activeCategory, filteredSites], loadIcons, { immediate: true })
 </script>
 
 <template>
@@ -114,7 +160,19 @@ watch(activeCategory, loadIcons)
 
     <!-- 站点网格 -->
     <div class="sites-container">
-      <div v-for="(sites, category) in filteredSites" :key="category" class="category-block">
+      <div v-if="isLoadingSites" class="sites-loading" aria-live="polite">
+        <div v-for="item in 6" :key="item" class="site-card loading-card">
+          <div class="site-icon">
+            <div class="icon-placeholder"></div>
+          </div>
+          <div class="site-info">
+            <span class="loading-line loading-name"></span>
+            <span class="loading-line loading-url"></span>
+          </div>
+        </div>
+      </div>
+
+      <div v-for="(sites, category) in filteredSites" v-else :key="category" class="category-block">
         <h3 v-if="showTitles" class="category-title">{{ category }}</h3>
         <div class="sites-grid">
           <a
@@ -221,6 +279,12 @@ watch(activeCategory, loadIcons)
 
 .sites-container {
   padding: var(--sp-3) var(--sp-4);
+}
+
+.sites-loading {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
 }
 
 .category-block {
@@ -334,6 +398,27 @@ watch(activeCategory, loadIcons)
   white-space: nowrap;
 }
 
+.loading-card {
+  pointer-events: none;
+}
+
+.loading-line {
+  display: block;
+  height: 10px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--bg-hover) 25%, var(--bg-elevated) 50%, var(--bg-hover) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.loading-name {
+  width: 64px;
+}
+
+.loading-url {
+  width: 96px;
+}
+
 .badge {
   position: absolute;
   top: 0;
@@ -348,13 +433,15 @@ watch(activeCategory, loadIcons)
 
 /* 在侧边栏中作为中间列时，降为2列 */
 @media (max-width: 1220px) {
-  .sites-grid {
+  .sites-grid,
+  .sites-loading {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .sites-grid {
+  .sites-grid,
+  .sites-loading {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-2);
   }
@@ -369,7 +456,8 @@ watch(activeCategory, loadIcons)
 }
 
 @media (max-width: 480px) {
-  .sites-grid {
+  .sites-grid,
+  .sites-loading {
     grid-template-columns: 1fr 1fr;
   }
 
