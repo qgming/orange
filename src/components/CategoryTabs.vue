@@ -64,12 +64,12 @@ const handleTabClick = (key: string) => {
 .tab-button {
   flex: 0 0 auto;
   min-width: 108px;
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-2);
-  padding: 0 var(--sp-3);
+  padding: 6px var(--sp-3);
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
@@ -77,11 +77,21 @@ const handleTabClick = (key: string) => {
   transition: all var(--duration-fast) var(--ease-out);
 }
 
-.tab-button:hover,
+.tab-button:hover {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--c-accent) 10%, var(--bg-elevated));
+  color: color-mix(in srgb, var(--c-accent) 48%, var(--text-primary));
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--c-accent) 55%, transparent);
+}
+
 .tab-button.active {
-  border-color: color-mix(in srgb, var(--c-accent) 28%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-elevated));
+  border-color: transparent;
+  background: color-mix(in srgb, var(--c-accent) 16%, var(--bg-elevated));
   color: var(--text-primary);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-white) 14%, transparent),
+    0 10px 18px -16px color-mix(in srgb, var(--c-accent) 48%, transparent);
 }
 
 .tab-label {
@@ -89,12 +99,29 @@ const handleTabClick = (key: string) => {
   font-weight: var(--font-medium);
 }
 
+.tab-button.active .tab-label {
+  color: color-mix(in srgb, var(--c-accent-dark) 28%, var(--text-primary));
+  font-weight: var(--font-semibold);
+}
+
 .tab-count {
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--c-accent) 18%, var(--bg-surface));
-  color: var(--c-accent-light);
+  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-elevated));
+  color: color-mix(in srgb, var(--c-accent) 72%, var(--text-primary));
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
+}
+
+.tab-button:hover .tab-count {
+  background: color-mix(in srgb, var(--c-accent) 16%, var(--bg-surface));
+  color: color-mix(in srgb, var(--c-accent-light) 78%, var(--text-primary));
+}
+
+.tab-button.active .tab-count {
+  padding: 3px 9px;
+  background: color-mix(in srgb, var(--c-accent) 24%, var(--bg-surface));
+  color: color-mix(in srgb, var(--c-accent-dark) 60%, var(--text-primary));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 18%, transparent);
 }
 </style>

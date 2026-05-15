@@ -113,10 +113,6 @@ const quickLinks = [
   align-items: center;
   justify-content: center;
   gap: var(--sp-1);
-  padding: 3px;
-  border: 1px solid color-mix(in srgb, var(--border-default) 72%, transparent);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--bg-surface) 72%, transparent);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -134,8 +130,10 @@ const quickLinks = [
   padding: 0 var(--sp-3);
   border-radius: calc(var(--radius-xl) - 4px);
   border: 1px solid transparent;
-  color: var(--text-tertiary);
+  background: color-mix(in srgb, var(--bg-elevated) 38%, transparent);
+  color: var(--text-secondary);
   font-size: var(--text-sm);
+  font-weight: var(--font-medium);
   white-space: nowrap;
   transition:
     color var(--duration-fast) var(--ease-out),
@@ -146,25 +144,42 @@ const quickLinks = [
 }
 
 .quick-link:hover {
-  color: var(--text-primary);
-  background: color-mix(in srgb, var(--bg-hover) 80%, transparent);
+  color: color-mix(in srgb, var(--c-accent) 42%, var(--text-primary));
+  border-color: transparent;
+  background: color-mix(in srgb, var(--c-accent) 9%, var(--bg-elevated));
   transform: translateY(-1px);
+  box-shadow: 0 8px 18px -15px color-mix(in srgb, var(--c-accent) 50%, transparent);
 }
 
 .quick-link.active {
   color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--c-accent) 34%, transparent);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--c-accent) 15%, var(--bg-elevated));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-white) 12%, transparent),
+    0 10px 18px -16px color-mix(in srgb, var(--c-accent) 46%, transparent);
+}
+
+.quick-link.active:hover {
   background: color-mix(in srgb, var(--c-accent) 18%, var(--bg-elevated));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 10%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-white) 14%, transparent),
+    0 12px 20px -16px color-mix(in srgb, var(--c-accent) 56%, transparent);
 }
 
 .quick-link.active .quick-icon {
-  color: var(--c-accent-light);
+  color: color-mix(in srgb, var(--c-accent-light) 86%, var(--text-primary));
+}
+
+.quick-link.active .quick-label {
+  color: color-mix(in srgb, var(--c-accent-dark) 24%, var(--text-primary));
+  font-weight: var(--font-semibold);
 }
 
 .quick-icon {
   width: 15px;
   height: 15px;
+  color: color-mix(in srgb, var(--text-primary) 18%, var(--text-secondary));
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;

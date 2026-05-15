@@ -9,6 +9,7 @@ import { performSearch, searchSites } from '@/utils/searchService'
 const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 const showEngines = ref(false)
+const heroTitle = '好内容，不必到处找。'
 
 const quickKeywords = ['庆余年', '沙丘', '繁花', '周处除三害', '三体']
 const currentSite = computed(() => searchSites[currentSiteIndex.value] ?? searchSites[0])
@@ -30,9 +31,9 @@ const submitSearch = (keyword = searchQuery.value) => {
 <template>
   <section class="home-search" aria-label="影视搜索">
     <div class="search-copy">
-      <span class="eyebrow">Orange Video Navigator</span>
-      <h1>找片、看榜、进站点，一次到位。</h1>
-      <p>把常用影视搜索放在首页中央，顶部栏只负责页面跳转。输入片名后会打开当前选择的搜索源。</p>
+      <h1 class="hero-title">
+        <span class="hero-title-text">{{ heroTitle }}</span>
+      </h1>
     </div>
 
     <form class="search-panel" @submit.prevent="submitSearch()">
@@ -96,59 +97,70 @@ const submitSearch = (keyword = searchQuery.value) => {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
-  padding: clamp(2rem, 7vw, 5.5rem) 0 var(--sp-8);
+  align-items: center;
+  gap: var(--sp-4);
+  padding: clamp(2rem, 6vw, 4rem) 0 var(--sp-8);
 }
 
 .search-copy {
-  max-width: 720px;
+  width: 100%;
+  max-width: 880px;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-}
-
-.eyebrow {
-  width: fit-content;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--c-accent) 16%, var(--bg-surface));
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  align-items: center;
+  margin-bottom: clamp(1rem, 2.8vw, 2rem);
+  text-align: center;
 }
 
 .search-copy h1 {
   margin: 0;
-  max-width: 680px;
-  font-size: clamp(2.25rem, 8vw, 5rem);
-  line-height: 0.98;
+  max-width: 100%;
+  font-size: clamp(2.625rem, 6vw, 4.5rem);
+  line-height: 1;
   letter-spacing: 0;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
-.search-copy p {
-  max-width: 620px;
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
+.hero-title {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-title-text {
+  --hero-title-width: 10.25em;
+
+  box-sizing: content-box;
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  padding-right: 0.04em;
+  border-right: 2px solid color-mix(in srgb, var(--c-accent) 92%, white);
+  white-space: nowrap;
+  animation:
+    title-typing-loop 4.8s steps(10, end) infinite,
+    caret-blink 900ms steps(1, end) infinite;
 }
 
 .search-panel {
   position: relative;
   display: grid;
   grid-template-columns: 160px minmax(0, 1fr) auto;
+  align-items: center;
   gap: var(--sp-2);
-  width: min(100%, 900px);
-  padding: var(--sp-2);
-  background:
-    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
-    linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 70%, transparent), var(--border-default)) border-box;
-  border: 1px solid transparent;
+  width: min(100%, 880px);
+  margin: 0 auto;
+  padding: 10px;
+  background: color-mix(in srgb, var(--bg-surface) 92%, var(--bg-base));
+  border: 1px solid color-mix(in srgb, var(--border-default) 88%, transparent);
   border-radius: var(--radius-2xl);
-  box-shadow: 0 24px 80px -48px color-mix(in srgb, var(--c-accent) 70%, transparent);
+  box-shadow: 0 24px 48px -36px rgb(0 0 0 / 0.45);
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.search-panel:focus-within {
+  border-color: color-mix(in srgb, var(--c-accent) 34%, var(--border-hover));
+  box-shadow: 0 22px 44px -34px color-mix(in srgb, var(--c-accent) 26%, transparent);
 }
 
 .engine-select {
@@ -170,8 +182,15 @@ const submitSearch = (keyword = searchQuery.value) => {
   justify-content: space-between;
   gap: var(--sp-2);
   padding: 0 var(--sp-4);
-  background: var(--bg-elevated);
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--bg-elevated) 88%, var(--bg-surface));
   color: var(--text-primary);
+  transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.engine-button:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-elevated);
 }
 
 .engine-button svg,
@@ -195,7 +214,7 @@ const submitSearch = (keyword = searchQuery.value) => {
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  box-shadow: 0 16px 36px -18px rgb(0 0 0 / 0.7);
+  box-shadow: 0 18px 36px -24px rgb(0 0 0 / 0.7);
 }
 
 .engine-option {
@@ -217,11 +236,11 @@ const submitSearch = (keyword = searchQuery.value) => {
   width: 100%;
   min-width: 0;
   height: 52px;
-  padding: 0 var(--sp-4);
-  border: 1px solid var(--border-default);
+  padding: 0 var(--sp-4) 0 var(--sp-3);
+  border: none;
   border-radius: var(--radius-xl);
   outline: none;
-  background: var(--bg-base);
+  background: transparent;
   color: var(--text-primary);
   font-size: var(--text-base);
 }
@@ -231,7 +250,7 @@ const submitSearch = (keyword = searchQuery.value) => {
 }
 
 .search-input:focus {
-  border-color: color-mix(in srgb, var(--c-accent) 55%, var(--border-hover));
+  outline: none;
 }
 
 .search-submit {
@@ -239,6 +258,7 @@ const submitSearch = (keyword = searchQuery.value) => {
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
+  min-width: 112px;
   padding: 0 var(--sp-5);
   background: var(--c-accent);
   color: white;
@@ -253,22 +273,24 @@ const submitSearch = (keyword = searchQuery.value) => {
 .quick-keywords {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--sp-2);
+  width: min(100%, 880px);
 }
 
 .keyword-chip {
   padding: 7px var(--sp-3);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 84%, var(--bg-base));
   color: var(--text-secondary);
   font-size: var(--text-sm);
-  transition: all var(--duration-fast) var(--ease-out);
+  transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .keyword-chip:hover {
-  border-color: var(--border-hover);
-  background: var(--bg-hover);
+  border-color: color-mix(in srgb, var(--c-accent) 30%, var(--border-hover));
+  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-surface));
   color: var(--text-primary);
 }
 
@@ -283,15 +305,78 @@ const submitSearch = (keyword = searchQuery.value) => {
   transform: translateY(-4px);
 }
 
+@keyframes title-typing-loop {
+  0%,
+  12% {
+    width: 0;
+  }
+
+  42%,
+  58% {
+    width: var(--hero-title-width);
+  }
+
+  88%,
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  45% {
+    border-right-color: color-mix(in srgb, var(--c-accent) 92%, white);
+  }
+
+  55%,
+  100% {
+    border-right-color: transparent;
+  }
+}
+
 @media (max-width: 720px) {
+  .search-copy {
+    margin-bottom: var(--sp-4);
+  }
+
+  .search-copy h1 {
+    white-space: normal;
+  }
+
+  .hero-title-text {
+    width: auto;
+    border-right: none;
+    white-space: normal;
+    animation: none;
+  }
+
   .search-panel {
     grid-template-columns: 1fr;
+    padding: var(--sp-2);
   }
 
   .engine-button,
   .search-input,
   .search-submit {
     height: 48px;
+  }
+
+  .search-input {
+    padding-left: var(--sp-4);
+    border-radius: var(--radius-xl);
+    background: var(--bg-base);
+  }
+
+  .search-submit {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title-text {
+    width: auto;
+    border-right: none;
+    animation: none;
   }
 }
 </style>
