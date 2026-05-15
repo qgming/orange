@@ -1,49 +1,32 @@
 <script setup lang="ts">
-/**
- * HomeView - 首页
- * 桌面(>1220px)：三栏同时展示 豆瓣 | 导航 | 实时
- * 中屏(768-1220px)：双栏 导航 | 榜单Tab切换
- * 移动端(<768px)：全Tab切换（导航 / 豆瓣周榜 / 实时榜单）
- */
-import { onMounted, onUnmounted, ref, computed } from 'vue'
-import TopBar from '../components/TopBar.vue'
-import RealtimeRanking from '../components/RealtimeRanking.vue'
-import DoubanWeeklyRankings from '../components/DoubanWeeklyRankings.vue'
-import VideoNav from '../components/VideoNav.vue'
-import AppFooter from '../components/AppFooter.vue'
+import { onMounted } from 'vue'
+import AppFooter from '@/components/AppFooter.vue'
+import HomeSearch from '@/components/HomeSearch.vue'
+import TopBar from '@/components/TopBar.vue'
 
-type ViewMode = 'desktop' | 'tablet' | 'mobile'
-type MobileTab = 'nav' | 'douban' | 'realtime'
-type RankingTab = 'douban' | 'realtime'
-
-const viewMode = ref<ViewMode>('desktop')
-const mobileTab = ref<MobileTab>('nav')
-const rankingTab = ref<RankingTab>('douban')
-
-const mobileTabs: { key: MobileTab; label: string; sub: string }[] = [
-  { key: 'nav', label: '网站导航', sub: '影视资源' },
-  { key: 'douban', label: '豆瓣周榜', sub: '口碑精选' },
-  { key: 'realtime', label: '实时榜单', sub: '热播票房' },
+const entryCards = [
+  {
+    to: '/nav',
+    title: '网站导航',
+    description: '把影视站点按分类整理成独立页面，适合快速跳转和长期维护。',
+    meta: '站点入口',
+  },
+  {
+    to: '/douban-weekly',
+    title: '豆瓣周榜',
+    description: '独立查看全球电影、华语剧集、综艺等口碑周榜。',
+    meta: '周更榜单',
+  },
+  {
+    to: '/realtime-rankings',
+    title: '实时排行榜',
+    description: '网剧热度、电视收视、电影票房实时切换。',
+    meta: '热度追踪',
+  },
 ]
 
-const isDesktop = computed(() => viewMode.value === 'desktop')
-const isTablet = computed(() => viewMode.value === 'tablet')
-const isMobile = computed(() => viewMode.value === 'mobile')
-
-const updateViewport = () => {
-  const w = window.innerWidth
-  if (w > 1220) viewMode.value = 'desktop'
-  else if (w > 768) viewMode.value = 'tablet'
-  else viewMode.value = 'mobile'
-}
-
 onMounted(() => {
-  updateViewport()
-  window.addEventListener('resize', updateViewport)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateViewport)
+  document.title = '橘子导航'
 })
 </script>
 
@@ -52,70 +35,22 @@ onUnmounted(() => {
     <TopBar />
 
     <main class="main-content">
-      <div class="page-shell">
+      <HomeSearch />
 
-        <!-- ============ 移动端：主 Tab 导航 ============ -->
-        <nav v-if="isMobile" class="mobile-tabs">
-          <button
-            v-for="tab in mobileTabs"
-            :key="tab.key"
-            class="mobile-tab"
-            :class="{ active: mobileTab === tab.key }"
-            @click="mobileTab = tab.key"
-          >
-            <span class="mobile-tab-label">{{ tab.label }}</span>
-            <span class="mobile-tab-sub">{{ tab.sub }}</span>
-          </button>
-        </nav>
-
-        <!-- ============ 移动端：Tab 内容 ============ -->
-        <template v-if="isMobile">
-          <VideoNav v-show="mobileTab === 'nav'" />
-          <DoubanWeeklyRankings v-show="mobileTab === 'douban'" />
-          <RealtimeRanking v-show="mobileTab === 'realtime'" />
-        </template>
-
-        <!-- ============ 桌面端：三栏 ============ -->
-        <div v-else-if="isDesktop" class="three-col">
-          <div class="col-side col-left">
-            <DoubanWeeklyRankings />
-          </div>
-          <div class="col-main">
-            <VideoNav />
-          </div>
-          <div class="col-side col-right">
-            <RealtimeRanking />
-          </div>
-        </div>
-
-        <!-- ============ 中屏：双栏（导航 + 榜单Tab） ============ -->
-        <div v-else-if="isTablet" class="two-col">
-          <div class="col-main">
-            <VideoNav />
-          </div>
-          <div class="col-rankings">
-            <div class="ranking-switcher">
-              <button
-                class="ranking-sw-btn"
-                :class="{ active: rankingTab === 'douban' }"
-                @click="rankingTab = 'douban'"
-              >
-                豆瓣周榜
-              </button>
-              <button
-                class="ranking-sw-btn"
-                :class="{ active: rankingTab === 'realtime' }"
-                @click="rankingTab = 'realtime'"
-              >
-                实时榜单
-              </button>
-            </div>
-            <DoubanWeeklyRankings v-show="rankingTab === 'douban'" />
-            <RealtimeRanking v-show="rankingTab === 'realtime'" />
-          </div>
-        </div>
-
-      </div>
+      <section class="entry-grid" aria-label="页面入口">
+        <router-link v-for="card in entryCards" :key="card.to" :to="card.to" class="entry-card">
+          <span class="entry-meta">{{ card.meta }}</span>
+          <h2>{{ card.title }}</h2>
+          <p>{{ card.description }}</p>
+          <span class="entry-action">
+            进入页面
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M5 12h14"></path>
+              <path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </span>
+        </router-link>
+      </section>
     </main>
 
     <AppFooter />
@@ -131,146 +66,96 @@ onUnmounted(() => {
 
 .main-content {
   flex: 1;
-  max-width: 1480px;
+  width: min(100%, 1240px);
   margin: 0 auto;
-  padding: var(--sp-4);
-  width: 100%;
+  padding: 0 var(--sp-4);
 }
 
-.page-shell {
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-8);
+}
+
+.entry-card {
+  min-height: 220px;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-}
-
-/* ========== 移动端 Tab 导航 ========== */
-.mobile-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--sp-2);
-  position: sticky;
-  top: 45px;
-  z-index: 50;
-  background: color-mix(in srgb, var(--bg-base) 90%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: var(--sp-2) 0;
-  margin: 0 calc(-1 * var(--sp-3));
-  padding-left: var(--sp-3);
-  padding-right: var(--sp-3);
-}
-
-.mobile-tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--sp-2) var(--sp-1);
-  border-radius: var(--radius-lg);
-  border: 1px solid transparent;
-  background: var(--bg-surface);
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.mobile-tab.active {
-  border-color: color-mix(in srgb, var(--c-accent) 40%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 8%, var(--bg-surface));
-}
-
-.mobile-tab-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.mobile-tab.active .mobile-tab-label {
-  color: var(--text-primary);
-}
-
-.mobile-tab-sub {
-  font-size: 10px;
-  color: var(--text-tertiary);
-}
-
-.mobile-tab.active .mobile-tab-sub {
-  color: var(--c-accent-light);
-}
-
-/* ========== 桌面端三栏 ========== */
-.three-col {
-  display: grid;
-  grid-template-columns: 340px minmax(0, 1fr) 340px;
-  gap: var(--sp-4);
-  align-items: start;
-}
-
-.col-side {
-  min-width: 0;
-}
-
-.col-main {
-  min-width: 0;
-}
-
-/* ========== 中屏双栏 ========== */
-.two-col {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: var(--sp-4);
-  align-items: start;
-}
-
-.col-rankings {
-  display: flex;
-  flex-direction: column;
+  align-items: flex-start;
   gap: var(--sp-3);
-  min-width: 0;
-}
-
-/* 榜单切换 */
-.ranking-switcher {
-  display: flex;
-  gap: var(--sp-1);
-  padding: var(--sp-1);
-  background: var(--bg-surface);
+  padding: var(--sp-5);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 36%),
+    var(--bg-surface);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.ranking-sw-btn {
-  flex: 1;
-  padding: var(--sp-2) var(--sp-3);
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-  border-radius: var(--radius-md);
-  text-align: center;
-  transition: all var(--duration-fast) var(--ease-out);
+.entry-card:hover {
+  border-color: var(--border-hover);
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--c-accent) 20%, transparent), transparent 38%),
+    var(--bg-elevated);
+  transform: translateY(-2px);
 }
 
-.ranking-sw-btn:hover {
-  color: var(--text-primary);
-}
-
-.ranking-sw-btn.active {
+.entry-meta {
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
   background: var(--bg-elevated);
-  color: var(--text-primary);
+  color: var(--c-accent-light);
+  font-size: var(--text-xs);
   font-weight: var(--font-medium);
 }
 
-/* ========== 响应式微调 ========== */
-@media (max-width: 1380px) {
-  .three-col {
-    grid-template-columns: 320px minmax(0, 1fr) 320px;
-  }
+.entry-card h2 {
+  margin: auto 0 0;
+  color: var(--text-primary);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    padding: var(--sp-3);
+.entry-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.entry-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.entry-action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.entry-card:hover .entry-action svg {
+  transform: translateX(2px);
+}
+
+@media (max-width: 860px) {
+  .entry-grid {
+    grid-template-columns: 1fr;
   }
 
-  .page-shell {
-    gap: var(--sp-3);
+  .entry-card {
+    min-height: 180px;
   }
 }
 </style>
