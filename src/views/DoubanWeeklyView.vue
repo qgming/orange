@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
-import { useHorizontalWheelScroll } from '@/composables/useHorizontalWheelScroll'
+import CategoryTabs from '@/components/CategoryTabs.vue'
 import type { DoubanWeeklyItem, DoubanWeeklyTab } from '@/types'
 import { performSearch } from '@/utils/searchService'
 
@@ -56,15 +56,10 @@ const errors = ref<Record<DoubanWeeklyTab, string | null>>({
 
 let currentHostIndex = 0
 
-// @ts-expect-error containerRef 在模板中作为 ref 使用
-const { containerRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
-
 const activeConfig = computed(() => tabs.find(tab => tab.key === activeTab.value) ?? tabs[0])
 const activeItems = computed(() => rankings.value[activeTab.value] ?? [])
 const activeError = computed(() => errors.value[activeTab.value])
 const heroItem = computed(() => activeItems.value[0] ?? null)
-const topThree = computed(() => activeItems.value.slice(0, 3))
-const listItems = computed(() => activeItems.value.slice(3, 12))
 
 const tabCounts = computed(() => {
   return tabs.reduce<Record<DoubanWeeklyTab, number>>((result, tab) => {
@@ -79,6 +74,14 @@ const tabCounts = computed(() => {
   })
 })
 
+const categoryTabs = computed(() => {
+  return tabs.map(tab => ({
+    key: tab.key,
+    label: tab.label,
+    count: tabCounts.value[tab.key] || 0,
+  }))
+})
+
 const formatRating = (value?: number) => {
   if (typeof value !== 'number') return '--'
   return value.toFixed(1)
@@ -87,6 +90,34 @@ const formatRating = (value?: number) => {
 const formatCount = (value?: number) => {
   if (typeof value !== 'number') return '--'
   return new Intl.NumberFormat('zh-CN', { notation: value > 9999 ? 'compact' : 'standard' }).format(value)
+}
+
+const coverSource = (item: DoubanWeeklyItem) => item.cover_proxy || item.cover
+
+const subtitleParts = (subtitle: string) => {
+  const [year, region, genre, director, ...castParts] = subtitle
+    .split('/')
+    .map(part => part.trim())
+    .filter(Boolean)
+
+  return {
+    year,
+    region,
+    genre,
+    director,
+    cast: castParts.join(' / '),
+  }
+}
+
+const subtitleFields = (subtitle: string) => {
+  const parts = subtitleParts(subtitle)
+  return [
+    { label: '时间', value: parts.year },
+    { label: '制片国家/地区', value: parts.region },
+    { label: '类型', value: parts.genre },
+    { label: '导演', value: parts.director },
+    { label: '主演', value: parts.cast },
+  ].filter(field => field.value)
 }
 
 const trendText = (item: DoubanWeeklyItem) => {
@@ -103,6 +134,10 @@ const trendClass = (item: DoubanWeeklyItem) => {
 
 const openSearch = (title: string) => {
   performSearch(title, 0)
+}
+
+const openDouban = (url: string) => {
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 const fetchApiData = async <T,>(endpoint: string): Promise<T | null> => {
@@ -171,19 +206,12 @@ onMounted(() => {
         </div>
       </header>
 
-      <nav ref="containerRef" class="weekly-tabs" aria-label="豆瓣周榜分类" @wheel="handleTabStripWheel">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          type="button"
-          class="tab-button"
-          :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >
-          <span>{{ tab.short }}</span>
-          <strong>{{ tabCounts[tab.key] || '--' }}</strong>
-        </button>
-      </nav>
+      <CategoryTabs
+        :tabs="categoryTabs"
+        :active-tab="activeTab"
+        aria-label="豆瓣周榜分类"
+        @update:active-tab="activeTab = $event as DoubanWeeklyTab"
+      />
 
       <section v-if="loading" class="state-card">
         <span class="spinner"></span>
@@ -197,47 +225,40 @@ onMounted(() => {
       </section>
 
       <template v-else-if="heroItem">
-        <section class="spotlight">
-          <button type="button" class="poster-card" @click="openSearch(heroItem.title)">
-            <img :src="heroItem.cover_proxy || heroItem.cover" :alt="heroItem.title" />
-            <span class="rank-mark">#1</span>
-          </button>
+        <section class="spotlight-list" :aria-label="`${activeConfig.label}列表`">
+          <article v-for="item in activeItems" :key="item.id" class="spotlight">
+            <button type="button" class="poster-card" @click="openSearch(item.title)">
+              <img :src="coverSource(item)" :alt="item.title" />
+            </button>
 
-          <div class="spotlight-copy">
-            <span class="spotlight-kicker">{{ activeConfig.label }}榜首</span>
-            <h2>{{ heroItem.title }}</h2>
-            <p>{{ heroItem.description || heroItem.card_subtitle }}</p>
-            <div class="rating-row">
-              <strong>{{ formatRating(heroItem.rating) }}</strong>
-              <span>{{ formatCount(heroItem.rating_count) }} 人评价</span>
-              <span>好评 {{ heroItem.good_rate }}%</span>
+            <div class="spotlight-copy">
+              <div class="headline-meta">
+                <span class="meta-pill">#{{ item.rank }}</span>
+              </div>
+              <span class="corner-score">{{ formatRating(item.rating) }}</span>
+              <h2>{{ item.title }}</h2>
+              <div class="detail-grid" aria-label="条目信息">
+                <span v-for="field in subtitleFields(item.card_subtitle)" :key="field.label">
+                  <strong>{{ field.label }}</strong>
+                  {{ field.value }}
+                </span>
+              </div>
+              <p>{{ item.description || item.card_subtitle }}</p>
+              <div class="rating-row">
+                <span>{{ formatCount(item.rating_count) }} 人评价</span>
+                <span>好评 {{ item.good_rate }}%</span>
+                <span class="trend" :class="trendClass(item)">{{ trendText(item) }}</span>
+                <span v-for="tag in item.tags.slice(0, 4)" :key="tag">{{ tag }}</span>
+              </div>
+              <div class="action-row">
+                <button type="button" class="primary-action" @click="openSearch(item.title)">
+                  <span class="play-icon" aria-hidden="true"></span>
+                  播放
+                </button>
+                <button type="button" class="ghost-action" @click="openDouban(item.url)">豆瓣详情</button>
+              </div>
             </div>
-            <div class="tag-row">
-              <span v-for="tag in heroItem.tags.slice(0, 4)" :key="tag">{{ tag }}</span>
-            </div>
-            <button type="button" class="primary-action" @click="openSearch(heroItem.title)">搜索播放源</button>
-          </div>
-        </section>
-
-        <section class="top-grid" aria-label="前三名">
-          <button v-for="item in topThree" :key="item.id" type="button" class="top-card" @click="openSearch(item.title)">
-            <span class="top-rank">#{{ item.rank }}</span>
-            <img :src="item.cover_proxy || item.cover" :alt="item.title" />
-            <div>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.card_subtitle }}</p>
-            </div>
-          </button>
-        </section>
-
-        <section class="rank-table" aria-label="豆瓣周榜列表">
-          <button v-for="item in listItems" :key="item.id" type="button" class="rank-row" @click="openSearch(item.title)">
-            <span class="rank-number">{{ item.rank }}</span>
-            <span class="rank-title">{{ item.title }}</span>
-            <span class="rank-sub">{{ item.card_subtitle }}</span>
-            <span class="rank-score">{{ formatRating(item.rating) }}</span>
-            <span class="trend" :class="trendClass(item)">{{ trendText(item) }}</span>
-          </button>
+          </article>
         </section>
       </template>
 
@@ -294,132 +315,149 @@ onMounted(() => {
   letter-spacing: 0;
 }
 
-.weekly-tabs {
+.spotlight-list {
   display: flex;
-  gap: var(--sp-2);
-  padding: var(--sp-2);
-  margin-bottom: var(--sp-5);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.weekly-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.tab-button {
-  flex: 1 0 132px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-2);
-  min-height: 44px;
-  padding: 0 var(--sp-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.tab-button:hover,
-.tab-button.active {
-  border-color: color-mix(in srgb, var(--c-accent) 28%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-elevated));
-  color: var(--text-primary);
-}
-
-.tab-button strong {
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
+  flex-direction: column;
+  gap: var(--sp-4);
 }
 
 .spotlight {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  gap: var(--sp-6);
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: var(--sp-4);
   align-items: stretch;
-  margin-bottom: var(--sp-5);
 }
 
 .poster-card {
   position: relative;
   overflow: hidden;
-  min-height: 420px;
+  min-height: 360px;
   border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
   background: var(--bg-surface);
+  box-shadow: 0 24px 70px -52px color-mix(in srgb, var(--c-accent) 72%, transparent);
 }
 
 .poster-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.rank-mark {
+.headline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: baseline;
+  padding-right: 72px;
+}
+
+.meta-pill {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  color: var(--c-accent);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
+}
+
+.corner-score {
   position: absolute;
-  top: var(--sp-3);
-  left: var(--sp-3);
-  padding: 5px 10px;
-  border-radius: var(--radius-md);
-  background: rgb(0 0 0 / 0.58);
-  color: white;
-  font-weight: var(--font-semibold);
+  top: var(--sp-5);
+  right: var(--sp-5);
+  color: var(--c-accent);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
 }
 
 .spotlight-copy {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--sp-4);
-  padding: var(--sp-6);
-  border: 1px solid var(--border-default);
+  justify-content: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-5) var(--sp-5) calc(var(--sp-5) + 48px);
+  border: 1px solid #e4e4e7;
   border-radius: var(--radius-xl);
-  background: var(--bg-surface);
+  background: #ffffff;
 }
 
 .spotlight-copy h2 {
   margin: 0;
-  color: var(--text-primary);
-  font-size: clamp(2rem, 5vw, 3.75rem);
-  line-height: 1;
+  color: #18181b;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.05;
 }
 
 .spotlight-copy p {
   margin: 0;
-  color: var(--text-secondary);
+  color: #52525b;
   line-height: var(--leading-relaxed);
 }
 
-.rating-row,
-.tag-row {
+.detail-grid {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-grid span {
+  min-width: 0;
+  padding: 0;
+  color: #52525b;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.detail-grid strong {
+  display: inline;
+  margin-right: 8px;
+  color: #71717a;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.rating-row {
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--sp-2);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.rating-row strong {
-  color: var(--c-accent-light);
-  font-size: var(--text-4xl);
-  line-height: 1;
+.rating-row::-webkit-scrollbar {
+  display: none;
 }
 
-.rating-row span,
-.tag-row span {
+.rating-row span {
+  flex: 0 0 auto;
   padding: 6px 10px;
   border-radius: var(--radius-full);
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
+  background: #f4f4f5;
+  color: #52525b;
   font-size: var(--text-xs);
+}
+
+.action-row {
+  position: absolute;
+  right: var(--sp-5);
+  bottom: var(--sp-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: flex-end;
 }
 
 .primary-action,
 .state-card button {
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
   padding: 10px 16px;
   border-radius: var(--radius-full);
   background: var(--c-accent);
@@ -428,112 +466,31 @@ onMounted(() => {
   font-weight: var(--font-medium);
 }
 
-.top-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-5);
+.play-icon {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid currentColor;
 }
 
-.top-card {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  gap: var(--sp-3);
-  align-items: center;
-  padding: var(--sp-3);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  text-align: left;
-}
-
-.top-card img {
-  width: 72px;
-  aspect-ratio: 2 / 3;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-}
-
-.top-rank {
-  grid-column: 1 / -1;
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-}
-
-.top-card h3,
-.top-card p {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.top-card h3 {
-  color: var(--text-primary);
-  font-size: var(--text-base);
-}
-
-.top-card p {
-  margin-top: 3px;
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-}
-
-.rank-table {
-  overflow: hidden;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-}
-
-.rank-row {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 48px minmax(120px, 1fr) minmax(180px, 1.4fr) 64px 86px;
-  gap: var(--sp-3);
-  align-items: center;
-  min-height: 58px;
-  padding: 0 var(--sp-4);
-  border-bottom: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  text-align: left;
-}
-
-.rank-row:last-child {
-  border-bottom: none;
-}
-
-.rank-row:hover {
-  background: var(--bg-hover);
-}
-
-.rank-number,
-.rank-score {
-  color: var(--c-accent-light);
-  font-weight: var(--font-semibold);
-}
-
-.rank-title,
-.rank-sub {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rank-title {
-  color: var(--text-primary);
+.ghost-action {
+  width: fit-content;
+  padding: 10px 16px;
+  border: 1px solid #e4e4e7;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  color: #18181b;
+  font-size: var(--text-sm);
   font-weight: var(--font-medium);
 }
 
-.rank-sub {
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
+.primary-action:hover,
+.ghost-action:hover {
+  transform: translateY(-1px);
 }
 
 .trend {
-  justify-self: end;
   font-size: var(--text-xs);
 }
 
@@ -586,22 +543,12 @@ onMounted(() => {
 }
 
 @media (max-width: 900px) {
-  .spotlight,
-  .top-grid {
+  .spotlight {
     grid-template-columns: 1fr;
   }
 
   .poster-card {
-    min-height: 360px;
-  }
-
-  .rank-row {
-    grid-template-columns: 36px minmax(0, 1fr) 54px;
-  }
-
-  .rank-sub,
-  .trend {
-    display: none;
+    min-height: 320px;
   }
 }
 
@@ -611,11 +558,21 @@ onMounted(() => {
   }
 
   .spotlight-copy {
-    padding: var(--sp-4);
+    padding: var(--sp-4) var(--sp-4) calc(var(--sp-4) + 48px);
+  }
+
+  .action-row {
+    right: var(--sp-4);
+    bottom: var(--sp-4);
+  }
+
+  .corner-score {
+    top: var(--sp-4);
+    right: var(--sp-4);
   }
 
   .poster-card {
-    min-height: 280px;
+    min-height: 240px;
   }
 }
 </style>

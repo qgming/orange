@@ -107,7 +107,7 @@
    ======================================== */
 :root,
 [data-theme="dark"] {
-  --bg-base: #09090b;
+  --bg-base: #f5f5f7;
   --bg-surface: #18181b;
   --bg-elevated: #27272a;
   --bg-hover: #3f3f46;
@@ -127,7 +127,7 @@
    亮色主题
    ======================================== */
 [data-theme="light"] {
-  --bg-base: #ffffff;
+  --bg-base: #f5f5f7;
   --bg-surface: #fafafa;
   --bg-elevated: #f4f4f5;
   --bg-hover: #e4e4e7;

@@ -2,9 +2,9 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
+import CategoryTabs from '@/components/CategoryTabs.vue'
 import videoSitesData from '@/data/videoSites.json'
 import type { VideoSiteCategory } from '@/types'
-import { useHorizontalWheelScroll } from '@/composables/useHorizontalWheelScroll'
 import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '@/utils/iconService'
 import { getSiteAvailability, type SiteAvailabilityStatus } from '@/utils/siteAvailability'
 
@@ -20,9 +20,6 @@ const statusQueue: Array<{ url: string, name: string }> = []
 
 let activeStatusChecks = 0
 const MAX_STATUS_CHECKS = 6
-
-// @ts-expect-error containerRef 在模板中作为 ref 使用
-const { containerRef, handleWheel: handleCategoryWheel } = useHorizontalWheelScroll()
 
 const isVideoSiteCategory = (data: unknown): data is VideoSiteCategory => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return false
@@ -75,11 +72,12 @@ const filteredSites = computed(() => {
   return sites ? { [activeCategory.value]: sites } : {}
 })
 
-const featuredSites = computed(() => {
-  return Object.values(videoSites.value)
-    .flat()
-    .filter(site => site.isRecommended)
-    .slice(0, 6)
+const categoryTabsList = computed(() => {
+  return categories.value.map(category => ({
+    key: category,
+    label: category,
+    count: categoryCount(category),
+  }))
 })
 
 const getSiteKey = (url: string, name: string) => `${name}-${url}`
@@ -129,12 +127,6 @@ const getHostname = (url: string) => {
   }
 }
 
-const statusLabel = (status: SiteAvailabilityStatus) => {
-  if (status === 'online') return '可用'
-  if (status === 'offline') return '不可用'
-  return '检测中'
-}
-
 const openSite = (event: MouseEvent, url: string) => {
   event.preventDefault()
   try {
@@ -177,32 +169,12 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
         </div>
       </header>
 
-      <section v-if="featuredSites.length" class="featured-strip" aria-label="推荐站点">
-        <a
-          v-for="site in featuredSites"
-          :key="site.name"
-          :href="site.url"
-          class="featured-site"
-          @click="openSite($event, site.url)"
-        >
-          <span>{{ site.name }}</span>
-          <small>{{ getHostname(site.url) }}</small>
-        </a>
-      </section>
-
-      <nav ref="containerRef" class="category-bar" aria-label="网站分类" @wheel="handleCategoryWheel">
-        <button
-          v-for="category in categories"
-          :key="category"
-          type="button"
-          class="category-button"
-          :class="{ active: activeCategory === category }"
-          @click="activeCategory = category"
-        >
-          <span>{{ category }}</span>
-          <strong>{{ categoryCount(category) }}</strong>
-        </button>
-      </nav>
+      <CategoryTabs
+        :tabs="categoryTabsList"
+        :active-tab="activeCategory"
+        aria-label="网站分类"
+        @update:active-tab="activeCategory = $event"
+      />
 
       <section v-if="loading" class="state-card">
         <span class="spinner"></span>
@@ -211,10 +183,7 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
 
       <section v-else class="directory">
         <article v-for="(sites, category) in filteredSites" :key="category" class="category-section">
-          <header class="category-heading">
-            <h2>{{ category }}</h2>
-            <span>{{ sites.length }} 个站点</span>
-          </header>
+          <h2 class="category-title">{{ category }}</h2>
 
           <div class="site-grid">
             <a
@@ -224,6 +193,9 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
               class="site-card"
               @click="openSite($event, site.url)"
             >
+              <span v-if="site.isRecommended" class="recommend-badge" title="推荐">推荐</span>
+              <span class="status-dot" :class="`status-${getStatus(site.url, site.name)}`"></span>
+
               <div class="site-icon">
                 <div v-if="!hasIcon(site.url, site.name)" class="icon-placeholder"></div>
                 <template v-else>
@@ -241,13 +213,6 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
               <div class="site-copy">
                 <strong>{{ site.name }}</strong>
                 <span>{{ getHostname(site.url) }}</span>
-              </div>
-
-              <div class="site-meta">
-                <span v-if="site.isRecommended" class="recommend-badge">推荐</span>
-                <span class="status-pill" :class="`status-${getStatus(site.url, site.name)}`">
-                  {{ statusLabel(getStatus(site.url, site.name)) }}
-                </span>
               </div>
             </a>
           </div>
@@ -300,154 +265,77 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
   letter-spacing: 0;
 }
 
-.featured-strip {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-4);
-}
-
-.featured-site {
-  min-width: 0;
-  padding: var(--sp-3);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.featured-site:hover {
-  border-color: var(--border-hover);
-  background: var(--bg-hover);
-  transform: translateY(-1px);
-}
-
-.featured-site span,
-.featured-site small {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.featured-site span {
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-}
-
-.featured-site small {
-  margin-top: var(--sp-1);
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-}
-
-.category-bar {
-  display: flex;
-  gap: var(--sp-2);
-  padding: var(--sp-2);
-  margin-bottom: var(--sp-5);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.category-bar::-webkit-scrollbar {
-  display: none;
-}
-
-.category-button {
-  flex: 0 0 auto;
-  min-width: 108px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  padding: 0 var(--sp-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.category-button:hover,
-.category-button.active {
-  border-color: color-mix(in srgb, var(--c-accent) 28%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-elevated));
-  color: var(--text-primary);
-}
-
-.category-button strong {
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
-}
-
 .directory {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-6);
 }
 
 .category-section {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  overflow: hidden;
-}
-
-.category-heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-4);
-  border-bottom: 1px solid var(--border-default);
 }
 
-.category-heading h2 {
+.category-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: var(--text-lg);
-}
-
-.category-heading span {
-  color: var(--text-tertiary);
-  font-size: var(--text-sm);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
 }
 
 .site-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-3);
-  padding: var(--sp-4);
 }
 
 .site-card {
+  position: relative;
   min-width: 0;
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: var(--sp-3);
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  padding: var(--sp-3);
+  gap: var(--sp-3);
+  padding: var(--sp-4);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
   transition: all var(--duration-fast) var(--ease-out);
 }
 
 .site-card:hover {
   border-color: var(--border-hover);
-  background: var(--bg-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--c-accent) 20%, transparent);
+}
+
+.recommend-badge {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--c-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-medium);
+  line-height: 1;
+}
+
+.status-dot {
+  position: absolute;
+  bottom: var(--sp-2);
+  right: var(--sp-2);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .site-icon {
-  width: 42px;
-  height: 42px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -479,7 +367,11 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
 }
 
 .site-copy {
+  flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .site-copy strong,
@@ -492,47 +384,25 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
 
 .site-copy strong {
   color: var(--text-primary);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
 }
 
 .site-copy span {
-  margin-top: 2px;
   color: var(--text-tertiary);
   font-size: var(--text-xs);
 }
 
-.site-meta {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.recommend-badge,
-.status-pill {
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  font-size: 10px;
-}
-
-.recommend-badge {
-  background: var(--c-accent);
-  color: white;
-}
-
 .status-online {
-  background: color-mix(in srgb, #22c55e 18%, var(--bg-surface));
-  color: #4ade80;
+  background: #22c55e;
 }
 
 .status-offline {
-  background: color-mix(in srgb, #ef4444 18%, var(--bg-surface));
-  color: #f87171;
+  background: #ef4444;
 }
 
 .status-unknown {
-  background: color-mix(in srgb, #f59e0b 18%, var(--bg-surface));
-  color: #fbbf24;
+  background: #f59e0b;
 }
 
 .state-card {
@@ -567,7 +437,6 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
 }
 
 @media (max-width: 1040px) {
-  .featured-strip,
   .site-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -578,7 +447,6 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
     padding-top: var(--sp-4);
   }
 
-  .featured-strip,
   .site-grid {
     grid-template-columns: 1fr;
   }

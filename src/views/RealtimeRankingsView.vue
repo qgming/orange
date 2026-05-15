@@ -2,8 +2,10 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
-import { useHorizontalWheelScroll } from '@/composables/useHorizontalWheelScroll'
+import CategoryTabs from '@/components/CategoryTabs.vue'
 import type {
+  GlobalBoxOfficeData,
+  GlobalBoxOfficeItem,
   MovieRankingData,
   MovieRankingItem,
   RankingTab,
@@ -36,9 +38,10 @@ interface DisplayRow {
 }
 
 const tabs: RealtimeTabConfig[] = [
-  { key: 'web', label: '网剧热度榜', short: '网剧', endpoint: '/v2/maoyan/realtime/web' },
-  { key: 'tv', label: '电视收视榜', short: '电视', endpoint: '/v2/maoyan/realtime/tv' },
-  { key: 'movie', label: '电影票房榜', short: '票房', endpoint: '/v2/maoyan/realtime/movie' },
+  { key: 'web', label: '网剧实时热度', short: '网剧', endpoint: '/v2/maoyan/realtime/web' },
+  { key: 'tv', label: '电视收视排行', short: '电视', endpoint: '/v2/maoyan/realtime/tv' },
+  { key: 'movie', label: '电影实时票房', short: '票房', endpoint: '/v2/maoyan/realtime/movie' },
+  { key: 'global', label: '全球票房总榜', short: '全球', endpoint: '/v2/maoyan/all/movie' },
 ]
 
 const apiHosts = [
@@ -58,23 +61,30 @@ const loading = ref(true)
 const webData = ref<WebRankingData | null>(null)
 const tvData = ref<TvRankingData | null>(null)
 const movieData = ref<MovieRankingData | null>(null)
+const globalData = ref<GlobalBoxOfficeData | null>(null)
 const errors = ref<Record<RankingTab, string | null>>({
   web: null,
   tv: null,
   movie: null,
+  global: null,
 })
 
 let currentHostIndex = 0
 let refreshInterval: number | null = null
 
-// @ts-expect-error containerRef 在模板中作为 ref 使用
-const { containerRef, handleWheel: handleTabStripWheel } = useHorizontalWheelScroll()
-
 const activeConfig = computed(() => tabs.find(tab => tab.key === activeTab.value) ?? tabs[0])
+
+const categoryTabs = computed(() => {
+  return tabs.map(tab => ({
+    key: tab.key,
+    label: tab.label,
+  }))
+})
 const activeError = computed(() => errors.value[activeTab.value])
 const webRanking = computed(() => webData.value?.list ?? [])
 const tvRanking = computed(() => tvData.value?.list ?? [])
 const movieRanking = computed(() => movieData.value?.list ?? [])
+const globalRanking = computed(() => globalData.value?.list ?? [])
 
 const formatCompact = (value?: number) => {
   if (typeof value !== 'number' || Number.isNaN(value)) return '--'
@@ -88,12 +98,6 @@ const formatRate = (value?: number) => {
   if (typeof value !== 'number' || Number.isNaN(value)) return '--'
   return `${value.toFixed(2)}%`
 }
-
-const activeRefreshGap = computed(() => {
-  if (activeTab.value === 'web') return webData.value?.update_gap_second
-  if (activeTab.value === 'tv') return tvData.value?.update_gap_second
-  return movieData.value?.update_gap_second
-})
 
 const rows = computed<DisplayRow[]>(() => {
   if (activeTab.value === 'web') {
@@ -120,6 +124,18 @@ const rows = computed<DisplayRow[]>(() => {
     }))
   }
 
+  if (activeTab.value === 'global') {
+    return globalRanking.value.map((item: GlobalBoxOfficeItem) => ({
+      key: String(item.maoyan_id),
+      rank: item.rank,
+      title: item.movie_name,
+      subtitle: `${item.release_year}年上映`,
+      metric: item.box_office_desc,
+      note: `全球累计票房`,
+      searchName: item.movie_name,
+    }))
+  }
+
   return movieRanking.value.map((item: MovieRankingItem, index: number) => ({
     key: String(item.movie_id),
     rank: index + 1,
@@ -131,34 +147,8 @@ const rows = computed<DisplayRow[]>(() => {
   }))
 })
 
-const heroRow = computed(() => rows.value[0] ?? null)
-const listRows = computed(() => rows.value.slice(1, 12))
-
-const metrics = computed(() => {
-  if (activeTab.value === 'movie' && movieData.value) {
-    return [
-      { label: '实时总票房', value: `${movieData.value.box_office}${movieData.value.box_office_unit}`, note: movieData.value.updated },
-      { label: '分账票房', value: `${movieData.value.split_box_office}${movieData.value.split_box_office_unit}`, note: movieData.value.show_count_desc },
-      { label: '场均人次', value: movieRanking.value[0]?.avg_show_view || '--', note: movieData.value.view_count_desc },
-    ]
-  }
-
-  if (activeTab.value === 'tv') {
-    const top = tvRanking.value[0]
-    return [
-      { label: '最近更新', value: tvData.value?.updated || '--', note: `${activeRefreshGap.value ?? '--'} 秒刷新` },
-      { label: '榜首市占', value: top?.market_rate_desc || '--', note: top?.channel_name || '等待同步' },
-      { label: '榜首关注', value: top?.attention_rate_desc || '--', note: top ? formatRate(top.attention_rate) : '等待同步' },
-    ]
-  }
-
-  const top = webRanking.value[0]
-  return [
-    { label: '最近更新', value: webData.value?.updated || '--', note: `${activeRefreshGap.value ?? '--'} 秒刷新` },
-    { label: '榜首热度', value: top?.curr_heat_desc || '--', note: top ? formatCompact(top.curr_heat) : '等待同步' },
-    { label: '头部平台', value: top?.platform_desc || '--', note: top?.release_info || '等待同步' },
-  ]
-})
+const hasRows = computed(() => rows.value.length > 0)
+const listRows = computed(() => rows.value.slice(0, 20))
 
 const fetchApiData = async <T,>(endpoint: string): Promise<T | null> => {
   for (let i = 0; i < apiHosts.length; i++) {
@@ -189,20 +179,23 @@ const fetchRankingData = async <T,>(endpoint: string) => {
 const fetchAll = async () => {
   loading.value = true
 
-  const [web, tv, movie] = await Promise.all([
+  const [web, tv, movie, global] = await Promise.all([
     fetchRankingData<WebRankingData>('/v2/maoyan/realtime/web'),
     fetchRankingData<TvRankingData>('/v2/maoyan/realtime/tv'),
     fetchRankingData<MovieRankingData>('/v2/maoyan/realtime/movie'),
+    fetchRankingData<GlobalBoxOfficeData>('/v2/maoyan/all/movie'),
   ])
 
   if (web) webData.value = web
   if (tv) tvData.value = tv
   if (movie) movieData.value = movie
+  if (global) globalData.value = global
 
   errors.value = {
     web: web || webData.value ? null : '网剧热度榜暂时连接不上，可能是上游接口波动。',
     tv: tv || tvData.value ? null : '电视收视榜暂时连接不上，可能是上游接口波动。',
     movie: movie || movieData.value ? null : '电影票房榜暂时连接不上，可能是上游接口波动。',
+    global: global || globalData.value ? null : '全球票房总榜暂时连接不上，可能是上游接口波动。',
   }
 
   loading.value = false
@@ -235,62 +228,38 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <nav ref="containerRef" class="switcher" aria-label="实时榜单分类" @wheel="handleTabStripWheel">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          type="button"
-          class="switch-button"
-          :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >
-          <span>{{ tab.short }}</span>
-          <strong>{{ tab.label }}</strong>
-        </button>
-      </nav>
-
-      <section class="metric-grid" aria-label="关键指标">
-        <div v-for="metric in metrics" :key="metric.label" class="metric-card">
-          <span>{{ metric.label }}</span>
-          <strong>{{ metric.value }}</strong>
-          <small>{{ metric.note }}</small>
-        </div>
-      </section>
+      <CategoryTabs
+        :tabs="categoryTabs"
+        :active-tab="activeTab"
+        aria-label="实时榜单分类"
+        @update:active-tab="activeTab = $event as RankingTab"
+      />
 
       <section v-if="loading" class="state-card">
         <span class="spinner"></span>
         <p>正在加载实时榜单...</p>
       </section>
 
-      <section v-else-if="activeError && !heroRow" class="state-card">
+      <section v-else-if="activeError && !hasRows" class="state-card">
         <strong>{{ activeConfig.label }}暂时不可用</strong>
         <p>{{ activeError }}</p>
         <button type="button" @click="fetchAll">重新加载</button>
       </section>
 
-      <template v-else-if="heroRow">
-        <section class="leader-card">
-          <div class="leader-rank">#1</div>
-          <div class="leader-copy">
-            <span>{{ activeConfig.label }}</span>
-            <h2>{{ heroRow.title }}</h2>
-            <p>{{ heroRow.subtitle }}</p>
-          </div>
-          <div class="leader-score">
-            <strong>{{ heroRow.metric }}</strong>
-            <span>{{ heroRow.note }}</span>
-          </div>
-          <button type="button" class="leader-action" @click="openSearch(heroRow.searchName)">搜索播放源</button>
-        </section>
-
+      <template v-else-if="hasRows">
         <section class="rank-list" aria-label="实时排行榜列表">
-          <button v-for="row in listRows" :key="row.key" type="button" class="rank-row" @click="openSearch(row.searchName)">
-            <span class="rank-number">{{ row.rank }}</span>
-            <span class="rank-title">{{ row.title }}</span>
-            <span class="rank-sub">{{ row.subtitle }}</span>
-            <span class="rank-metric">{{ row.metric }}</span>
-            <span class="rank-note">{{ row.note }}</span>
-          </button>
+          <article v-for="row in listRows" :key="row.key" class="rank-card">
+            <div class="rank-header">
+              <span class="rank-badge">#{{ row.rank }}</span>
+              <span class="rank-metric">{{ row.metric }}</span>
+            </div>
+            <h2 class="rank-title">{{ row.title }}</h2>
+            <p class="rank-info">{{ row.subtitle }} • {{ row.note }}</p>
+            <button type="button" class="play-button" @click="openSearch(row.searchName)">
+              <span class="play-icon" aria-hidden="true"></span>
+              播放
+            </button>
+          </article>
         </section>
       </template>
 
@@ -346,158 +315,12 @@ onUnmounted(() => {
   letter-spacing: 0;
 }
 
-.metric-card,
-.leader-card,
-.rank-list,
 .state-card {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   background: var(--bg-surface);
 }
 
-.metric-card span,
-.metric-card small {
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-}
-
-.switcher {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-2);
-  padding: var(--sp-2);
-  margin-bottom: var(--sp-4);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  overflow-x: auto;
-}
-
-.switch-button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  min-height: 58px;
-  padding: var(--sp-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
-  text-align: left;
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.switch-button span {
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
-}
-
-.switch-button strong {
-  color: inherit;
-  font-size: var(--text-sm);
-}
-
-.switch-button:hover,
-.switch-button.active {
-  border-color: color-mix(in srgb, var(--c-accent) 28%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-elevated));
-  color: var(--text-primary);
-}
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-5);
-}
-
-.metric-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-4);
-}
-
-.metric-card strong {
-  color: var(--text-primary);
-  font-size: var(--text-2xl);
-  line-height: var(--leading-tight);
-}
-
-.leader-card {
-  display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) 220px auto;
-  gap: var(--sp-4);
-  align-items: center;
-  padding: var(--sp-5);
-  margin-bottom: var(--sp-4);
-  background:
-    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--c-accent) 20%, transparent), transparent 32%),
-    var(--bg-surface);
-}
-
-.leader-rank {
-  width: 64px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-xl);
-  background: var(--c-accent);
-  color: white;
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-}
-
-.leader-copy {
-  min-width: 0;
-}
-
-.leader-copy span {
-  color: var(--c-accent-light);
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-}
-
-.leader-copy h2,
-.leader-copy p {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.leader-copy h2 {
-  margin-top: var(--sp-1);
-  color: var(--text-primary);
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  line-height: 1;
-}
-
-.leader-copy p {
-  margin-top: var(--sp-2);
-  color: var(--text-secondary);
-}
-
-.leader-score {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--sp-1);
-}
-
-.leader-score strong {
-  color: var(--c-accent-light);
-  font-size: var(--text-3xl);
-  line-height: 1;
-}
-
-.leader-score span {
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-}
-
-.leader-action,
 .state-card button {
   padding: 10px 16px;
   border-radius: var(--radius-full);
@@ -508,58 +331,87 @@ onUnmounted(() => {
 }
 
 .rank-list {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
 }
 
-.rank-row {
-  width: 100%;
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: 48px minmax(140px, 1fr) minmax(160px, 1.2fr) 110px 120px;
-  gap: var(--sp-3);
+.rank-card {
+  position: relative;
+  padding: var(--sp-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.rank-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--c-accent) 28%, var(--border-hover));
+  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--c-accent) 24%, transparent);
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 var(--sp-4);
-  border-bottom: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  text-align: left;
+  margin-bottom: var(--sp-3);
 }
 
-.rank-row:last-child {
-  border-bottom: none;
+.rank-badge {
+  color: var(--c-accent);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
 }
 
-.rank-row:hover {
-  background: var(--bg-hover);
-}
-
-.rank-number,
 .rank-metric {
   color: var(--c-accent-light);
+  font-size: var(--text-lg);
   font-weight: var(--font-semibold);
 }
 
-.rank-title,
-.rank-sub,
-.rank-note {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .rank-title {
+  margin: 0 0 var(--sp-2) 0;
   color: var(--text-primary);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+  font-weight: var(--font-semibold);
+}
+
+.rank-info {
+  margin: 0 0 var(--sp-4) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.play-button {
+  position: absolute;
+  right: var(--sp-5);
+  bottom: var(--sp-5);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  background: var(--c-accent);
+  color: white;
+  font-size: var(--text-sm);
   font-weight: var(--font-medium);
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
-.rank-sub,
-.rank-note {
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
+.play-button:hover {
+  transform: translateY(-1px);
 }
 
-.rank-note {
-  justify-self: end;
+.play-icon {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid currentColor;
 }
 
 .state-card {
@@ -596,51 +448,19 @@ onUnmounted(() => {
 }
 
 @media (max-width: 960px) {
-  .metric-grid {
-    grid-template-columns: 1fr;
+  .rank-card {
+    padding: var(--sp-4);
   }
 
-  .leader-card {
-    grid-template-columns: 64px minmax(0, 1fr);
-  }
-
-  .leader-score,
-  .leader-action {
-    grid-column: 1 / -1;
-    align-items: flex-start;
-    justify-self: start;
-  }
-
-  .rank-row {
-    grid-template-columns: 36px minmax(0, 1fr) 92px;
-  }
-
-  .rank-sub,
-  .rank-note {
-    display: none;
+  .play-button {
+    right: var(--sp-4);
+    bottom: var(--sp-4);
   }
 }
 
 @media (max-width: 620px) {
   .realtime-main {
     padding-top: var(--sp-4);
-  }
-
-  .switcher {
-    display: flex;
-    scrollbar-width: none;
-  }
-
-  .switcher::-webkit-scrollbar {
-    display: none;
-  }
-
-  .switch-button {
-    flex: 1 0 126px;
-  }
-
-  .leader-card {
-    padding: var(--sp-4);
   }
 }
 </style>
