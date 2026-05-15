@@ -1,38 +1,47 @@
-[
-  {
-    "title": "豆瓣周榜",
-    "description": "每周口碑热度聚合，快速看最近值得追的片单。",
-    "route": "/douban-weekly",
-    "image": "https://image.dooo.ng/t/2026/05/15/6a0708230a2d3.webp"
-  },
-  {
-    "title": "实时排行榜",
-    "description": "同步热门剧集、电视节目和电影热度走势。",
-    "route": "/realtime-rankings",
-    "image": "https://image.dooo.ng/t/2026/05/15/6a070947d4640.webp"
-  },
-  {
-    "title": "豆瓣电影",
-    "description": "查看新片评分、榜单和影片详情。",
-    "url": "https://movie.douban.com/",
-    "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    "title": "IMDb",
-    "description": "海外影视评分、演职员和作品信息总库。",
-    "url": "https://www.imdb.com/",
-    "image": "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    "title": "TMDB",
-    "description": "多地区影视资料、海报和剧集内容索引。",
-    "url": "https://www.themoviedb.org/",
-    "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    "title": "Bangumi",
-    "description": "动画、书籍、游戏和三次元作品的兴趣目录。",
-    "url": "https://bgm.tv/",
-    "image": "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=1200&q=80"
-  }
-]
+{
+  "isVisible": true,
+  "items": [
+    {
+      "title": "豆瓣周榜",
+      "description": "每周口碑热度聚合，快速看最近值得追的片单。",
+      "route": "/douban-weekly",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a07217ca3f66.webp",
+      "isVisible": true
+    },
+    {
+      "title": "实时排行榜",
+      "description": "同步热门剧集、电视节目和电影热度走势。",
+      "route": "/realtime-rankings",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a0722a98d88f.webp",
+      "isVisible": true
+    },
+    {
+      "title": "流量卡领取",
+      "description": "免费流量卡领取，助力追剧无忧畅享。",
+      "url": "https://haokawx.lot-ml.com/ProductEn/Index/dce473a0d2917ca2",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a072448214c3.webp",
+      "isVisible": true
+    },
+    {
+      "title": "TMDB",
+      "description": "多地区影视资料、海报和剧集内容索引。",
+      "url": "https://www.themoviedb.org/",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a071f771729e.webp",
+      "isVisible": true
+    },
+    {
+      "title": "优惠购物",
+      "description": "全平台隐藏优惠卷领取，追剧省钱好帮手。",
+      "url": "https://xing06.kuaizhan.com/2497298185?cid=5Q0N0BFi#/index/home",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a071caf4c722.webp",
+      "isVisible": true
+    },
+    {
+      "title": "任推邦",
+      "description": "加入任推邦，分享资源来赚钱",
+      "url": "https://tg.bd.cn/#/pages/login/register?invite_code=818029&qd=self_fans_android",
+      "image": "https://image.dooo.ng/t/2026/05/15/6a071e9cd79a2.webp",
+      "isVisible": true
+    }
+  ]
+}

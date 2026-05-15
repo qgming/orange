@@ -1,29 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import promotionsData from '@/data/homePromotions.json'
-
-interface HomePromotionItem {
-  title: string
-  description: string
-  route?: string
-  url?: string
-  image?: string
-}
+import { fetchRemotePromotions, localHomePromotions } from '@/services/homePromotions'
+import type { HomePromotionItem, HomePromotionsConfig } from '@/types'
 
 const VISIBLE_LIMIT = 4
-const DRAG_THRESHOLD = 6
-const promotions = promotionsData as HomePromotionItem[]
-const shouldLoop = promotions.length > VISIBLE_LIMIT
-const renderPromotions = computed(() => (shouldLoop ? [...promotions, ...promotions] : promotions))
+const promotionsConfig = ref<HomePromotionsConfig | null>(null)
+const visiblePromotions = computed(() => promotionsConfig.value?.items.filter(item => item.isVisible) ?? [])
+const shouldShow = computed(() => Boolean(promotionsConfig.value?.isVisible && visiblePromotions.value.length > 0))
+const shouldLoop = computed(() => visiblePromotions.value.length > VISIBLE_LIMIT)
 const router = useRouter()
-const containerRef = ref<HTMLElement | null>(null)
-const isDragging = ref(false)
-const didDrag = ref(false)
-
-let pointerId: number | null = null
-let pointerStartX = 0
-let scrollStartLeft = 0
 
 const getCardStyle = (item: HomePromotionItem) => {
   if (!item.image) return undefined
@@ -34,106 +20,54 @@ const getCardHref = (item: HomePromotionItem) => item.route ?? item.url ?? '#'
 const getCardTarget = (item: HomePromotionItem) => item.url ? '_blank' : undefined
 const getCardRel = (item: HomePromotionItem) => item.url ? 'noreferrer' : undefined
 
-const handleWheel = (event: WheelEvent) => {
-  const container = containerRef.value
-  if (!container) return
-
-  const maxScrollLeft = container.scrollWidth - container.clientWidth
-  if (maxScrollLeft <= 0) return
-
-  const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
-  if (delta === 0) return
-
-  const nextScrollLeft = Math.max(0, Math.min(maxScrollLeft, container.scrollLeft + delta))
-  if (nextScrollLeft === container.scrollLeft) return
-
-  container.scrollLeft = nextScrollLeft
-  event.preventDefault()
-}
-
-const handlePointerDown = (event: PointerEvent) => {
-  if (event.pointerType === 'touch') return
-
-  const container = containerRef.value
-  if (!container) return
-
-  pointerId = event.pointerId
-  pointerStartX = event.clientX
-  scrollStartLeft = container.scrollLeft
-  isDragging.value = true
-  didDrag.value = false
-  container.setPointerCapture(event.pointerId)
-}
-
-const handlePointerMove = (event: PointerEvent) => {
-  if (!isDragging.value || pointerId !== event.pointerId) return
-
-  const container = containerRef.value
-  if (!container) return
-
-  const deltaX = event.clientX - pointerStartX
-  if (Math.abs(deltaX) >= DRAG_THRESHOLD) {
-    didDrag.value = true
-  }
-
-  container.scrollLeft = scrollStartLeft - deltaX
-  event.preventDefault()
-}
-
-const handlePointerUp = (event: PointerEvent) => {
-  if (pointerId !== event.pointerId) return
-
-  const container = containerRef.value
-  if (container && container.hasPointerCapture(event.pointerId)) {
-    container.releasePointerCapture(event.pointerId)
-  }
-
-  pointerId = null
-  isDragging.value = false
-
-  window.setTimeout(() => {
-    didDrag.value = false
-  }, 0)
-}
-
 const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
-  if (didDrag.value) {
-    event.preventDefault()
-    return
-  }
-
   if (item.route) {
     event.preventDefault()
     void router.push(item.route)
   }
 }
+
+onMounted(async () => {
+  const remotePromotions = await fetchRemotePromotions()
+  promotionsConfig.value = remotePromotions ?? localHomePromotions
+})
 </script>
 
 <template>
-  <section class="home-promotions" aria-labelledby="home-promotions-title">
+  <section v-if="shouldShow" class="home-promotions" aria-labelledby="home-promotions-title">
     <div class="section-head">
       <h2 id="home-promotions-title">精选推荐</h2>
     </div>
 
-    <div
-      ref="containerRef"
-      class="promo-marquee"
-      :class="{ dragging: isDragging }"
-      @wheel="handleWheel"
-      @pointerdown="handlePointerDown"
-      @pointermove="handlePointerMove"
-      @pointerup="handlePointerUp"
-      @pointercancel="handlePointerUp"
-    >
+    <div class="promo-marquee" :class="{ looping: shouldLoop }">
       <div class="promo-track">
         <a
-          v-for="(item, index) in renderPromotions"
-          :key="`${item.title}-${index}`"
+          v-for="item in visiblePromotions"
+          :key="`primary-${item.title}`"
           :href="getCardHref(item)"
           :target="getCardTarget(item)"
           :rel="getCardRel(item)"
           class="promo-card"
           :style="getCardStyle(item)"
+          @click="handleCardClick($event, item)"
+        >
+          <div class="promo-copy">
+            <strong>{{ item.title }}</strong>
+            <p>{{ item.description }}</p>
+          </div>
+        </a>
+
+        <a
+          v-for="item in visiblePromotions"
+          v-if="shouldLoop"
+          :key="`duplicate-${item.title}`"
+          :href="getCardHref(item)"
+          :target="getCardTarget(item)"
+          :rel="getCardRel(item)"
+          class="promo-card promo-card-duplicate"
+          :style="getCardStyle(item)"
+          aria-hidden="true"
+          tabindex="-1"
           @click="handleCardClick($event, item)"
         >
           <div class="promo-copy">
@@ -163,27 +97,22 @@ const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
 
 .promo-marquee {
   position: relative;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   padding-bottom: var(--sp-2);
-  scrollbar-width: none;
-  cursor: grab;
-  touch-action: pan-x;
-}
-
-.promo-marquee::-webkit-scrollbar {
-  display: none;
-}
-
-.promo-marquee.dragging {
-  cursor: grabbing;
-  user-select: none;
 }
 
 .promo-track {
   display: flex;
   gap: var(--sp-3);
   width: max-content;
+}
+
+.promo-marquee.looping .promo-track {
+  animation: promo-scroll 42s linear infinite;
+}
+
+.promo-marquee.looping:hover .promo-track {
+  animation-play-state: paused;
 }
 
 .promo-card {
@@ -253,6 +182,16 @@ const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
   overflow: hidden;
 }
 
+@keyframes promo-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - (var(--sp-3) / 2)));
+  }
+}
+
 @media (max-width: 1040px) {
   .promo-card {
     width: min(72vw, 280px);
@@ -261,7 +200,22 @@ const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
 
 @media (max-width: 720px) {
   .promo-marquee {
-    cursor: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+
+  .promo-marquee::-webkit-scrollbar {
+    display: none;
+  }
+
+  .promo-marquee.looping .promo-track {
+    animation: none;
+  }
+
+  .promo-card-duplicate {
+    display: none;
   }
 
   .promo-card {
@@ -269,3 +223,4 @@ const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
   }
 }
 </style>
+

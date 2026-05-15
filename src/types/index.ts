@@ -150,3 +150,17 @@ export interface ApiResponse<T> {
   code?: number;
   message?: string;
 }
+
+export interface HomePromotionItem {
+  title: string;
+  description: string;
+  route?: string;
+  url?: string;
+  image?: string;
+  isVisible: boolean;
+}
+
+export interface HomePromotionsConfig {
+  isVisible: boolean;
+  items: HomePromotionItem[];
+}

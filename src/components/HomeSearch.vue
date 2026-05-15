@@ -11,7 +11,7 @@ import { performSearch, searchSites } from '@/services/search'
 const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 const showEngines = ref(false)
-const heroTitle = '好内容，不必到处找。'
+const heroTitle = '好片，不必到处找。'
 const fallbackKeywords = ['庆余年', '沙丘', '繁花', '周处除三害', '三体']
 
 const rankingsStore = useRealtimeRankingsStore()
@@ -56,27 +56,15 @@ onMounted(() => {
 
         <Transition name="engine-pop">
           <div v-if="showEngines" class="engine-menu">
-            <button
-              v-for="(site, index) in searchSites"
-              :key="site.name"
-              type="button"
-              class="engine-option"
-              :class="{ active: currentSiteIndex === index }"
-              @click="selectSite(index)"
-            >
+            <button v-for="(site, index) in searchSites" :key="site.name" type="button" class="engine-option"
+              :class="{ active: currentSiteIndex === index }" @click="selectSite(index)">
               {{ site.name }}
             </button>
           </div>
         </Transition>
       </div>
 
-      <input
-        v-model="searchQuery"
-        class="search-input"
-        type="search"
-        placeholder="输入电影、剧集、综艺名称"
-        autocomplete="off"
-      />
+      <input v-model="searchQuery" class="search-input" type="search" placeholder="输入电影、剧集、综艺名称" autocomplete="off" />
 
       <button type="submit" class="search-submit" aria-label="搜索">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -88,13 +76,8 @@ onMounted(() => {
     </form>
 
     <div class="quick-keywords" aria-label="快速搜索">
-      <button
-        v-for="keyword in quickKeywords"
-        :key="keyword"
-        type="button"
-        class="keyword-chip"
-        @click="submitSearch(keyword)"
-      >
+      <button v-for="keyword in quickKeywords" :key="keyword" type="button" class="keyword-chip"
+        @click="submitSearch(keyword)">
         {{ keyword }}
       </button>
     </div>
@@ -315,6 +298,7 @@ onMounted(() => {
 }
 
 @keyframes title-typing-loop {
+
   0%,
   12% {
     width: 0;
@@ -332,6 +316,7 @@ onMounted(() => {
 }
 
 @keyframes caret-blink {
+
   0%,
   45% {
     border-right-color: color-mix(in srgb, var(--c-accent) 92%, white);

@@ -21,6 +21,11 @@ export default defineConfig({
         target: 'https://pages.qgming.com',
         changeOrigin: true,
       },
+      '/orange/promotions.json': {
+        target: 'https://pages.qgming.com',
+        changeOrigin: true,
+      },
     },
   },
 })
+
