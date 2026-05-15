@@ -1,87 +1,303 @@
 {
   "影视": [
-    { "name": "247看", "url": "https://247kan.com/", "isRecommended": true },
-    { "name": "布布影视", "url": "https://bbys.app/", "isRecommended": true },
-    { "name": "剧圈圈", "url": "https://www.jqqzx.top/", "isRecommended": true },
-    { "name": "简单TV", "url": "https://jiandantv.com/", "isRecommended": true },
-    { "name": "网飞猫", "url": "https://www.ncat22.com/", "isRecommended": true },
-    { "name": "奈飞工厂", "url": "https://www.netflixgc.com/", "isRecommended": true },
-    { "name": "火车太堵", "url": "https://www.tdgo.shop/", "isRecommended": true },
-    { "name": "NO视频", "url": "https://www.novipnoad.net/", "isRecommended": true },
-    { "name": "飞快TV", "url": "https://feikuai.tv/", "isRecommended": true },
-    { "name": "555影视", "url": "https://www.55yy6.com" },
-    { "name": "大米星球", "url": "https://www.dma9v6c0c2.shop/index/home.html" },
-    { "name": "爱看机器人", "url": "https://v.ikanbot.com/" },
-    { "name": "独播库", "url": "https://www.dbkk.cc/" },
-    { "name": "厂长资源", "url": "https://www.cz233.com/" },
-    { "name": "真狼影视", "url": "https://www.zhenlang.cc/" },
-    { "name": "追影猫", "url": "https://zhuiyingmao5.com/" },
-    { "name": "剧多多", "url": "https://www.jddzx.cc/" },
-    { "name": "达达趣", "url": "https://www.dadaqu.cc/" },
-    { "name": "喵TV", "url": "https://miaotv.net/" },
-    { "name": "厂长影视", "url": "https://www.czvod.cc/" },
-    { "name": "快看影视", "url": "https://www.kuaikanys.net" },
-    { "name": "看片狂人", "url": "https://kuangren.us/" },
-    { "name": "爱电影", "url": "http://ivdy.com/" },
-    { "name": "爱壹帆", "url": "https://www.iyf.lv/" },
-    { "name": "海纳TV", "url": "https://www.hainatv.net/" },
-    { "name": "欧乐影院", "url": "https://www.olehdtv.com/" },
-    { "name": "4K影视", "url": "https://www.4kvm.tv/" },
-    { "name": "4K影院", "url": "https://4k4k.live/" },
-    { "name": "注视影视", "url": "https://gaze.run/" },
-    { "name": "hao6v", "url": "http://www.hao6v.com" },
-    { "name": "枫林网", "url": "https://imaple8.co/" },
-    { "name": "剧迷", "url": "https://gimy.tv" },
-    { "name": "好好看", "url": "https://www.hhkan0.com/" },
-    { "name": "金牌影院", "url": "https://www.x8kb9k8.com/" },
-    { "name": "耐看点播", "url": "https://nkvod.me/" },
-    { "name": "LIVIBO", "url": "https://www.libvio.vip/" }
+    {
+      "name": "247看",
+      "url": "https://247kan.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "布布影视",
+      "url": "https://bbys.app/",
+      "isRecommended": true
+    },
+    {
+      "name": "剧圈圈",
+      "url": "https://www.jqqzx.top/",
+      "isRecommended": true
+    },
+    {
+      "name": "简单TV",
+      "url": "https://jiandantv.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "网飞猫",
+      "url": "https://www.ncat22.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "奈飞工厂",
+      "url": "https://www.netflixgc.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "看片狂人",
+      "url": "https://kpkuang.fyi/",
+      "isRecommended": true
+    },
+    {
+      "name": "火车太堵",
+      "url": "https://www.tdgo.shop/",
+      "isRecommended": true
+    },
+    {
+      "name": "NO视频",
+      "url": "https://www.novipnoad.net/",
+      "isRecommended": true
+    },
+    {
+      "name": "飞快TV",
+      "url": "https://feikuai.tv/",
+      "isRecommended": true
+    },
+    {
+      "name": "低端影视",
+      "url": "https://ddys.app/",
+      "isRecommended": true
+    },
+    {
+      "name": "555影视",
+      "url": "https://www.55yy6.com"
+    },
+    {
+      "name": "爱看机器人",
+      "url": "https://v.ikanbot.com/"
+    },
+    {
+      "name": "独播库",
+      "url": "https://www.dbkk.cc/"
+    },
+    {
+      "name": "厂长资源",
+      "url": "https://www.cz233.com/"
+    },
+    {
+      "name": "追影猫",
+      "url": "https://zhuiyingmiao2.com/"
+    },
+    {
+      "name": "剧多多",
+      "url": "https://www.jddzx.cc/"
+    },
+    {
+      "name": "喵TV",
+      "url": "https://miaotv.net/"
+    },
+    {
+      "name": "FreeOK",
+      "url": "https://www.freeok.one/"
+    },
+    {
+      "name": "快看影视",
+      "url": "https://www.kuaikanys.net"
+    },
+    {
+      "name": "爱电影",
+      "url": "http://ivdy.com/"
+    },
+    {
+      "name": "爱壹帆",
+      "url": "https://www.iyf.lv/"
+    },
+    {
+      "name": "欧乐影院",
+      "url": "https://www.olehdtv.com/"
+    },
+    {
+      "name": "4K影视",
+      "url": "https://www.4kvm.tv/"
+    },
+    {
+      "name": "4K影院",
+      "url": "https://4k4k.live/"
+    },
+    {
+      "name": "hao6v",
+      "url": "http://www.hao6v.com"
+    },
+    {
+      "name": "枫林网",
+      "url": "https://imaple8.co/"
+    },
+    {
+      "name": "剧迷",
+      "url": "https://gimy.tv"
+    },
+    {
+      "name": "好好看",
+      "url": "https://www.hhkan0.com/"
+    },
+    {
+      "name": "金牌影院",
+      "url": "https://www.x8kb9k8.com/"
+    },
+    {
+      "name": "LIVIBO",
+      "url": "https://www.libvio.run/"
+    }
   ],
   "二次元": [
-    { "name": "AGE动漫", "url": "https://www.agedm.org/", "isRecommended": true },
-    { "name": "风铃动漫", "url": "https://www.aafun.cc/", "isRecommended": true },
-    { "name": "233动漫", "url": "https://www.233dm.com/" },
-    { "name": "路漫漫", "url": "https://i.qg50.com/" },
-    { "name": "柒番", "url": "https://www.qifun.cc/" },
-    { "name": "MiruroTV", "url": "https://www.miruro.tv/" },
-    { "name": "E站弹幕网", "url": "https://www.ezdmw.site/" },
-    { "name": "爱恋动漫", "url": "http://www.kisssub.org/" },
-    { "name": "animoe", "url": "https://animoe.org/" },
-    { "name": "橘子动漫", "url": "https://www.mgnacg.com/" },
-    { "name": "慢猫动漫", "url": "http://www.comicat.org/" },
-    { "name": "D站", "url": "https://www.5dm.link/" },
-    { "name": "次元狗", "url": "https://www.acgndog.com" },
-    { "name": "动漫花园", "url": "https://www.dmhy.org/" },
-    { "name": "嗷呜动漫", "url": "https://www.aowu.tv/" },
-    { "name": "MuteFun", "url": "https://www.mutedm.com/" },
-    { "name": "西瓜卡通", "url": "https://www.xgcartoon.com/" }
+    {
+      "name": "风铃动漫",
+      "url": "https://www.aafun.cc/",
+      "isRecommended": true
+    },
+    {
+      "name": "西瓜卡通",
+      "url": "https://www.xgcartoon.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "233动漫",
+      "url": "https://www.233dm.com/"
+    },
+    {
+      "name": "路漫漫",
+      "url": "https://i.qg50.com/"
+    },
+    {
+      "name": "柒番",
+      "url": "https://www.qifun.cc/"
+    },
+    {
+      "name": "MiruroTV",
+      "url": "https://www.miruro.tv/"
+    },
+    {
+      "name": "E站弹幕网",
+      "url": "https://www.ezdmw.site/"
+    },
+    {
+      "name": "爱恋动漫",
+      "url": "http://www.kisssub.org/"
+    },
+    {
+      "name": "animoe",
+      "url": "https://animoe.org/"
+    },
+    {
+      "name": "橘子动漫",
+      "url": "https://www.mgnacg.com/"
+    },
+    {
+      "name": "慢猫动漫",
+      "url": "http://www.comicat.org/"
+    },
+    {
+      "name": "D站",
+      "url": "https://www.5dm.link/"
+    },
+    {
+      "name": "次元狗",
+      "url": "https://www.acgndog.com"
+    },
+    {
+      "name": "动漫花园",
+      "url": "https://www.dmhy.org/"
+    },
+    {
+      "name": "嗷呜动漫",
+      "url": "https://www.aowu.tv/"
+    },
+    {
+      "name": "MuteFun",
+      "url": "https://www.mutedm.com/"
+    }
   ],
   "短剧": [
-    { "name": "55短剧", "url": "https://www.duanju55.com/" },
-    { "name": "短剧狗", "url": "https://duanjugou.top/" },
-    { "name": "河马剧场", "url": "https://www.kuaikaw.cn/" },
-    { "name": "短剧库", "url": "https://duanjuku.top/" },
-    { "name": "短剧搜", "url": "https://www.duanjuso.com/" }
+    {
+      "name": "55短剧",
+      "url": "https://www.duanju55.com/"
+    },
+    {
+      "name": "短剧狗",
+      "url": "https://duanjugou.top/"
+    },
+    {
+      "name": "河马剧场",
+      "url": "https://www.kuaikaw.cn/"
+    },
+    {
+      "name": "短剧库",
+      "url": "https://duanjuku.top/"
+    },
+    {
+      "name": "短剧搜",
+      "url": "https://www.duanjuso.com/"
+    }
   ],
   "阅读": [
-    { "name": "Z-Library", "url": "https://zlib.re", "isRecommended": true },
-    { "name": "安娜的档案", "url": "https://zh.annas-archive.gl/" },
-    { "name": "识典古籍", "url": "https://www.shidianguji.com/" },
-    { "name": "微信读书", "url": "https://weread.qq.com" },
-    { "name": "多看阅读", "url": "http://www.duokan.com" },
-    { "name": "书格", "url": "https://new.shuge.org/" }
+    {
+      "name": "Z-Library",
+      "url": "https://zlib.re",
+      "isRecommended": true
+    },
+    {
+      "name": "安娜的档案",
+      "url": "https://zh.annas-archive.gl/"
+    },
+    {
+      "name": "识典古籍",
+      "url": "https://www.shidianguji.com/"
+    },
+    {
+      "name": "微信读书",
+      "url": "https://weread.qq.com"
+    },
+    {
+      "name": "多看阅读",
+      "url": "http://www.duokan.com"
+    },
+    {
+      "name": "书格",
+      "url": "https://new.shuge.org/"
+    }
   ],
   "工具": [
-    { "name": "认知自我", "url": "https://know.qgming.com/", "isRecommended": true },
-    { "name": "draw.io", "url": "https://app.diagrams.net/" },
-    { "name": "Excalidraw", "url": "https://excalidraw.com/" },
-    { "name": "Canva", "url": "https://www.canva.com/" },
-    { "name": "Photopea", "url": "https://www.photopea.com/" },
-    { "name": "Remove.bg", "url": "https://www.remove.bg/" },
-    { "name": "iLovePDF", "url": "https://www.ilovepdf.com/" },
-    { "name": "TinyPNG", "url": "https://tinypng.com/" },
-    { "name": "DeepSeek", "url": "https://chat.deepseek.com/" },
-    { "name": "Kimi", "url": "https://kimi.moonshot.cn/" },
-    { "name": "即梦AI", "url": "https://jimeng.jianying.com/" }
+    {
+      "name": "认知自我",
+      "url": "https://know.qgming.com/",
+      "isRecommended": true
+    },
+    {
+      "name": "draw.io",
+      "url": "https://app.diagrams.net/"
+    },
+    {
+      "name": "Excalidraw",
+      "url": "https://excalidraw.com/"
+    },
+    {
+      "name": "Canva",
+      "url": "https://www.canva.com/"
+    },
+    {
+      "name": "Photopea",
+      "url": "https://www.photopea.com/"
+    },
+    {
+      "name": "Remove.bg",
+      "url": "https://www.remove.bg/"
+    },
+    {
+      "name": "iLovePDF",
+      "url": "https://www.ilovepdf.com/"
+    },
+    {
+      "name": "TinyPNG",
+      "url": "https://tinypng.com/"
+    },
+    {
+      "name": "DeepSeek",
+      "url": "https://chat.deepseek.com/"
+    },
+    {
+      "name": "Kimi",
+      "url": "https://kimi.moonshot.cn/"
+    },
+    {
+      "name": "即梦AI",
+      "url": "https://jimeng.jianying.com/"
+    }
   ]
 }

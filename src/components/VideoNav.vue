@@ -7,6 +7,8 @@ import { ref, computed, onMounted, watch } from 'vue'
 import videoSitesData from '../data/videoSites.json'
 import type { VideoSiteCategory } from '@/types'
 import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '../utils/iconService'
+import { getSiteAvailability } from '../utils/siteAvailability'
+import type { SiteAvailabilityStatus } from '../utils/siteAvailability'
 
 const REMOTE_SITES_URL = '/orange/sites.json'
 
@@ -15,6 +17,10 @@ const videoSites = ref<VideoSiteCategory>({})
 const isLoadingSites = ref(true)
 const activeCategory = ref('全部')
 const siteIcons = ref(new Map<string, string>())
+const siteStatuses = ref(new Map<string, SiteAvailabilityStatus>())
+const statusQueue: Array<{ url: string, name: string }> = []
+const MAX_STATUS_CHECKS = 6
+let activeStatusChecks = 0
 
 const isVideoSiteCategory = (data: unknown): data is VideoSiteCategory => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return false
@@ -74,19 +80,21 @@ const getHostname = (url: string) => {
   }
 }
 
+const getSiteKey = (url: string, name: string) => `${name}-${url}`
+
 const loadIcon = async (url: string, name: string) => {
-  const key = `${name}-${url}`
+  const key = getSiteKey(url, name)
   if (siteIcons.value.has(key)) return
   const icon = await getWebsiteIcon(url, { cache: true, siteName: name })
   siteIcons.value.set(key, icon)
 }
 
 const getIcon = (url: string, name: string) => {
-  return siteIcons.value.get(`${name}-${url}`) || ''
+  return siteIcons.value.get(getSiteKey(url, name)) || ''
 }
 
 const hasIcon = (url: string, name: string) => {
-  return siteIcons.value.has(`${name}-${url}`)
+  return siteIcons.value.has(getSiteKey(url, name))
 }
 
 const isInitial = (url: string, name: string) => {
@@ -97,6 +105,47 @@ const isInitial = (url: string, name: string) => {
 const getInitialData = (url: string, name: string) => {
   const icon = getIcon(url, name)
   return parseInitialIcon(icon)
+}
+
+const runStatusQueue = () => {
+  while (activeStatusChecks < MAX_STATUS_CHECKS && statusQueue.length > 0) {
+    const nextSite = statusQueue.shift()
+    if (!nextSite) return
+
+    activeStatusChecks += 1
+    getSiteAvailability(nextSite.url, { cache: true, timeout: 4000 })
+      .then(status => {
+        siteStatuses.value.set(getSiteKey(nextSite.url, nextSite.name), status)
+      })
+      .catch(() => {
+        siteStatuses.value.set(getSiteKey(nextSite.url, nextSite.name), 'offline')
+      })
+      .finally(() => {
+        activeStatusChecks -= 1
+        runStatusQueue()
+      })
+  }
+}
+
+const loadSiteStatus = (url: string, name: string) => {
+  const key = getSiteKey(url, name)
+  if (siteStatuses.value.has(key)) return
+
+  siteStatuses.value.set(key, 'unknown')
+  statusQueue.push({ url, name })
+  runStatusQueue()
+}
+
+const getSiteStatus = (url: string, name: string) => {
+  return siteStatuses.value.get(getSiteKey(url, name)) || 'unknown'
+}
+
+const getSiteStatusLabel = (url: string, name: string) => {
+  const status = getSiteStatus(url, name)
+
+  if (status === 'online') return '网站状态：可用'
+  if (status === 'offline') return '网站状态：不可用'
+  return '网站状态：无法判断'
 }
 
 const categories = computed(() => ['全部', '推荐', ...Object.keys(videoSites.value)])
@@ -133,8 +182,15 @@ const loadIcons = () => {
   })
 }
 
+const loadStatuses = () => {
+  Object.values(filteredSites.value).forEach(sites => {
+    sites.forEach(site => loadSiteStatus(site.url, site.name))
+  })
+}
+
 onMounted(loadVideoSites)
 watch([activeCategory, filteredSites], loadIcons, { immediate: true })
+watch([activeCategory, filteredSites], loadStatuses, { immediate: true })
 </script>
 
 <template>
@@ -205,6 +261,12 @@ watch([activeCategory, filteredSites], loadIcons, { immediate: true })
               <span class="site-url">{{ getHostname(site.url) }}</span>
             </div>
             <span v-if="site.isRecommended" class="badge">精选</span>
+            <span
+              class="status-dot"
+              :class="`status-${getSiteStatus(site.url, site.name)}`"
+              :title="getSiteStatusLabel(site.url, site.name)"
+              :aria-label="getSiteStatusLabel(site.url, site.name)"
+            ></span>
           </a>
         </div>
       </div>
@@ -322,6 +384,7 @@ watch([activeCategory, filteredSites], loadIcons, { immediate: true })
   border-radius: var(--radius-lg);
   transition: all var(--duration-fast) var(--ease-out);
   position: relative;
+  padding-right: calc(var(--sp-3) + 12px);
 }
 
 .site-card:hover {
@@ -431,6 +494,29 @@ watch([activeCategory, filteredSites], loadIcons, { immediate: true })
   border-radius: 0 var(--radius-lg) 0 var(--radius-sm);
 }
 
+.status-dot {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: var(--sp-2);
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--bg-elevated);
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 0.08);
+}
+
+.status-online {
+  background: #22c55e;
+}
+
+.status-offline {
+  background: #ef4444;
+}
+
+.status-unknown {
+  background: #f59e0b;
+}
+
 /* 在侧边栏中作为中间列时，降为2列 */
 @media (max-width: 1220px) {
   .sites-grid,
@@ -463,6 +549,7 @@ watch([activeCategory, filteredSites], loadIcons, { immediate: true })
 
   .site-card {
     padding: var(--sp-2);
+    padding-right: calc(var(--sp-2) + 12px);
   }
 
   .site-icon {
