@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
+import HomePromotions from '@/components/HomePromotions.vue'
+import HomeRecommendedSites from '@/components/HomeRecommendedSites.vue'
 import HomeSearch from '@/components/HomeSearch.vue'
 import TopBar from '@/components/TopBar.vue'
 
@@ -15,6 +17,8 @@ onMounted(() => {
 
     <main class="main-content">
       <HomeSearch />
+      <HomePromotions />
+      <HomeRecommendedSites />
     </main>
 
     <AppFooter />
