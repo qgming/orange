@@ -3,7 +3,7 @@
  * AppFooter - 页脚组件
  * 简洁风格
  */
-import ThemeToggle from './ThemeToggle.vue'
+import DeepRefreshButton from './DeepRefreshButton.vue'
 
 interface Props {
   githubUrl?: string
@@ -34,7 +34,7 @@ const currentYear = new Date().getFullYear()
           </svg>
           GitHub
         </a>
-        <ThemeToggle />
+        <DeepRefreshButton />
       </div>
     </div>
   </footer>

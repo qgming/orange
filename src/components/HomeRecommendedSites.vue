@@ -153,14 +153,16 @@ watch(recommendedSites, loadRecommendedIcons)
   padding: var(--sp-4);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: #ffffff;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
   transition: all var(--duration-fast) var(--ease-out);
 }
 
 .site-card:hover {
   border-color: var(--border-hover);
+  background: var(--surface-card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--c-accent) 20%, transparent);
+  box-shadow: var(--shadow-md);
 }
 
 .site-icon {
@@ -171,7 +173,7 @@ watch(recommendedSites, loadRecommendedIcons)
   place-items: center;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+  background: var(--surface-card-muted);
 }
 
 .site-icon img {
@@ -231,7 +233,7 @@ watch(recommendedSites, loadRecommendedIcons)
   justify-content: center;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: var(--bg-surface);
+  background: var(--surface-card);
   color: var(--text-secondary);
 }
 

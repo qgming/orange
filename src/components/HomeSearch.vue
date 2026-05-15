@@ -143,16 +143,16 @@ onMounted(() => {
   width: min(100%, 880px);
   margin: 0 auto;
   padding: 10px;
-  background: color-mix(in srgb, var(--bg-surface) 92%, var(--bg-base));
+  background: var(--surface-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 88%, transparent);
   border-radius: var(--radius-2xl);
-  box-shadow: 0 24px 48px -36px rgb(0 0 0 / 0.45);
+  box-shadow: var(--shadow-lg);
   transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .search-panel:focus-within {
   border-color: color-mix(in srgb, var(--c-accent) 34%, var(--border-hover));
-  box-shadow: 0 22px 44px -34px color-mix(in srgb, var(--c-accent) 26%, transparent);
+  box-shadow: var(--shadow-md);
 }
 
 .engine-select {
@@ -175,14 +175,14 @@ onMounted(() => {
   gap: var(--sp-2);
   padding: 0 var(--sp-4);
   border: 1px solid transparent;
-  background: color-mix(in srgb, var(--bg-elevated) 88%, var(--bg-surface));
+  background: var(--surface-chip);
   color: var(--text-primary);
   transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .engine-button:hover {
   border-color: var(--border-hover);
-  background: var(--bg-elevated);
+  background: var(--surface-chip-hover);
 }
 
 .engine-button svg,
@@ -203,10 +203,10 @@ onMounted(() => {
   width: 100%;
   min-width: 160px;
   padding: var(--sp-1);
-  background: var(--bg-elevated);
+  background: var(--surface-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  box-shadow: 0 18px 36px -24px rgb(0 0 0 / 0.7);
+  box-shadow: var(--shadow-lg);
 }
 
 .engine-option {
@@ -253,7 +253,7 @@ onMounted(() => {
   min-width: 112px;
   padding: 0 var(--sp-5);
   background: var(--c-accent);
-  color: white;
+  color: var(--text-on-accent);
   transition: filter var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
@@ -274,7 +274,7 @@ onMounted(() => {
   padding: 7px var(--sp-3);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg-surface) 84%, var(--bg-base));
+  background: var(--surface-chip);
   color: var(--text-secondary);
   font-size: var(--text-sm);
   transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
@@ -282,7 +282,7 @@ onMounted(() => {
 
 .keyword-chip:hover {
   border-color: color-mix(in srgb, var(--c-accent) 30%, var(--border-hover));
-  background: color-mix(in srgb, var(--c-accent) 12%, var(--bg-surface));
+  background: var(--surface-chip-hover);
   color: var(--text-primary);
 }
 
@@ -358,7 +358,7 @@ onMounted(() => {
   .search-input {
     padding-left: var(--sp-4);
     border-radius: var(--radius-xl);
-    background: var(--bg-base);
+    background: var(--surface-card-muted);
   }
 
   .search-submit {

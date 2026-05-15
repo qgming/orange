@@ -1,46 +1,36 @@
 /* ========================================
-   橘子导航 - 简洁现代设计系统
-   参考：Linear, Vercel, Notion 风格
+   橘子导航 - 全局设计系统
    ======================================== */
 
 :root {
-  /* 颜色系统 - 简洁明亮 */
   --c-white: #ffffff;
   --c-black: #000000;
-  
-  /* 灰度色阶 */
-  --c-gray-50: #fafafa;
-  --c-gray-100: #f4f4f5;
-  --c-gray-200: #e4e4e7;
-  --c-gray-300: #d4d4d8;
-  --c-gray-400: #a1a1aa;
-  --c-gray-500: #71717a;
-  --c-gray-600: #52525b;
-  --c-gray-700: #3f3f46;
-  --c-gray-800: #27272a;
-  --c-gray-900: #18181b;
-  --c-gray-950: #09090b;
-  
-  /* 主题色 - 简洁单一 */
-  --c-primary: #18181b;
-  --c-primary-hover: #27272a;
-  
-  /* 强调色 - 柔和橙色 */
+
+  --c-gray-50: #fafaf9;
+  --c-gray-100: #f5f5f4;
+  --c-gray-200: #e7e5e4;
+  --c-gray-300: #d6d3d1;
+  --c-gray-400: #a8a29e;
+  --c-gray-500: #78716c;
+  --c-gray-600: #57534e;
+  --c-gray-700: #44403c;
+  --c-gray-800: #292524;
+  --c-gray-900: #1c1917;
+  --c-gray-950: #0c0a09;
+
   --c-accent: #f97316;
   --c-accent-light: #fb923c;
   --c-accent-dark: #ea580c;
-  
-  /* 语义色 */
+
   --c-success: #22c55e;
   --c-warning: #f59e0b;
   --c-error: #ef4444;
   --c-info: #3b82f6;
-  
-  /* 排版 */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-  
-  /* 字号 */
+
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -50,19 +40,16 @@
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
-  
-  /* 字重 */
+
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
-  
-  /* 行高 */
-  --leading-tight: 1.25;
+
+  --leading-tight: 1.2;
   --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
-  
-  /* 间距 */
+  --leading-relaxed: 1.65;
+
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
   --sp-3: 0.75rem;
@@ -74,78 +61,95 @@
   --sp-12: 3rem;
   --sp-16: 4rem;
   --sp-20: 5rem;
-  
-  /* 圆角 */
+
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
   --radius-full: 9999px;
-  
-  /* 阴影 - 极简 */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  
-  /* 动画 */
+
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-  
-  /* Z-index */
+  --duration-normal: 220ms;
+  --duration-slow: 320ms;
+
   --z-dropdown: 100;
   --z-modal: 200;
   --z-tooltip: 300;
-}
 
-/* ========================================
-   暗色主题（默认）
-   ======================================== */
-:root,
-[data-theme="dark"] {
+  color-scheme: light;
+
   --bg-base: #f5f5f7;
-  --bg-surface: #18181b;
-  --bg-elevated: #27272a;
-  --bg-hover: #3f3f46;
-  
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  
-  --border-default: #27272a;
-  --border-hover: #3f3f46;
-  
-  --c-primary: #fafafa;
-  --c-primary-hover: #e4e4e7;
+  --bg-muted: #f0ebe5;
+  --bg-surface: rgb(255 255 255 / 0.88);
+  --bg-surface-strong: #ffffff;
+  --bg-elevated: #f7f4ef;
+  --bg-hover: #efe6dd;
+  --bg-accent-soft: color-mix(in srgb, var(--c-accent) 10%, white);
+
+  --text-primary: #18181b;
+  --text-secondary: #57534e;
+  --text-tertiary: #78716c;
+  --text-quaternary: #a8a29e;
+  --text-on-accent: #ffffff;
+
+  --border-default: rgb(120 113 108 / 0.18);
+  --border-strong: rgb(120 113 108 / 0.28);
+  --border-hover: rgb(120 113 108 / 0.42);
+
+  --shadow-color: 22 18 15;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.06);
+  --shadow: 0 10px 30px -24px rgb(var(--shadow-color) / 0.2);
+  --shadow-md: 0 18px 42px -28px rgb(var(--shadow-color) / 0.24);
+  --shadow-lg: 0 24px 60px -34px rgb(var(--shadow-color) / 0.3);
+
+  --surface-backdrop: color-mix(in srgb, var(--bg-base) 82%, transparent);
+  --surface-card: var(--bg-surface-strong);
+  --surface-card-muted: color-mix(in srgb, var(--bg-surface) 84%, var(--bg-base));
+  --surface-card-hover: color-mix(in srgb, var(--bg-surface-strong) 92%, var(--bg-hover));
+  --surface-chip: color-mix(in srgb, var(--bg-surface) 86%, var(--bg-muted));
+  --surface-chip-hover: color-mix(in srgb, var(--c-accent) 12%, var(--bg-surface-strong));
+  --surface-overlay: rgb(255 255 255 / 0.76);
 }
 
-/* ========================================
-   亮色主题
-   ======================================== */
-[data-theme="light"] {
-  --bg-base: #f5f5f7;
-  --bg-surface: #fafafa;
-  --bg-elevated: #f4f4f5;
-  --bg-hover: #e4e4e7;
-  
-  --text-primary: #09090b;
-  --text-secondary: #52525b;
-  --text-tertiary: #a1a1aa;
-  
-  --border-default: #e4e4e7;
-  --border-hover: #d4d4d8;
-  
-  --c-primary: #18181b;
-  --c-primary-hover: #27272a;
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-base: #0f0f11;
+  --bg-muted: #151518;
+  --bg-surface: rgb(23 23 27 / 0.88);
+  --bg-surface-strong: #18181b;
+  --bg-elevated: #222228;
+  --bg-hover: #2c2d34;
+  --bg-accent-soft: color-mix(in srgb, var(--c-accent) 14%, var(--bg-elevated));
+
+  --text-primary: #fafaf9;
+  --text-secondary: #d6d3d1;
+  --text-tertiary: #a8a29e;
+  --text-quaternary: #78716c;
+  --text-on-accent: #fff7ed;
+
+  --border-default: rgb(255 255 255 / 0.08);
+  --border-strong: rgb(255 255 255 / 0.14);
+  --border-hover: rgb(255 255 255 / 0.22);
+
+  --shadow-color: 0 0 0;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.28);
+  --shadow: 0 16px 36px -24px rgb(var(--shadow-color) / 0.55);
+  --shadow-md: 0 18px 42px -22px rgb(var(--shadow-color) / 0.62);
+  --shadow-lg: 0 28px 68px -28px rgb(var(--shadow-color) / 0.72);
+
+  --surface-backdrop: color-mix(in srgb, var(--bg-base) 70%, transparent);
+  --surface-card: color-mix(in srgb, var(--bg-surface-strong) 94%, white);
+  --surface-card-muted: color-mix(in srgb, var(--bg-elevated) 84%, var(--bg-base));
+  --surface-card-hover: color-mix(in srgb, var(--bg-elevated) 88%, var(--bg-hover));
+  --surface-chip: color-mix(in srgb, var(--bg-elevated) 82%, var(--bg-base));
+  --surface-chip-hover: color-mix(in srgb, var(--c-accent) 16%, var(--bg-elevated));
+  --surface-overlay: rgb(15 15 17 / 0.66);
 }
 
-/* ========================================
-   全局重置
-   ======================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -163,8 +167,20 @@ body {
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--text-primary);
-  background-color: var(--bg-base);
+  background: var(--bg-base);
   min-height: 100vh;
+  transition: background-color var(--duration-slow) var(--ease-out), color var(--duration-normal) var(--ease-out);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.03), rgb(255 255 255 / 0.03)),
+    repeating-linear-gradient(135deg, transparent, transparent 22px, rgb(255 255 255 / 0.015) 22px, rgb(255 255 255 / 0.015) 44px);
+  pointer-events: none;
+  opacity: 0.65;
 }
 
 a {
@@ -193,11 +209,6 @@ ul, ol {
   list-style: none;
 }
 
-/* ========================================
-   工具类
-   ======================================== */
-
-/* 布局 */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
@@ -210,7 +221,6 @@ ul, ol {
 .gap-6 { gap: var(--sp-6); }
 .gap-8 { gap: var(--sp-8); }
 
-/* 间距 */
 .p-2 { padding: var(--sp-2); }
 .p-3 { padding: var(--sp-3); }
 .p-4 { padding: var(--sp-4); }
@@ -227,7 +237,6 @@ ul, ol {
 .mb-4 { margin-bottom: var(--sp-4); }
 .mb-6 { margin-bottom: var(--sp-6); }
 
-/* 文本 */
 .text-xs { font-size: var(--text-xs); }
 .text-sm { font-size: var(--text-sm); }
 .text-base { font-size: var(--text-base); }
@@ -246,27 +255,22 @@ ul, ol {
 
 .text-center { text-align: center; }
 
-/* 圆角 */
 .rounded-lg { border-radius: var(--radius-lg); }
 .rounded-xl { border-radius: var(--radius-xl); }
 .rounded-2xl { border-radius: var(--radius-2xl); }
 .rounded-full { border-radius: var(--radius-full); }
 
-/* 显示 */
 .hidden { display: none; }
 .block { display: block; }
 .inline-flex { display: inline-flex; }
 
-/* 尺寸 */
 .w-full { width: 100%; }
 .max-w-screen-xl { max-width: 80rem; }
 
-/* 动画 */
-.transition { 
-  transition: all var(--duration-normal) var(--ease-out); 
+.transition {
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
-/* 截断 */
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -287,9 +291,6 @@ ul, ol {
   overflow: hidden;
 }
 
-/* ========================================
-   滚动条
-   ======================================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -300,7 +301,7 @@ ul, ol {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-default);
+  background: var(--border-strong);
   border-radius: var(--radius-full);
 }
 
@@ -308,39 +309,33 @@ ul, ol {
   background: var(--border-hover);
 }
 
-/* ========================================
-   选中文本
-   ======================================== */
 ::selection {
   background: var(--c-accent);
-  color: var(--c-white);
+  color: var(--text-on-accent);
 }
 
-/* ========================================
-   焦点样式
-   ======================================== */
 :focus-visible {
-  outline: 2px solid var(--c-accent);
+  outline: 2px solid color-mix(in srgb, var(--c-accent) 78%, white);
   outline-offset: 2px;
 }
 
-/* ========================================
-   减少动画
-   ======================================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
-/* ========================================
-   主题切换过渡
-   ======================================== */
 .theme-transition,
 .theme-transition * {
-  transition: background-color var(--duration-slow) var(--ease-out),
-              border-color var(--duration-slow) var(--ease-out),
-              color var(--duration-slow) var(--ease-out) !important;
+  transition:
+    background-color var(--duration-slow) var(--ease-out),
+    border-color var(--duration-slow) var(--ease-out),
+    color var(--duration-slow) var(--ease-out),
+    box-shadow var(--duration-slow) var(--ease-out) !important;
 }

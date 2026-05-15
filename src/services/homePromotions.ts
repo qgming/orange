@@ -1,7 +1,10 @@
 import promotionsData from '@/data/homePromotions.json'
 import type { HomePromotionItem, HomePromotionsConfig } from '@/types'
 
-const REMOTE_PROMOTIONS_URL = '/orange/promotions.json'
+const REMOTE_PROMOTIONS_URLS = [
+  'https://pages.qgming.com/orange/promotions.json',
+  '/orange/promotions.json',
+]
 const PROMOTIONS_CACHE_KEY = 'orange:home-promotions'
 const PROMOTIONS_CACHE_TTL = 60 * 60 * 1000
 export const localHomePromotions = promotionsData as HomePromotionsConfig
@@ -41,6 +44,14 @@ const isHomePromotionsCacheEntry = (data: unknown): data is HomePromotionsCacheE
     && isHomePromotionsConfig(entry.data)
 }
 
+export const clearPromotionsCache = () => {
+  try {
+    localStorage.removeItem(PROMOTIONS_CACHE_KEY)
+  } catch {
+    // 忽略缓存清理失败，强制刷新仍会直接请求远程数据。
+  }
+}
+
 const getCachedPromotions = () => {
   try {
     const cached = localStorage.getItem(PROMOTIONS_CACHE_KEY)
@@ -64,19 +75,38 @@ const setCachedPromotions = (data: HomePromotionsConfig) => {
   }
 }
 
-export const fetchRemotePromotions = async () => {
-  const cachedPromotions = getCachedPromotions()
-  if (cachedPromotions) return cachedPromotions
+const fetchPromotionsFromUrl = async (url: string) => {
+  const response = await fetch(url, { cache: 'no-store' })
+  if (!response.ok) return null
+
+  const text = await response.text()
+  const trimmedText = text.trimStart()
+
+  if (!trimmedText || trimmedText.startsWith('<')) return null
 
   try {
-    const response = await fetch(REMOTE_PROMOTIONS_URL, { cache: 'no-cache' })
-    if (!response.ok) return null
-    const data = await response.json()
-    if (!isHomePromotionsConfig(data)) return null
-
-    setCachedPromotions(data)
-    return data
+    const data = JSON.parse(text)
+    return isHomePromotionsConfig(data) ? data : null
   } catch {
     return null
   }
+}
+
+export const fetchRemotePromotions = async (options: { force?: boolean } = {}) => {
+  if (options.force) clearPromotionsCache()
+  const cachedPromotions = options.force ? null : getCachedPromotions()
+
+  for (const url of REMOTE_PROMOTIONS_URLS) {
+    try {
+      const data = await fetchPromotionsFromUrl(url)
+      if (!data) continue
+
+      setCachedPromotions(data)
+      return data
+    } catch {
+      // 尝试下一个远程地址，最后再回退到本地缓存或内置数据。
+    }
+  }
+
+  return cachedPromotions
 }

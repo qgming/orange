@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
+import { usePageMeta } from '@/composables/usePageMeta'
 import type { DoubanWeeklyTab } from '@/types'
 import {
   coverSource,
@@ -20,6 +21,12 @@ import { performSearch } from '@/services/search'
 const activeTab = ref<DoubanWeeklyTab>('movie')
 const weeklyStore = useDoubanWeeklyStore()
 const { loading, loaded, rankings, errors, tabCounts } = storeToRefs(weeklyStore)
+
+usePageMeta({
+  title: '豆瓣周榜 - 橘子导航',
+  description: '聚合豆瓣电影、华语剧集、全球剧集与综艺周榜，按分类查看高口碑内容并快速搜索观看。',
+  canonicalPath: '/douban-weekly',
+})
 
 const activeConfig = computed(() => doubanWeeklyTabs.find(tab => tab.key === activeTab.value) ?? doubanWeeklyTabs[0])
 const activeItems = computed(() => rankings.value[activeTab.value] ?? [])
@@ -46,7 +53,6 @@ const showLoading = computed(() => loading.value && !loaded.value)
 const fetchAll = () => weeklyStore.fetchAll({ force: true })
 
 onMounted(() => {
-  document.title = '豆瓣周榜 - 橘子导航'
   void weeklyStore.fetchAll()
 })
 </script>
@@ -237,21 +243,22 @@ onMounted(() => {
   justify-content: flex-start;
   gap: var(--sp-3);
   padding: var(--sp-5) var(--sp-5) calc(var(--sp-5) + 48px);
-  border: 1px solid #e4e4e7;
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: #ffffff;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .spotlight-copy h2 {
   margin: 0;
-  color: #18181b;
+  color: var(--text-primary);
   font-size: clamp(1.75rem, 4vw, 3rem);
   line-height: 1.05;
 }
 
 .spotlight-copy p {
   margin: 0;
-  color: #52525b;
+  color: var(--text-secondary);
   line-height: var(--leading-relaxed);
 }
 
@@ -264,7 +271,7 @@ onMounted(() => {
 .detail-grid span {
   min-width: 0;
   padding: 0;
-  color: #52525b;
+  color: var(--text-secondary);
   font-size: var(--text-sm);
   line-height: 1.45;
 }
@@ -272,7 +279,7 @@ onMounted(() => {
 .detail-grid strong {
   display: inline;
   margin-right: 8px;
-  color: #71717a;
+  color: var(--text-tertiary);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
 }
@@ -294,8 +301,8 @@ onMounted(() => {
   flex: 0 0 auto;
   padding: 6px 10px;
   border-radius: var(--radius-full);
-  background: #f4f4f5;
-  color: #52525b;
+  background: var(--surface-chip);
+  color: var(--text-secondary);
   font-size: var(--text-xs);
 }
 
@@ -334,10 +341,10 @@ onMounted(() => {
 .ghost-action {
   width: fit-content;
   padding: 10px 16px;
-  border: 1px solid #e4e4e7;
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
-  background: #ffffff;
-  color: #18181b;
+  background: var(--surface-card-muted);
+  color: var(--text-primary);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
 }
@@ -352,11 +359,11 @@ onMounted(() => {
 }
 
 .trend.up {
-  color: #4ade80;
+  color: var(--c-success);
 }
 
 .trend.down {
-  color: #f87171;
+  color: var(--c-error);
 }
 
 .trend.flat {

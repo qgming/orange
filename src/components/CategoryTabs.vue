@@ -52,7 +52,8 @@ const handleTabClick = (key: string) => {
   margin-bottom: var(--sp-5);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: var(--bg-surface);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -72,7 +73,7 @@ const handleTabClick = (key: string) => {
   padding: 6px var(--sp-3);
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+  background: transparent;
   color: var(--text-secondary);
   transition: all var(--duration-fast) var(--ease-out);
 }
@@ -82,7 +83,7 @@ const handleTabClick = (key: string) => {
   background: color-mix(in srgb, var(--c-accent) 10%, var(--bg-elevated));
   color: color-mix(in srgb, var(--c-accent) 48%, var(--text-primary));
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--c-accent) 55%, transparent);
+  box-shadow: var(--shadow-sm);
 }
 
 .tab-button.active {
@@ -91,7 +92,7 @@ const handleTabClick = (key: string) => {
   color: var(--text-primary);
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--c-white) 14%, transparent),
-    0 10px 18px -16px color-mix(in srgb, var(--c-accent) 48%, transparent);
+    var(--shadow-sm);
 }
 
 .tab-label {

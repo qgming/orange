@@ -299,5 +299,16 @@
       "name": "即梦AI",
       "url": "https://jimeng.jianying.com/"
     }
+  ],
+  "社区": [
+    {
+      "name": "LINUX DO",
+      "url": "https://linux.do/",
+      "isRecommended": true
+    },
+    {
+      "name": "V2EX",
+      "url": "https://www.v2ex.com/"
+    }
   ]
 }

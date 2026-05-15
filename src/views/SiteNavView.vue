@@ -4,6 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
+import { usePageMeta } from '@/composables/usePageMeta'
 import { getHostname, openSiteWithSource } from '@/services/siteDirectory'
 import { useSiteDirectoryStore } from '@/stores/siteDirectory'
 import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '@/services/siteIcons'
@@ -18,6 +19,12 @@ const statusQueue: Array<{ url: string, name: string }> = []
 
 let activeStatusChecks = 0
 const MAX_STATUS_CHECKS = 6
+
+usePageMeta({
+  title: '网站导航 - 橘子导航',
+  description: '浏览橘子导航收录的影视、动漫、短剧、阅读、工具与社区站点，按分类快速访问常用资源。',
+  canonicalPath: '/nav',
+})
 
 const filteredSites = computed(() => siteDirectoryStore.filteredSites(activeCategory.value))
 
@@ -83,7 +90,6 @@ const loadVisibleAssets = () => {
 }
 
 onMounted(async () => {
-  document.title = '网站导航 - 橘子导航'
   await siteDirectoryStore.loadSites()
   loadVisibleAssets()
 })
@@ -234,14 +240,16 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
   padding: var(--sp-4);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: #ffffff;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
   transition: all var(--duration-fast) var(--ease-out);
 }
 
 .site-card:hover {
   border-color: var(--border-hover);
+  background: var(--surface-card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--c-accent) 20%, transparent);
+  box-shadow: var(--shadow-md);
 }
 
 .recommend-badge {
@@ -274,7 +282,7 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
   place-items: center;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+  background: var(--surface-card-muted);
 }
 
 .site-icon img {
@@ -328,15 +336,15 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
 }
 
 .status-online {
-  background: #22c55e;
+  background: var(--c-success);
 }
 
 .status-offline {
-  background: #ef4444;
+  background: var(--c-error);
 }
 
 .status-unknown {
-  background: #f59e0b;
+  background: var(--c-warning);
 }
 
 .state-card {
@@ -348,7 +356,7 @@ watch([activeCategory, filteredSites], loadVisibleAssets)
   gap: var(--sp-3);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: var(--bg-surface);
+  background: var(--surface-card);
   color: var(--text-secondary);
 }
 

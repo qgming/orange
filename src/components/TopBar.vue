@@ -71,7 +71,7 @@ const quickLinks = [
   position: sticky;
   top: 0;
   z-index: 100;
-  background: color-mix(in srgb, var(--bg-base) 88%, transparent);
+  background: var(--surface-backdrop);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-default);
@@ -130,7 +130,7 @@ const quickLinks = [
   padding: 0 var(--sp-3);
   border-radius: calc(var(--radius-xl) - 4px);
   border: 1px solid transparent;
-  background: color-mix(in srgb, var(--bg-elevated) 38%, transparent);
+  background: color-mix(in srgb, var(--surface-chip) 86%, transparent);
   color: var(--text-secondary);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
@@ -148,7 +148,7 @@ const quickLinks = [
   border-color: transparent;
   background: color-mix(in srgb, var(--c-accent) 9%, var(--bg-elevated));
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px -15px color-mix(in srgb, var(--c-accent) 50%, transparent);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-link.active {
@@ -157,14 +157,14 @@ const quickLinks = [
   background: color-mix(in srgb, var(--c-accent) 15%, var(--bg-elevated));
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--c-white) 12%, transparent),
-    0 10px 18px -16px color-mix(in srgb, var(--c-accent) 46%, transparent);
+    var(--shadow-sm);
 }
 
 .quick-link.active:hover {
   background: color-mix(in srgb, var(--c-accent) 18%, var(--bg-elevated));
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--c-white) 14%, transparent),
-    0 12px 20px -16px color-mix(in srgb, var(--c-accent) 56%, transparent);
+    var(--shadow);
 }
 
 .quick-link.active .quick-icon {
@@ -215,6 +215,7 @@ const quickLinks = [
     padding: 0 var(--sp-2);
     font-size: var(--text-xs);
   }
+
 }
 
 @media (max-width: 460px) {

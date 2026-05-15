@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>橘子导航 - 免费影视电子书资源导航</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('orange-theme');
+          var preference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+          var resolved = preference === 'system'
+            ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : preference;
+          document.documentElement.setAttribute('data-theme', resolved);
+          document.documentElement.setAttribute('data-theme-preference', preference);
+          document.documentElement.style.colorScheme = resolved;
+        } catch (error) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.setAttribute('data-theme-preference', 'system');
+          document.documentElement.style.colorScheme = 'light';
+        }
+      })();
+    </script>
+    <title>橘子导航 - 影视、阅读、工具与社区资源导航</title>
     <link rel="shortcut icon" href="/favicon.svg" />
+    <link rel="canonical" href="https://v.qgming.com/" />
 
     <!-- Google Fonts - DM Sans & Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,25 +31,30 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
     <meta
       name="description"
-      content="橘子导航 - 您的一站式资源导航平台。提供免费影视、电子书、在线视频、动漫番剧、AI工具箱等优质资源。支持腾讯视频、爱奇艺、哔哩哔哩等主流平台，让您轻松找到想要的内容。"
+      content="橘子导航聚合影视、动漫、短剧、阅读、工具与社区站点，支持热门搜索、精选推荐、实时榜单与豆瓣周榜。"
     />
     <meta
       name="keywords"
-      content="橘子导航,免费影视,在线视频,电子书,视频导航,AI工具箱,动漫番剧,哔哩哔哩,腾讯视频,爱奇艺,资源导航,在线观看"
+      content="橘子导航,影视导航,动漫导航,短剧导航,电子书,阅读资源,工具导航,社区导航,实时榜单,豆瓣周榜"
     />
     <meta name="author" content="橘子导航" />
     <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="橘子导航 - 免费影视电子书资源导航" />
+    <meta name="theme-color" content="#f97316" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="橘子导航" />
+    <meta property="og:title" content="橘子导航 - 影视、阅读、工具与社区资源导航" />
     <meta
       property="og:description"
-      content="橘子导航是您的一站式资源导航平台，提供免费影视、电子书、在线视频等优质资源，支持各大主流视频平台。"
+      content="橘子导航聚合影视、动漫、短剧、阅读、工具与社区站点，支持热门搜索、精选推荐、实时榜单与豆瓣周榜。"
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://v.qgming.com/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="橘子导航 - 免费影视电子书资源导航" />
+    <meta name="twitter:title" content="橘子导航 - 影视、阅读、工具与社区资源导航" />
     <meta
       name="twitter:description"
-      content="发现和访问优质的免费影视、电子书和在线视频资源。橘子导航，您的在线资源导航助手。"
+      content="发现影视、动漫、短剧、阅读、工具与社区资源，并查看实时榜单和豆瓣周榜。"
     />
     <!-- 谷歌统计 -->
     <meta

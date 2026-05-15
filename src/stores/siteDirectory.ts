@@ -36,11 +36,11 @@ export const useSiteDirectoryStore = defineStore('siteDirectory', () => {
     return sites ? { [category]: sites } : {}
   }
 
-  const loadSites = async () => {
-    if (loading.value || loaded.value) return
+  const loadSites = async (options: { force?: boolean } = {}) => {
+    if (loading.value || (loaded.value && !options.force)) return
 
     loading.value = true
-    videoSites.value = (await fetchRemoteSites()) ?? localVideoSites
+    videoSites.value = (await fetchRemoteSites({ force: options.force })) ?? localVideoSites
     loaded.value = true
     loading.value = false
   }

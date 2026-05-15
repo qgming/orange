@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
+import { usePageMeta } from '@/composables/usePageMeta'
 import type { RankingTab } from '@/types'
 import { realtimeRankingTabs } from '@/services/realtimeRankings'
 import { useRealtimeRankingsStore } from '@/stores/realtimeRankings'
@@ -14,6 +15,12 @@ const rankingsStore = useRealtimeRankingsStore()
 const { loading, loaded, errors } = storeToRefs(rankingsStore)
 
 let refreshInterval: number | null = null
+
+usePageMeta({
+  title: '实时榜单 - 橘子导航',
+  description: '查看网剧热度、电视收视、电影票房与全球票房榜单，快速发现当下热门影视内容。',
+  canonicalPath: '/realtime-rankings',
+})
 
 const activeConfig = computed(() => realtimeRankingTabs.find(tab => tab.key === activeTab.value) ?? realtimeRankingTabs[0])
 
@@ -36,7 +43,6 @@ const openSearch = (name: string) => {
 }
 
 onMounted(() => {
-  document.title = '实时榜单 - 橘子导航'
   void rankingsStore.fetchAll()
   refreshInterval = setInterval(fetchAll, 5 * 60 * 1000) as unknown as number
 })

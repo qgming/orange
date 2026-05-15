@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchRemotePromotions, localHomePromotions } from '@/services/homePromotions'
-import type { HomePromotionItem, HomePromotionsConfig } from '@/types'
+import { useHomePromotionsStore } from '@/stores/homePromotions'
+import type { HomePromotionItem } from '@/types'
 
 const VISIBLE_LIMIT = 4
-const promotionsConfig = ref<HomePromotionsConfig | null>(null)
-const visiblePromotions = computed(() => promotionsConfig.value?.items.filter(item => item.isVisible) ?? [])
-const shouldShow = computed(() => Boolean(promotionsConfig.value?.isVisible && visiblePromotions.value.length > 0))
+const promotionsStore = useHomePromotionsStore()
+const { visiblePromotions, shouldShow } = storeToRefs(promotionsStore)
 const shouldLoop = computed(() => visiblePromotions.value.length > VISIBLE_LIMIT)
 const router = useRouter()
 
@@ -28,8 +28,7 @@ const handleCardClick = (event: MouseEvent, item: HomePromotionItem) => {
 }
 
 onMounted(async () => {
-  const remotePromotions = await fetchRemotePromotions()
-  promotionsConfig.value = remotePromotions ?? localHomePromotions
+  await promotionsStore.loadPromotions()
 })
 </script>
 
@@ -131,15 +130,15 @@ onMounted(async () => {
   border-radius: var(--radius-xl);
   background:
     var(--promo-image) center / cover no-repeat,
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 96%, white), color-mix(in srgb, var(--bg-surface) 88%, var(--bg-base)));
-  box-shadow: 0 18px 36px -34px rgb(15 23 42 / 0.45);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 96%, white), color-mix(in srgb, var(--surface-card-muted) 88%, var(--bg-base)));
+  box-shadow: var(--shadow);
   transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
 }
 
 .promo-card:hover {
   transform: translateY(-3px);
-  border-color: color-mix(in srgb, white 24%, var(--border-hover));
-  box-shadow: 0 24px 44px -30px rgb(15 23 42 / 0.55);
+  border-color: color-mix(in srgb, var(--c-accent) 16%, var(--border-hover));
+  box-shadow: var(--shadow-md);
   filter: saturate(1.05);
 }
 
@@ -163,7 +162,7 @@ onMounted(async () => {
 }
 
 .promo-copy strong {
-  color: #ffffff;
+  color: var(--text-on-accent);
   font-size: 1.375rem;
   font-weight: var(--font-semibold);
   line-height: 1.15;
