@@ -1,19 +1,17 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
-import videoSitesData from '@/data/videoSites.json'
-import type { VideoSiteCategory } from '@/types'
-import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '@/utils/iconService'
-import { getSiteAvailability, type SiteAvailabilityStatus } from '@/utils/siteAvailability'
+import { getHostname, openSiteWithSource } from '@/services/siteDirectory'
+import { useSiteDirectoryStore } from '@/stores/siteDirectory'
+import { getWebsiteIcon, isInitialIcon, parseInitialIcon } from '@/services/siteIcons'
+import { getSiteAvailability, type SiteAvailabilityStatus } from '@/services/siteAvailability'
 
-const REMOTE_SITES_URL = '/orange/sites.json'
-const localVideoSites = videoSitesData as VideoSiteCategory
-
-const videoSites = ref<VideoSiteCategory>({})
 const activeCategory = ref('全部')
-const loading = ref(true)
+const siteDirectoryStore = useSiteDirectoryStore()
+const { loading, categories } = storeToRefs(siteDirectoryStore)
 const siteIcons = ref(new Map<string, string>())
 const siteStatuses = ref(new Map<string, SiteAvailabilityStatus>())
 const statusQueue: Array<{ url: string, name: string }> = []
@@ -21,62 +19,13 @@ const statusQueue: Array<{ url: string, name: string }> = []
 let activeStatusChecks = 0
 const MAX_STATUS_CHECKS = 6
 
-const isVideoSiteCategory = (data: unknown): data is VideoSiteCategory => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return false
-
-  return Object.values(data).every(sites => {
-    if (!Array.isArray(sites)) return false
-    return sites.every(site => {
-      if (!site || typeof site !== 'object' || Array.isArray(site)) return false
-      const item = site as Record<string, unknown>
-      return typeof item.name === 'string' && typeof item.url === 'string'
-    })
-  })
-}
-
-const fetchRemoteSites = async () => {
-  try {
-    const response = await fetch(REMOTE_SITES_URL, { cache: 'no-cache' })
-    if (!response.ok) return null
-    const data = await response.json()
-    return isVideoSiteCategory(data) ? data : null
-  } catch {
-    return null
-  }
-}
-
-const categories = computed(() => ['全部', '推荐', ...Object.keys(videoSites.value)])
-const totalCount = computed(() => Object.values(videoSites.value).reduce((sum, sites) => sum + sites.length, 0))
-const recommendedCount = computed(() => {
-  return Object.values(videoSites.value).reduce((sum, sites) => sum + sites.filter(site => site.isRecommended).length, 0)
-})
-const categoryCount = (category: string) => {
-  if (category === '全部') return totalCount.value
-  if (category === '推荐') return recommendedCount.value
-  return videoSites.value[category]?.length ?? 0
-}
-
-const filteredSites = computed(() => {
-  if (activeCategory.value === '全部') return videoSites.value
-
-  if (activeCategory.value === '推荐') {
-    const filtered: VideoSiteCategory = {}
-    Object.entries(videoSites.value).forEach(([category, sites]) => {
-      const recommended = sites.filter(site => site.isRecommended)
-      if (recommended.length) filtered[category] = recommended
-    })
-    return filtered
-  }
-
-  const sites = videoSites.value[activeCategory.value]
-  return sites ? { [activeCategory.value]: sites } : {}
-})
+const filteredSites = computed(() => siteDirectoryStore.filteredSites(activeCategory.value))
 
 const categoryTabsList = computed(() => {
   return categories.value.map(category => ({
     key: category,
     label: category,
-    count: categoryCount(category),
+    count: siteDirectoryStore.categoryCount(category),
   }))
 })
 
@@ -119,23 +68,9 @@ const isInitial = (url: string, name: string) => isInitialIcon(getIcon(url, name
 const getInitialData = (url: string, name: string) => parseInitialIcon(getIcon(url, name))
 const getStatus = (url: string, name: string) => siteStatuses.value.get(getSiteKey(url, name)) || 'unknown'
 
-const getHostname = (url: string) => {
-  try {
-    return new URL(url).hostname
-  } catch {
-    return url
-  }
-}
-
 const openSite = (event: MouseEvent, url: string) => {
   event.preventDefault()
-  try {
-    const targetUrl = new URL(url)
-    targetUrl.searchParams.append('from', 'v.qgming.com')
-    window.open(targetUrl.toString(), '_blank')
-  } catch {
-    window.open(url, '_blank')
-  }
+  openSiteWithSource(url)
 }
 
 const loadVisibleAssets = () => {
@@ -149,8 +84,7 @@ const loadVisibleAssets = () => {
 
 onMounted(async () => {
   document.title = '网站导航 - 橘子导航'
-  videoSites.value = (await fetchRemoteSites()) ?? localVideoSites
-  loading.value = false
+  await siteDirectoryStore.loadSites()
   loadVisibleAssets()
 })
 

@@ -1,136 +1,38 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
-import type { DoubanWeeklyItem, DoubanWeeklyTab } from '@/types'
-import { performSearch } from '@/utils/searchService'
-
-interface ApiEnvelope<T> {
-  data?: T
-}
-
-interface WeeklyTabConfig {
-  key: DoubanWeeklyTab
-  label: string
-  short: string
-  endpoint: string
-}
-
-const tabs: WeeklyTabConfig[] = [
-  { key: 'movie', label: '全球电影', short: '电影', endpoint: '/v2/douban/weekly/movie' },
-  { key: 'tv_chinese', label: '华语剧集', short: '华语剧', endpoint: '/v2/douban/weekly/tv_chinese' },
-  { key: 'tv_global', label: '全球剧集', short: '全球剧', endpoint: '/v2/douban/weekly/tv_global' },
-  { key: 'show_chinese', label: '华语综艺', short: '综艺', endpoint: '/v2/douban/weekly/show_chinese' },
-  { key: 'show_global', label: '全球口碑综艺', short: '口碑综艺', endpoint: '/v2/douban/weekly/show_global' },
-]
-
-const apiHosts = [
-  'https://60s.viki.moe',
-  'https://60api.09cdn.xyz',
-  'https://60s.zeabur.app',
-  'https://60s.crystelf.top',
-  'https://cqxx.site',
-  'https://api.yanyua.icu',
-  'https://60s.tmini.net',
-  'https://60s.7se.cn',
-  'https://60s.mizhoubaobei.top',
-]
+import type { DoubanWeeklyTab } from '@/types'
+import {
+  coverSource,
+  doubanWeeklyTabs,
+  formatDoubanCount,
+  formatDoubanRating,
+  subtitleFields,
+  trendClass,
+  trendText,
+} from '@/services/doubanWeekly'
+import { useDoubanWeeklyStore } from '@/stores/doubanWeekly'
+import { performSearch } from '@/services/search'
 
 const activeTab = ref<DoubanWeeklyTab>('movie')
-const loading = ref(true)
-const rankings = ref<Record<DoubanWeeklyTab, DoubanWeeklyItem[]>>({
-  movie: [],
-  tv_chinese: [],
-  tv_global: [],
-  show_chinese: [],
-  show_global: [],
-})
-const errors = ref<Record<DoubanWeeklyTab, string | null>>({
-  movie: null,
-  tv_chinese: null,
-  tv_global: null,
-  show_chinese: null,
-  show_global: null,
-})
+const weeklyStore = useDoubanWeeklyStore()
+const { loading, loaded, rankings, errors, tabCounts } = storeToRefs(weeklyStore)
 
-let currentHostIndex = 0
-
-const activeConfig = computed(() => tabs.find(tab => tab.key === activeTab.value) ?? tabs[0])
+const activeConfig = computed(() => doubanWeeklyTabs.find(tab => tab.key === activeTab.value) ?? doubanWeeklyTabs[0])
 const activeItems = computed(() => rankings.value[activeTab.value] ?? [])
 const activeError = computed(() => errors.value[activeTab.value])
 const heroItem = computed(() => activeItems.value[0] ?? null)
 
-const tabCounts = computed(() => {
-  return tabs.reduce<Record<DoubanWeeklyTab, number>>((result, tab) => {
-    result[tab.key] = rankings.value[tab.key]?.length ?? 0
-    return result
-  }, {
-    movie: 0,
-    tv_chinese: 0,
-    tv_global: 0,
-    show_chinese: 0,
-    show_global: 0,
-  })
-})
-
 const categoryTabs = computed(() => {
-  return tabs.map(tab => ({
+  return doubanWeeklyTabs.map(tab => ({
     key: tab.key,
     label: tab.label,
     count: tabCounts.value[tab.key] || 0,
   }))
 })
-
-const formatRating = (value?: number) => {
-  if (typeof value !== 'number') return '--'
-  return value.toFixed(1)
-}
-
-const formatCount = (value?: number) => {
-  if (typeof value !== 'number') return '--'
-  return new Intl.NumberFormat('zh-CN', { notation: value > 9999 ? 'compact' : 'standard' }).format(value)
-}
-
-const coverSource = (item: DoubanWeeklyItem) => item.cover_proxy || item.cover
-
-const subtitleParts = (subtitle: string) => {
-  const [year, region, genre, director, ...castParts] = subtitle
-    .split('/')
-    .map(part => part.trim())
-    .filter(Boolean)
-
-  return {
-    year,
-    region,
-    genre,
-    director,
-    cast: castParts.join(' / '),
-  }
-}
-
-const subtitleFields = (subtitle: string) => {
-  const parts = subtitleParts(subtitle)
-  return [
-    { label: '时间', value: parts.year },
-    { label: '制片国家/地区', value: parts.region },
-    { label: '类型', value: parts.genre },
-    { label: '导演', value: parts.director },
-    { label: '主演', value: parts.cast },
-  ].filter(field => field.value)
-}
-
-const trendText = (item: DoubanWeeklyItem) => {
-  if (item.trend === 'up') return `上升 ${Math.abs(item.rank_change)}`
-  if (item.trend === 'down') return `下降 ${Math.abs(item.rank_change)}`
-  return item.rank_change === 0 ? '持平' : `变化 ${Math.abs(item.rank_change)}`
-}
-
-const trendClass = (item: DoubanWeeklyItem) => {
-  if (item.trend === 'up') return 'up'
-  if (item.trend === 'down') return 'down'
-  return 'flat'
-}
 
 const openSearch = (title: string) => {
   performSearch(title, 0)
@@ -140,57 +42,12 @@ const openDouban = (url: string) => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
-const fetchApiData = async <T,>(endpoint: string): Promise<T | null> => {
-  for (let i = 0; i < apiHosts.length; i++) {
-    try {
-      const host = apiHosts[(currentHostIndex + i) % apiHosts.length]
-      const response = await fetch(`${host}${endpoint}`, {
-        signal: AbortSignal.timeout(5000),
-      })
-
-      if (!response.ok) continue
-
-      const result = (await response.json()) as T
-      currentHostIndex = (currentHostIndex + i) % apiHosts.length
-      return result
-    } catch {
-      continue
-    }
-  }
-
-  return null
-}
-
-const fetchAll = async () => {
-  loading.value = true
-
-  const responses = await Promise.all(
-    tabs.map(async (tab) => {
-      const result = await fetchApiData<ApiEnvelope<DoubanWeeklyItem[]>>(tab.endpoint)
-      return {
-        key: tab.key,
-        items: result?.data ?? [],
-        failed: !result,
-      }
-    })
-  )
-
-  const nextRankings = { ...rankings.value }
-  const nextErrors = { ...errors.value }
-
-  responses.forEach(({ key, items, failed }) => {
-    nextRankings[key] = items
-    nextErrors[key] = failed ? '这一份周榜暂时连接不上，可能是上游接口波动。' : null
-  })
-
-  rankings.value = nextRankings
-  errors.value = nextErrors
-  loading.value = false
-}
+const showLoading = computed(() => loading.value && !loaded.value)
+const fetchAll = () => weeklyStore.fetchAll({ force: true })
 
 onMounted(() => {
   document.title = '豆瓣周榜 - 橘子导航'
-  fetchAll()
+  void weeklyStore.fetchAll()
 })
 </script>
 
@@ -213,7 +70,7 @@ onMounted(() => {
         @update:active-tab="activeTab = $event as DoubanWeeklyTab"
       />
 
-      <section v-if="loading" class="state-card">
+      <section v-if="showLoading" class="state-card">
         <span class="spinner"></span>
         <p>正在加载豆瓣周榜...</p>
       </section>
@@ -235,7 +92,7 @@ onMounted(() => {
               <div class="headline-meta">
                 <span class="meta-pill">#{{ item.rank }}</span>
               </div>
-              <span class="corner-score">{{ formatRating(item.rating) }}</span>
+              <span class="corner-score">{{ formatDoubanRating(item.rating) }}</span>
               <h2>{{ item.title }}</h2>
               <div class="detail-grid" aria-label="条目信息">
                 <span v-for="field in subtitleFields(item.card_subtitle)" :key="field.label">
@@ -245,7 +102,7 @@ onMounted(() => {
               </div>
               <p>{{ item.description || item.card_subtitle }}</p>
               <div class="rating-row">
-                <span>{{ formatCount(item.rating_count) }} 人评价</span>
+                <span>{{ formatDoubanCount(item.rating_count) }} 人评价</span>
                 <span>好评 {{ item.good_rate }}%</span>
                 <span class="trend" :class="trendClass(item)">{{ trendText(item) }}</span>
                 <span v-for="tag in item.tags.slice(0, 4)" :key="tag">{{ tag }}</span>

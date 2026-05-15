@@ -3,16 +3,21 @@
  * HomeSearch - 首页搜索入口
  * 搜索逻辑从顶栏迁移到首页，避免全站顶栏承担业务输入。
  */
-import { computed, ref } from 'vue'
-import { performSearch, searchSites } from '@/utils/searchService'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref } from 'vue'
+import { useRealtimeRankingsStore } from '@/stores/realtimeRankings'
+import { performSearch, searchSites } from '@/services/search'
 
 const searchQuery = ref('')
 const currentSiteIndex = ref(0)
 const showEngines = ref(false)
 const heroTitle = '好内容，不必到处找。'
+const fallbackKeywords = ['庆余年', '沙丘', '繁花', '周处除三害', '三体']
 
-const quickKeywords = ['庆余年', '沙丘', '繁花', '周处除三害', '三体']
+const rankingsStore = useRealtimeRankingsStore()
+const { webTopKeywords } = storeToRefs(rankingsStore)
 const currentSite = computed(() => searchSites[currentSiteIndex.value] ?? searchSites[0])
+const quickKeywords = computed(() => webTopKeywords.value.length ? webTopKeywords.value : fallbackKeywords)
 
 const selectSite = (index: number) => {
   currentSiteIndex.value = index
@@ -26,6 +31,10 @@ const submitSearch = (keyword = searchQuery.value) => {
   searchQuery.value = query
   performSearch(query, currentSiteIndex.value)
 }
+
+onMounted(() => {
+  void rankingsStore.fetchAll()
+})
 </script>
 
 <template>

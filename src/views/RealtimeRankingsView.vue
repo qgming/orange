@@ -1,205 +1,35 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import TopBar from '@/components/TopBar.vue'
 import CategoryTabs from '@/components/CategoryTabs.vue'
-import type {
-  GlobalBoxOfficeData,
-  GlobalBoxOfficeItem,
-  MovieRankingData,
-  MovieRankingItem,
-  RankingTab,
-  TvRankingData,
-  TvRankingItem,
-  WebRankingData,
-  WebRankingItem,
-} from '@/types'
-import { performSearch } from '@/utils/searchService'
-
-interface ApiEnvelope<T> {
-  data?: T
-}
-
-interface RealtimeTabConfig {
-  key: RankingTab
-  label: string
-  short: string
-  endpoint: string
-}
-
-interface DisplayRow {
-  key: string
-  rank: number
-  title: string
-  subtitle: string
-  metric: string
-  note: string
-  searchName: string
-}
-
-const tabs: RealtimeTabConfig[] = [
-  { key: 'web', label: '网剧实时热度', short: '网剧', endpoint: '/v2/maoyan/realtime/web' },
-  { key: 'tv', label: '电视收视排行', short: '电视', endpoint: '/v2/maoyan/realtime/tv' },
-  { key: 'movie', label: '电影实时票房', short: '票房', endpoint: '/v2/maoyan/realtime/movie' },
-  { key: 'global', label: '全球票房总榜', short: '全球', endpoint: '/v2/maoyan/all/movie' },
-]
-
-const apiHosts = [
-  'https://60s.viki.moe',
-  'https://60api.09cdn.xyz',
-  'https://60s.zeabur.app',
-  'https://60s.crystelf.top',
-  'https://cqxx.site',
-  'https://api.yanyua.icu',
-  'https://60s.tmini.net',
-  'https://60s.7se.cn',
-  'https://60s.mizhoubaobei.top',
-]
+import type { RankingTab } from '@/types'
+import { realtimeRankingTabs } from '@/services/realtimeRankings'
+import { useRealtimeRankingsStore } from '@/stores/realtimeRankings'
+import { performSearch } from '@/services/search'
 
 const activeTab = ref<RankingTab>('web')
-const loading = ref(true)
-const webData = ref<WebRankingData | null>(null)
-const tvData = ref<TvRankingData | null>(null)
-const movieData = ref<MovieRankingData | null>(null)
-const globalData = ref<GlobalBoxOfficeData | null>(null)
-const errors = ref<Record<RankingTab, string | null>>({
-  web: null,
-  tv: null,
-  movie: null,
-  global: null,
-})
+const rankingsStore = useRealtimeRankingsStore()
+const { loading, loaded, errors } = storeToRefs(rankingsStore)
 
-let currentHostIndex = 0
 let refreshInterval: number | null = null
 
-const activeConfig = computed(() => tabs.find(tab => tab.key === activeTab.value) ?? tabs[0])
+const activeConfig = computed(() => realtimeRankingTabs.find(tab => tab.key === activeTab.value) ?? realtimeRankingTabs[0])
 
 const categoryTabs = computed(() => {
-  return tabs.map(tab => ({
+  return realtimeRankingTabs.map(tab => ({
     key: tab.key,
     label: tab.label,
   }))
 })
 const activeError = computed(() => errors.value[activeTab.value])
-const webRanking = computed(() => webData.value?.list ?? [])
-const tvRanking = computed(() => tvData.value?.list ?? [])
-const movieRanking = computed(() => movieData.value?.list ?? [])
-const globalRanking = computed(() => globalData.value?.list ?? [])
-
-const formatCompact = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '--'
-  return new Intl.NumberFormat('zh-CN', {
-    notation: value >= 10000 ? 'compact' : 'standard',
-    maximumFractionDigits: value >= 100 ? 0 : 1,
-  }).format(value)
-}
-
-const formatRate = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '--'
-  return `${value.toFixed(2)}%`
-}
-
-const rows = computed<DisplayRow[]>(() => {
-  if (activeTab.value === 'web') {
-    return webRanking.value.map((item: WebRankingItem, index: number) => ({
-      key: String(item.series_id),
-      rank: index + 1,
-      title: item.series_name,
-      subtitle: item.release_info || item.platform_desc || '热度同步中',
-      metric: item.curr_heat_desc || formatCompact(item.curr_heat),
-      note: item.platform_desc || `指数 ${formatCompact(item.bar_value)}`,
-      searchName: item.series_name,
-    }))
-  }
-
-  if (activeTab.value === 'tv') {
-    return tvRanking.value.map((item: TvRankingItem, index: number) => ({
-      key: `${item.programme_name}-${index}`,
-      rank: index + 1,
-      title: item.programme_name,
-      subtitle: item.channel_name || '频道信息暂缺',
-      metric: item.market_rate_desc || formatRate(item.market_rate),
-      note: `关注度 ${item.attention_rate_desc || formatRate(item.attention_rate)}`,
-      searchName: item.programme_name,
-    }))
-  }
-
-  if (activeTab.value === 'global') {
-    return globalRanking.value.map((item: GlobalBoxOfficeItem) => ({
-      key: String(item.maoyan_id),
-      rank: item.rank,
-      title: item.movie_name,
-      subtitle: `${item.release_year}年上映`,
-      metric: item.box_office_desc,
-      note: `全球累计票房`,
-      searchName: item.movie_name,
-    }))
-  }
-
-  return movieRanking.value.map((item: MovieRankingItem, index: number) => ({
-    key: String(item.movie_id),
-    rank: index + 1,
-    title: item.movie_name,
-    subtitle: item.release_info || item.sum_box_desc || '票房同步中',
-    metric: item.box_office_desc || `${item.box_office}${item.box_office_unit}`,
-    note: item.box_office_rate || item.split_box_office_desc || '票房占比待同步',
-    searchName: item.movie_name,
-  }))
-})
+const rows = computed(() => rankingsStore.rowsForTab(activeTab.value))
 
 const hasRows = computed(() => rows.value.length > 0)
 const listRows = computed(() => rows.value.slice(0, 20))
-
-const fetchApiData = async <T,>(endpoint: string): Promise<T | null> => {
-  for (let i = 0; i < apiHosts.length; i++) {
-    try {
-      const host = apiHosts[(currentHostIndex + i) % apiHosts.length]
-      const response = await fetch(`${host}${endpoint}`, {
-        signal: AbortSignal.timeout(5000),
-      })
-
-      if (!response.ok) continue
-
-      const result = (await response.json()) as T
-      currentHostIndex = (currentHostIndex + i) % apiHosts.length
-      return result
-    } catch {
-      continue
-    }
-  }
-
-  return null
-}
-
-const fetchRankingData = async <T,>(endpoint: string) => {
-  const result = await fetchApiData<ApiEnvelope<T>>(endpoint)
-  return result?.data ?? null
-}
-
-const fetchAll = async () => {
-  loading.value = true
-
-  const [web, tv, movie, global] = await Promise.all([
-    fetchRankingData<WebRankingData>('/v2/maoyan/realtime/web'),
-    fetchRankingData<TvRankingData>('/v2/maoyan/realtime/tv'),
-    fetchRankingData<MovieRankingData>('/v2/maoyan/realtime/movie'),
-    fetchRankingData<GlobalBoxOfficeData>('/v2/maoyan/all/movie'),
-  ])
-
-  if (web) webData.value = web
-  if (tv) tvData.value = tv
-  if (movie) movieData.value = movie
-  if (global) globalData.value = global
-
-  errors.value = {
-    web: web || webData.value ? null : '网剧热度榜暂时连接不上，可能是上游接口波动。',
-    tv: tv || tvData.value ? null : '电视收视榜暂时连接不上，可能是上游接口波动。',
-    movie: movie || movieData.value ? null : '电影票房榜暂时连接不上，可能是上游接口波动。',
-    global: global || globalData.value ? null : '全球票房总榜暂时连接不上，可能是上游接口波动。',
-  }
-
-  loading.value = false
-}
+const showLoading = computed(() => loading.value && !loaded.value)
+const fetchAll = () => rankingsStore.fetchAll({ force: true })
 
 const openSearch = (name: string) => {
   performSearch(name, 0)
@@ -207,7 +37,7 @@ const openSearch = (name: string) => {
 
 onMounted(() => {
   document.title = '实时榜单 - 橘子导航'
-  fetchAll()
+  void rankingsStore.fetchAll()
   refreshInterval = setInterval(fetchAll, 5 * 60 * 1000) as unknown as number
 })
 
@@ -235,7 +65,7 @@ onUnmounted(() => {
         @update:active-tab="activeTab = $event as RankingTab"
       />
 
-      <section v-if="loading" class="state-card">
+      <section v-if="showLoading" class="state-card">
         <span class="spinner"></span>
         <p>正在加载实时榜单...</p>
       </section>
